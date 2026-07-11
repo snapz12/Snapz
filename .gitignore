@@ -1,8 +1,5 @@
 uploads/
 static/uploads/
 __pycache__/
-*.db
-*.db-shm
-*.db-wal
 cloudflared-linux-arm64
 ngrok-v3-stable-linux-arm64.zip

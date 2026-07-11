@@ -448,16 +448,18 @@ def login():
         username = request.form['username']
         password = request.form['password']
 
-        conn = sqlite3.connect('snapz.db')
-        cur = conn.cursor()
+    conn = sqlite3.connect("snapz.db")
+    cur = conn.cursor()
 
+    try:
         cur.execute(
             "SELECT name, bio, profile_pic FROM users WHERE username=? AND password=?",
             (username, password)
         )
+    except Exception as e:
+        return "<pre>" + str(e) + "</pre>"
 
-        user = cur.fetchone()
-
+    user = cur.fetchone()
         if user:
             cur.execute("""
                 UPDATE users

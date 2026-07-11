@@ -1,5 +1,6 @@
 Flask
 Flask-Mail
 Flask-SocketIO
+eventlet
 gunicorn
 Werkzeug

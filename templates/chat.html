@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #1a0836;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: white;
+            padding-top: 70px;
+            padding-bottom: 85px; /* Input bar ke liye niche solid space */
+            min-height: 100vh;
+        }
+
+
+
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.18);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.recording{
+    animation: pulse .8s infinite;
+    color: red;
+}
+
+
+        .chat-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: #1a0836;
+            padding: 12px 16px;
+            border-bottom: 1px solid #33145a;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .chat-header a {
+            color: white;
+            text-decoration: none;
+            font-size: 20px;
+        }
+
+        .header-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-info b {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .header-info span {
+            font-size: 12px;
+            color: #b3b3b3;
+        }
+
+	.chat-container{
+	    height: calc(100vh - 155px);
+	    overflow-y: auto;
+	    padding:15px;
+	    display:flex;
+	    flex-direction:column;
+	    gap:16px;
+            scroll-behavior: auto;
+	}
+        .message-wrapper {
+            display: flex;
+            width: 100%;
+	    pointer-events:auto;
+        }
+
+        .message-wrapper.outgoing {
+            justify-content: flex-end;
+        }
+
+        .message-wrapper.incoming {
+            justify-content: flex-start;
+        }
+
+
+        .outgoing .message-box {
+            align-items: flex-end;
+        }
+
+        .incoming .message-box {
+            align-items: flex-start;
+        }
+
+.message-box {
+    display: flex;
+    flex-direction: column;
+    max-width: 75%;
+}
+
+.bubble {
+    padding: 12px 16px;
+    font-size: 15px;
+    line-height: 1.4;
+    word-break: break-word;
+    max-width: 250px;
+    min-width: 140px;
+    position:relative;
+}
+        .outgoing .bubble {
+            background: #a124eb;
+            color: white;
+            border-radius: 22px 22px 4px 22px;
+        }
+
+        .incoming .bubble {
+            background: #2d144d;
+            color: white;
+            border-radius: 22px 22px 22px 4px;
+        }
+
+        .meta-info {
+            font-size: 10px;
+            color: #8c76ac;
+            margin-top: 4px;
+        }
+
+        .chat-form-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #1a0836;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: center;
+            z-index: 1000;
+            border-top: 1px solid #33145a; /* Ek subtle border */
+        }
+
+
+.chat-form{
+    width:100%;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:8px 12px;
+    background:#2d144d;
+    border-radius:30px;
+}
+
+.chat-form input{
+    flex:1;
+    min-width:0;
+    background:transparent;
+    border:none;
+    outline:none;
+    color:white;
+    font-size:16px;
+}
+
+.icon-btn{
+    width:40px;
+    height:40px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:none;
+    border:none;
+    color:white;
+    font-size:22px;
+    cursor:pointer;
+    flex-shrink:0;
+}
+
+.send-btn{
+    background:#b12cff;
+    color:white;
+    border:none;
+    border-radius:20px;
+    padding:10px 18px;
+    font-weight:bold;
+    flex-shrink:0;
+}
+
+
+        .chat-form input::placeholder {
+            color: #8c76ac;
+        }
+
+        .chat-form button {
+            background: #a124eb;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .empty-chat {
+            text-align: center;
+            color: #8c76ac;
+            margin-top: 40px;
+            font-size: 14px;
+        }
+
+	.avatar{
+	    width:50px;
+	    height:50px;
+	    border-radius:50%;
+	    border:2px solid #ff4dd2;
+	    object-fit:cover;
+	}
+
+    </style>
+</head>
+<body>
+
+    <div class="chat-header">
+        <a href="/users">⬅</a>
+        <div class="header-info">
+
+	    <b>{{ chat_with }}</b>
+<span id="lastSeen">
+    {% if is_online == 1 %}
+        🟢 Online
+    {% else %}
+        Last seen {{ last_seen }}
+    {% endif %}
+</span>
+	</div>
+
+	<div style="margin-left:auto;display:flex;gap:15px;align-items:center;">
+
+<a href="#"
+onclick="startCall('voice')"
+style="
+font-size:22px;
+color:#00c853;
+text-decoration:none;">
+📞
+</a>
+
+<a href="#"
+onclick="startCall('video')"
+style="
+font-size:22px;
+color:#2196f3;
+text-decoration:none;">
+📹
+</a>
+
+	
+	</div>
+    </div>
+
+    <div class="chat-container">
+        {% if not chats %}
+            <div class="empty-chat">No messages yet. Say hi! 👋</div>
+        {% endif %}
+        
+        {% for chat in chats %}
+            {% if chat['sender'] == session['username'] %}
+                <div class="message-wrapper outgoing">
+                    <div class="message-box">
+
+<div class="bubble"
+id="msg{{ chat['id'] }}">
+
+{% if chat['image'] %}
+<img src="/static/uploads/{{ chat['image'] }}"
+style="width:220px;border-radius:12px;margin-bottom:8px;">
+{% endif %}
+
+{{ chat['message'] }}
+
+</div>
+			<div
+			onclick="deleteMessage({{chat.id}})"
+			style="
+			font-size:12px;
+			color:red;
+			cursor:pointer;
+			margin-top:5px;">
+			Delete
+			</div>
+                        <div class="meta-info">
+                            {{ chat['time'] }} 
+                            {% if chat['is_seen'] == 1 %}
+                                <span style="color: #00ea11; margin-left: 3px;">✓ Seen</span>
+                            {% else %}
+                                <span style="color: #aaa; margin-left: 3px;">✓ Sent</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="message-wrapper incoming">
+
+		<div class="message-box">
+
+{% if chat['image'] %}
+    <img src="/static/uploads/{{ chat['image'] }}"
+         style="width:220px;border-radius:12px;margin-bottom:8px;">
+{% endif %}
+
+		    <div class="bubble">
+		        {{ chat['message'] }}
+		    </div>
+
+		    <div class="meta-info">
+		        {{ chat['time'] }}
+
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+
+
+    </div>
+
+
+<div class="chat-form-container">
+
+
+<form class="chat-form" id="chatForm" enctype="multipart/form-data">
+    <input
+        id="msgInput"
+        type="text"
+        name="message"
+        placeholder="Message...">
+
+    <!-- Camera -->
+    <label for="imageInput" class="icon-btn">📷</label>
+
+    <input
+        type="file"
+        id="imageInput"
+        name="image"
+        accept="image/*"
+	style="display:none;">
+
+    <!-- Mic -->
+<div id="recordHint"
+style="
+display:none;
+position:fixed;
+bottom:95px;
+left:50%;
+transform:translateX(-50%);
+background:#222;
+color:white;
+padding:10px 18px;
+border-radius:25px;
+font-size:15px;
+z-index:9999;">
+
+🔴 Recording...
+<span id="recordTime">00:00</span>
+
+<br>
+
+<small>⬅️ Slide left to cancel</small>
+
+</div>
+
+<button
+    type="button"
+    id="micBtn"
+    class="icon-btn">
+    🎤
+</button>
+    <!-- Send -->
+    <button type="submit" class="send-btn">
+        Send
+    </button>
+
+</form>
+
+
+
+</div>
+
+<div id="deleteMenu"
+style="
+display:none;
+position:fixed;
+bottom:30px;
+left:50%;
+transform:translateX(-50%);
+background:#222;
+padding:12px 20px;
+border-radius:10px;
+z-index:9999;">
+
+<button
+id="deleteBtn"
+style="
+background:red;
+color:white;
+border:none;
+padding:10px 18px;
+border-radius:8px;">
+🗑 Delete
+</button>
+
+</div>
+
+
+<div id="incomingCall"
+style="
+display:none;
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+background:#181818;
+padding:25px;
+border-radius:20px;
+text-align:center;
+z-index:9999;
+width:320px;
+box-shadow:0 0 25px rgba(0,0,0,.7);">
+
+<h3 id="callerName"></h3>
+
+<p id="callType"></p>
+
+<div style="margin-top:20px;display:flex;justify-content:center;gap:20px;">
+
+<button
+onclick="acceptCall()"
+style="
+background:#00c853;
+color:white;
+border:none;
+padding:12px 22px;
+border-radius:12px;
+font-size:16px;">
+Accept
+</button>
+
+<button
+onclick="rejectCall()"
+style="
+background:#ff1744;
+color:white;
+border:none;
+padding:12px 22px;
+border-radius:12px;
+font-size:16px;">
+Reject
+</button>
+
+</div>
+
+</div>
+
+<div id="callPopup"
+style="
+display:none;
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+background:#111;
+padding:20px;
+border-radius:15px;
+width:300px;
+text-align:center;
+z-index:99999;
+box-shadow:0 0 20px rgba(0,0,0,.8);
+">
+
+<h3 id="callerName"></h3>
+
+<p id="callType"></p>
+
+<button
+onclick="acceptCall()"
+style="
+background:#00c853;
+color:white;
+border:none;
+padding:10px 20px;
+border-radius:8px;
+margin:8px;">
+Accept
+</button>
+
+<button
+onclick="rejectCall()"
+style="
+background:#d50000;
+color:white;
+border:none;
+padding:10px 20px;
+border-radius:8px;
+margin:8px;">
+Reject
+</button>
+
+</div>
+
+
+
+
+<script>
+
+const chatBox = document.querySelector(".chat-container");
+let lastMessageId = 0;
+let firstLoad = true;
+let autoScroll = true;
+
+chatBox.addEventListener("scroll", function () {
+
+    const distance =
+        chatBox.scrollHeight -
+        chatBox.scrollTop -
+        chatBox.clientHeight;
+
+    autoScroll = distance < 100;
+
+});
+
+function loadMessages() {
+
+    fetch("/chat_messages/{{ chat_with }}")
+    .then(res => res.json())
+    .then(data => {
+
+        let html = "";
+
+        data.forEach(chat => {
+
+            let content = "";
+
+            if (chat.image) {
+
+                content = `<img src="/static/uploads/${chat.image}" style="max-width:220px;border-radius:12px;">`;
+
+            } else if (chat.audio) {
+
+                content = `<audio controls style="width:220px"><source src="/static/uploads/${chat.audio}"></audio>`;
+
+            } else {
+
+                content = chat.message;
+
+            }
+
+            if (chat.sender == "{{ session['username'] }}") {
+
+                html += `
+                <div class="message-wrapper outgoing">
+                    <div class="message-box">
+                        <div class="bubble">${content}</div>
+                        <div class="meta-info">
+                            ${chat.time}
+                            ${chat.is_seen==1 ? '<span style="color:#00ff66;">✓ Seen</span>' : '<span>✓ Sent</span>'}
+                        </div>
+                    </div>
+                </div>`;
+
+            } else {
+
+                html += `
+                <div class="message-wrapper incoming">
+                    <div class="message-box">
+                        <div class="bubble">${content}</div>
+                        <div class="meta-info">${chat.time}</div>
+                    </div>
+                </div>`;
+
+            }
+
+        });
+
+        const oldHeight = chatBox.scrollHeight;
+
+        chatBox.innerHTML = html;
+
+    chatBox.querySelectorAll(".bubble").forEach(function(bubble){
+
+    let timer;
+
+    bubble.onpointerdown = function(){
+
+        let id = this.id.replace("msg","");
+
+        timer = setTimeout(function(){
+
+            startPress(id);
+
+        }, 3000);
+
+    };
+
+    bubble.onpointerup = function(){
+
+        clearTimeout(timer);
+        cancelPress();
+
+    };
+
+    bubble.onpointerleave = function(){
+
+        clearTimeout(timer);
+        cancelPress();
+
+    };
+
+});
+
+
+        if (firstLoad) {
+
+            chatBox.scrollTop = chatBox.scrollHeight;
+            firstLoad = false;
+
+        } else if (autoScroll) {
+
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+        } else {
+
+            const newHeight = chatBox.scrollHeight;
+            chatBox.scrollTop += (newHeight - oldHeight);
+
+        }
+
+    });
+
+}
+
+loadMessages();
+
+/*setInterval(loadMessages, 5000);*/
+
+// ================= TEXT MESSAGE =================
+
+
+const form = document.getElementById("chatForm");
+
+
+form.addEventListener("submit", function(e){
+    
+
+    e.preventDefault();
+
+    let msgInput = document.getElementById("msgInput");
+
+    let message = msgInput.value.trim();
+
+    if(message=="") return;
+
+    fetch("/send_message/{{ chat_with }}",{
+
+        method:"POST",
+
+        headers:{
+            "Content-Type":"application/x-www-form-urlencoded"
+        },
+
+        body:new URLSearchParams({
+            message:message
+        })
+
+    })
+
+    .then(r=>r.json())
+
+    .then(data=>{
+
+        if(data.status=="ok"){
+
+            msgInput.value="";
+
+            loadMessages();
+
+        }else{
+
+            alert(data.status);
+
+        }
+
+    })
+
+    .catch(err=>{
+
+        alert(err);
+
+    });
+
+});
+
+// ================= IMAGE SEND =================
+
+const imageInput = document.getElementById("imageInput");
+
+imageInput.addEventListener("change", function () {
+
+    if (this.files.length === 0) return;
+
+    let fd = new FormData();
+    fd.append("image", this.files[0]);
+
+    fetch("/send_image/{{ chat_with }}", {
+        method: "POST",
+        body: fd
+    })
+
+    .then(res => res.json())
+
+    .then(data => {
+
+        if (data.status === "ok") {
+
+            imageInput.value = "";
+
+            loadMessages();
+
+            // Last message par scroll
+            setTimeout(() => {
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }, 100);
+
+        } else {
+
+            alert(data.status);
+
+        }
+
+    })
+
+    .catch(err => {
+
+        console.log(err);
+        alert("Upload Failed");
+
+    });
+
+});
+
+// ================= AUDIO SEND =================
+
+
+// ================= TYPING =================
+
+let typingTimer;
+const msgInput = document.getElementById("msgInput");
+
+msgInput.addEventListener("input", () => {
+
+    fetch("/typing", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body:
+            "sender={{session['username']}}" +
+            "&receiver={{chat_with}}" +
+            "&typing=1"
+    });
+
+    clearTimeout(typingTimer);
+
+    typingTimer = setTimeout(() => {
+
+        fetch("/typing", {
+            method: "POST",
+            headers: {
+                "Content-Type":"application/x-www-form-urlencoded"
+            },
+            body:
+                "sender={{session['username']}}" +
+                "&receiver={{chat_with}}" +
+                "&typing=0"
+        });
+
+    },1000);
+
+});
+
+setInterval(() => {
+
+    fetch("/typing_status/{{ chat_with }}")
+    .then(r => r.json())
+    .then(data => {
+
+        const status = document.getElementById("lastSeen");
+
+        if(data.typing){
+
+            status.innerHTML="✍️ Typing...";
+
+        }else{
+
+            {% if is_online %}
+                status.innerHTML="🟢 Online";
+            {% else %}
+                status.innerHTML="Last seen {{ last_seen }}";
+            {% endif %}
+
+        }
+
+    });
+
+},800);
+
+
+// ================= DELETE MESSAGE =================
+
+function deleteMessage(id){
+
+    if(!confirm("Delete this message?")) return;
+
+    fetch("/delete_message/"+id,{
+        method:"POST"
+    })
+    .then(r=>r.json())
+    .then(data=>{
+
+        if(data.status=="ok"){
+
+            loadMessages();
+
+        }
+
+    });
+
+}
+
+
+// ================= LONG PRESS DELETE =================
+
+let pressTimer = null;
+let selectedMessage = null;
+
+function startPress(id){
+
+alert("LONG PRESS START");
+
+    selectedMessage = id;
+
+    pressTimer = setTimeout(function(){
+
+        document.getElementById("deleteMenu").style.display="block";
+
+    },3000);
+
+}
+
+function cancelPress(){
+
+    clearTimeout(pressTimer);
+
+}
+
+document.getElementById("deleteBtn").onclick=function(){
+
+    fetch("/delete_message/"+selectedMessage,{
+        method:"POST"
+    })
+    .then(r=>r.json())
+    .then(data=>{
+
+        document.getElementById("deleteMenu").style.display="none";
+
+        if(data.status=="ok"){
+
+            loadMessages();
+
+        }
+
+    });
+
+};
+
+document.body.onclick=function(e){
+
+    if(e.target.id!="deleteBtn"){
+
+        document.getElementById("deleteMenu").style.display="none";
+
+    }
+
+};
+// =====================
+// HIDE MENU
+// =====================
+
+document.addEventListener("click",function(e){
+
+    if(e.target.id!="deleteBtn"){
+
+        document.getElementById("deleteMenu").style.display="none";
+
+    }
+
+});
+
+
+// ================================
+// VOICE / VIDEO CALL
+// ================================
+
+let callId = null;
+let currentCall = null;
+
+
+// ================================
+// START CALL
+// ================================
+
+function startCall(type){
+
+    fetch("/start_call/{{ chat_with }}/"+type,{
+        method:"POST"
+    })
+
+    .then(r=>r.json())
+
+    .then(data=>{
+
+        if(data.status=="ok"){
+
+            callId=data.call_id;
+
+            waitCallAccept(type);
+
+        }
+
+    });
+
+}
+
+
+
+// ================================
+// WAIT FOR ACCEPT
+// ================================
+
+function waitCallAccept(type){
+
+    let timer=setInterval(function(){
+
+        fetch("/call_status/"+callId)
+
+        .then(r=>r.json())
+
+        .then(data=>{
+
+            if(data.status=="accepted"){
+
+                clearInterval(timer);
+
+                if(type=="voice"){
+
+                    window.location="/voice_call/{{ chat_with }}";
+
+                }else{
+
+                    window.location="/video_call/{{ chat_with }}";
+
+                }
+
+            }
+
+            if(data.status=="rejected"){
+
+                clearInterval(timer);
+
+                alert("Call Rejected");
+
+            }
+
+        });
+
+    },1000);
+
+}
+
+
+
+// ================================
+// CHECK INCOMING CALL
+// ================================
+
+setInterval(checkIncomingCall,5000);
+
+function checkIncomingCall(){
+
+    fetch("/check_call")
+
+    .then(r=>r.json())
+
+    .then(data=>{
+
+        if(!data.id) return;
+
+        currentCall=data;
+
+        document.getElementById("callPopup").style.display="block";
+
+        document.getElementById("callerName").innerHTML=
+        "📞 "+data.caller;
+
+        document.getElementById("callType").innerHTML=
+        data.type=="voice"
+        ?
+        "Voice Call"
+        :
+        "Video Call";
+
+    });
+
+}
+
+
+
+// ================================
+// ACCEPT CALL
+// ================================
+
+function acceptCall(){
+
+    fetch("/accept_call/"+currentCall.id,{
+        method:"POST"
+    })
+
+    .then(r=>r.json())
+
+    .then(()=>{
+
+        document.getElementById("callPopup").style.display="none";
+
+        if(currentCall.type=="voice"){
+
+            window.location="/voice_call/"+currentCall.caller;
+
+        }else{
+
+            window.location="/video_call/"+currentCall.caller;
+
+        }
+
+    });
+
+}
+
+
+
+// ================================
+// REJECT CALL
+// ================================
+
+function rejectCall(){
+
+    fetch("/reject_call/"+currentCall.id,{
+        method:"POST"
+    })
+
+    .then(()=>{
+
+        document.getElementById("callPopup").style.display="none";
+
+    });
+
+}
+let cancelRecording = false;
+let startX = 0;
+let recordSeconds = 0;
+let recordTimer = null;
+let mediaRecorder;
+let audioChunks = [];
+
+const micBtn = document.getElementById("micBtn");
+
+alert("MIC FOUND = " + micBtn);
+
+async function startRecording() {
+
+cancelRecording = false;
+document.getElementById("recordHint").style.display = "block";
+
+recordSeconds = 0;
+
+document.getElementById("recordTime").innerHTML = "00:00";
+
+recordTimer = setInterval(function(){
+
+    recordSeconds++;
+
+    let min = String(Math.floor(recordSeconds / 60)).padStart(2,"0");
+
+    let sec = String(recordSeconds % 60).padStart(2,"0");
+
+    document.getElementById("recordTime").innerHTML =
+    min + ":" + sec;
+
+},1000);
+
+
+    try {
+
+        const stream = await navigator.mediaDevices.getUserMedia({
+            audio: true
+        });
+
+        mediaRecorder = new MediaRecorder(stream);
+
+        audioChunks = [];
+
+        mediaRecorder.ondataavailable = function(e) {
+            audioChunks.push(e.data);
+        };
+
+        mediaRecorder.onstart = function() {
+            micBtn.innerHTML = "🔴";
+	    micBtn.classList.add("recording");
+         };
+
+        mediaRecorder.onstop = function() {
+
+	alert("STOP CALLED");
+            micBtn.innerHTML = "🎤";
+	    micBtn.classList.remove("recording");
+
+            const audioBlob = new Blob(audioChunks, {
+                type: "audio/webm"
+            });
+
+            let fd = new FormData();
+            fd.append("audio", audioBlob, "voice.webm");
+
+	if(cancelRecording){
+
+	clearInterval(recordTimer);
+
+	    document.getElementById("recordHint").style.display="none";
+
+	    startX = 0;
+
+	    return;
+
+	}
+
+            fetch("/send_audio/{{ chat_with }}", {
+                method: "POST",
+                body: fd
+            })
+            .then(r => r.json())
+            .then(data => {
+
+                if (data.status == "ok") {
+
+                    loadMessages();
+
+                } else {
+
+                    alert(data.status);
+
+                }
+
+            });
+
+        };
+
+mediaRecorder.start();
+
+} catch(err) {
+
+    alert(err);
+
+}
+
+}
+
+function stopRecording() {
+
+    if (mediaRecorder &&
+        mediaRecorder.state === "recording") {
+
+        mediaRecorder.stop();
+
+    }
+
+}
+micBtn.addEventListener("touchmove", function(e){
+
+    let x = e.touches[0].clientX;
+
+    if(startX==0){
+        startX = x;
+    }
+
+    if(startX - x > 80){
+
+        cancelRecording = true;
+
+        document.getElementById("recordHint").innerHTML =
+        "❌ Recording Cancelled";
+
+    }
+
+});
+
+let recording = false;
+
+micBtn.onmousedown = startRecording;
+micBtn.onmouseup = stopRecording;
+
+micBtn.ontouchstart = function(e){
+    e.preventDefault();
+    startRecording();
+};
+
+micBtn.ontouchend = function(e){
+    e.preventDefault();
+    stopRecording();
+};
+
+
+document.querySelectorAll(".bubble").forEach(function(bubble){
+
+    let timer;
+
+    bubble.addEventListener("touchstart", function(){
+
+        const id = this.id.replace("msg","");
+
+        timer = setTimeout(function(){
+
+            startPress(id);
+
+        },3000);
+
+    });
+
+    bubble.addEventListener("touchend", function(){
+
+        clearTimeout(timer);
+
+    });
+
+});
+
+document.querySelectorAll(".bubble").forEach(function(bubble){
+
+    let timer;
+
+    bubble.addEventListener("pointerdown", function(){
+
+        let id = this.id.replace("msg","");
+
+        timer = setTimeout(function(){
+
+            startPress(id);
+
+        },3000);
+
+    });
+
+    bubble.addEventListener("pointerup", function(){
+
+        clearTimeout(timer);
+
+        cancelPress();
+
+    });
+
+    bubble.addEventListener("pointerleave", function(){
+
+        clearTimeout(timer);
+
+        cancelPress();
+
+    });
+
+});
+
+
+</script>
+
+</body>
+</html>

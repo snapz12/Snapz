@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snapz - Reels</title>
+    <style>
+        /* Full Dark Theme Layout */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000000;
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        /* Top Bar Header */
+        .reels-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 15px;
+            font-size: 20px;
+            font-weight: bold;
+            border-bottom: 1px solid #1c1c1e;
+            z-index: 100;
+            box-sizing: border-box;
+        }
+
+        /* Navigation Buttons Styling */
+        .navbar button {
+            background: none;
+            border: none;
+            color: #8e8e8e;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 5px 10px;
+            transition: color 0.2s;
+        }
+
+        .navbar button:hover {
+            color: #fff;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+
+        /* Action Buttons Overlay (Right Side) */
+        .reel-actions-overlay {
+            position: absolute;
+            right: 10px;
+            bottom: 80px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .action-icon-btn {
+            background: rgba(0, 0, 0, 0.4);
+            border: none;
+            color: #fff;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+            transition: transform 0.1s ease;
+        }
+
+        .action-label {
+            font-size: 11px;
+            color: #fff;
+            margin-top: -2px;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="reels-header">
+        Snapz Reels
+    </div>
+
+    <div id="reelsSection" style="max-width: 500px; margin: 55px auto 0 auto; padding: 5px; padding-bottom: 90px; box-sizing: border-box;">
+        
+        {% if reels %}
+            {% for r in reels %}
+            <div class="reel-container" style="width:100%; margin-bottom:20px; background: #000; border: 1px solid #1c1c1e; border-radius: 16px; overflow: hidden; box-sizing: border-box; position: relative;">
+                
+                <div style="width:100%; aspect-ratio: 9/16; max-height: 600px; background: #000; overflow: hidden; position: relative;">
+                    <video controls loop style="width:100%; height:100%; object-fit:cover; display: block;">
+                        <source src="/static/uploads/{{ r[1] }}" type="video/mp4">
+                        <source src="/static/uploads/{{ r[1] }}" type="video/webm">
+                        Your browser does not support the video tag.
+                    </video>
+
+                    <div style="position: absolute; left: 15px; bottom: 20px; z-index: 10; max-width: 75%; text-shadow: 1px 1px 3px rgba(0,0,0,0.8);">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                            <span style="font-size: 18px; background: rgba(0,0,0,0.5); padding: 4px; border-radius: 50%;">👤</span>
+                            <strong style="font-size: 15px; color: #fff;">{{ r[0] }}</strong>
+                            
+                            <button class="follow-btn" onclick="toggleFollow(this, '{{ r[0] }}')" style="background: #0095f6; color: white; border: none; padding: 4px 10px; border-radius: 6px; font-weight: bold; font-size: 12px; cursor: pointer; transition: background 0.2s;">
+                                Follow
+                            </button>
+                        </div>
+                        <p style="margin: 0; font-size: 13px; color: #f5f5f5; line-height: 1.4;">{{ r[2] }}</p>
+                    </div>
+
+                    <div class="reel-actions-overlay">
+                        <div style="display: flex; flex-direction: column; align-items: center;">
+                            <button class="action-icon-btn like-btn" onclick="toggleLike(this)">🤍</button>
+                            <span class="action-label">Like</span>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; align-items: center;">
+                            <button class="action-icon-btn" onclick="toggleCommentBox('comment-box-{{ loop.index }}')">💬</button>
+                            <span class="action-label">Comment</span>
+                        </div>
+
+                        <div style="display: flex; flex-direction: column; align-items: center;">
+                            <button class="action-icon-btn" onclick="openShareModal('{{ r[1] }}')">📥</button>
+                            <span class="action-label">Share</span>
+                        </div>
+
+                        <form action="/delete/reel/{{ r[1] }}" method="POST" onsubmit="return confirm('Kya aap is Reel ko delete karna chahte hain?');" style="margin: 0;">
+                            <button type="submit" style="background: rgba(255, 48, 64, 0.6); border: none; color: white; width: 35px; height: 35px; border-radius: 50%; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px);">✕</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div id="comment-box-{{ loop.index }}" style="display: none; background: #121212; padding: 12px; border-top: 1px solid #1c1c1e;">
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" placeholder="Add a comment..." style="flex: 1; background: #000; border: 1px solid #262626; color: #fff; padding: 8px; border-radius: 6px; font-size: 13px; outline: none;">
+                        <button onclick="alert('Comment Posted!')" style="background: #0095f6; color: white; border: none; padding: 0 14px; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer;">Post</button>
+                    </div>
+                </div>
+                
+            </div>
+            {% endfor %}
+        {% else %}
+            <div style="text-align: center; padding: 120px 0; color: #8e8e8e;">
+                <span style="font-size: 48px;">🎬</span>
+                <h3 style="margin-top: 15px; font-size: 18px; color: #fff;">No Reels Uploaded Yet</h3>
+                <p style="font-size: 14px;">Pehli reel upload karke shuruaat karein!</p>
+            </div>
+        {% endif %}
+
+    </div>
+
+    <div id="shareModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center;">
+        <div style="background: #1c1c1e; width: 85%; max-width: 340px; border-radius: 14px; padding: 16px; box-sizing: border-box; color: #fff; border: 1px solid #262626;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #262626; padding-bottom: 8px;">
+                <h3 style="margin: 0; font-size: 16px;">Send Reel to</h3>
+                <button onclick="closeShareModal()" style="background: none; border: none; color: #8e8e8e; font-size: 18px; cursor: pointer;">✕</button>
+            </div>
+            <div style="max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px;">
+                <div onclick="sendToFriend('Wifey')" style="display: flex; align-items: center; justify-content: space-between; padding: 8px; background: #000; border-radius: 8px; cursor: pointer;">
+                    <span>👩‍❤️‍👨 Wifey</span>
+                    <button style="background: #0095f6; color: #fff; border: none; font-size: 12px; padding: 4px 12px; border-radius: 6px; font-weight: bold;">Send</button>
+                </div>
+                <div onclick="sendToFriend('Rahul')" style="display: flex; align-items: center; justify-content: space-between; padding: 8px; background: #000; border-radius: 8px; cursor: pointer;">
+                    <span>👦 Rahul</span>
+                    <button style="background: #0095f6; color: #fff; border: none; font-size: 12px; padding: 4px 12px; border-radius: 6px; font-weight: bold;">Send</button>
+                </div>
+                <div onclick="sendToFriend('Shorif')" style="display: flex; align-items: center; justify-content: space-between; padding: 8px; background: #000; border-radius: 8px; cursor: pointer;">
+                    <span>👨 Shorif</span>
+                    <button style="background: #0095f6; color: #fff; border: none; font-size: 12px; padding: 4px 12px; border-radius: 6px; font-weight: bold;">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="navbar" style="position: fixed; bottom: 0; left: 0; width: 100%; display: flex; justify-content: space-around; background: #000; padding: 12px 0; border-top: 1px solid #1c1c1e; z-index: 100; box-sizing: border-box;">
+        <a href="/">
+            <button>🏠 Home</button>
+        </a>
+        <a href="/reels">
+            <button style="color: #ffffff; font-weight: bold;">🎬 Reels</button>
+        </a>
+        <button id="createBtn" onclick="alert('Create trigger open!')">➕ Create</button>
+        <a href="/users">
+            <button>💬 Messages</button>
+        </a>
+        <a href="/profile">
+            <button>👤 Profile</button>
+        </a>
+    </div>
+
+    <script>
+    // 1. ❤️ Like Button Toggle (Turns Red on Tap)
+    function toggleLike(btn) {
+        if (btn.innerText === "🤍") {
+            btn.innerText = "❤️";
+            btn.style.color = "#ff3040"; // Perfect Insta Red
+            btn.style.transform = "scale(1.3)";
+            setTimeout(() => btn.style.transform = "scale(1)", 100);
+        } else {
+            btn.innerText = "🤍";
+            btn.style.color = "#ffffff";
+        }
+    }
+
+    // 2. 💬 Comment Box Toggle
+    function toggleCommentBox(boxId) {
+        let box = document.getElementById(boxId);
+        if (box.style.display === "none") {
+            box.style.display = "block";
+        } else {
+            box.style.display = "none";
+        }
+    }
+
+    // 3. ➕ Follow / Following Toggle Switch
+    function toggleFollow(btn, username) {
+        if (btn.innerText === "Follow") {
+            btn.innerText = "Following";
+            btn.style.background = "rgba(255, 255, 255, 0.2)";
+            btn.style.color = "#fff";
+            alert(username + " successfully added to Following list!");
+        } else {
+            btn.innerText = "Follow";
+            btn.style.background = "#0095f6";
+        }
+    }
+
+    // 4. 📥 Share Panel Handlers
+    function openShareModal(filename) {
+        document.getElementById('shareModal').style.display = "flex";
+    }
+    function closeShareModal() {
+        document.getElementById('shareModal').style.display = "none";
+    }
+    function sendToFriend(name) {
+        alert("Reel successfully shared with " + name + "!");
+        closeShareModal();
+    }
+    </script>
+
+</body>
+</html>

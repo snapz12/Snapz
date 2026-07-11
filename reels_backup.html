@@ -1,0 +1,212 @@
+<!DOCTYPE html><html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Snapz Reels</title><style>
+body{
+    margin:0;
+    background:#000;
+    color:white;
+    font-family:sans-serif;
+}
+
+.header{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    background:#000;
+    padding:15px;
+    font-size:20px;
+    font-weight:bold;
+    border-bottom:1px solid #222;
+    z-index:100;
+}
+
+
+.reel{
+    position:relative;
+    width:100%;
+    max-width:500px;
+    margin:70px auto 30px auto;
+    overflow:hidden;
+}
+
+.reel video{
+    width:100%;
+    border-radius:10px;
+}
+
+.info{
+    position:absolute;
+    left:15px;
+    bottom:20px;
+    z-index:5;
+}
+
+.actions{
+    position:absolute;
+    right:10px;
+    bottom:20px;
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+    z-index:5;
+}
+.username{
+    font-weight:bold;
+    font-size:16px;
+}
+
+.caption{
+    margin-top:5px;
+    font-size:14px;
+}
+
+
+.actions button{
+    width:45px;
+    height:45px;
+    border:none;
+    border-radius:50%;
+    background:rgba(0,0,0,.5);
+    color:white;
+    font-size:20px;
+}
+
+.navbar{
+    position:fixed;
+    bottom:0;
+    left:0;
+    width:100%;
+    display:flex;
+    justify-content:space-around;
+    background:#000;
+    border-top:1px solid #222;
+    padding:10px 0;
+}
+
+.navbar a{
+    text-decoration:none;
+}
+
+.navbar button{
+    background:none;
+    border:none;
+    color:white;
+    font-size:18px;
+}
+</style></head><body><div class="header">
+🎬 Snapz Reels
+</div>
+{% for r in reels %}
+
+<div class="reel">
+
+    <video controls loop>
+        <source src="/static/uploads/{{ r[2] }}">
+    </video>
+
+    <div class="info">
+        <div style="display:flex;align-items:center;gap:8px;">
+            <span class="username">@{{ r[1] }}</span>
+
+            <button class="follow-btn"
+            onclick="toggleFollow(this,'{{ r[1] }}')">
+            Follow
+            </button>
+        </div>
+
+        <div class="caption">
+            {{ r[3] }}
+        </div>
+    </div>
+
+    <div class="actions">
+
+        <button onclick="toggleLike(this, {{ r[0] }})">🤍</button>
+
+        <button onclick="toggleCommentBox('c{{ loop.index }}')">💬</button>
+
+        <button onclick="openShareModal()">📥</button>
+
+    </div>
+
+</div>
+
+<div id="c{{ loop.index }}" style="display:none;">
+    <input type="text" placeholder="Add comment...">
+    <button>Post</button>
+</div>
+
+{% endfor %}
+
+
+<div class="navbar"><a href="/">
+<button>🏠</button>
+</a><a href="/reels">
+<button style="color:#0095f6;">🎬</button>
+</a><a href="/upload">
+<button>➕</button>
+</a><a href="/users">
+<button>💬</button>
+</a><a href="/profile">
+<button>👤</button>
+</a>
+
+</div>
+
+
+
+
+<script>
+function toggleLike(btn,reelId){
+
+fetch("/like_reel/" + reelId,{
+method:"POST"
+})
+
+.then(r=>r.json())
+
+.then(data=>{
+
+if(data.status=="liked"){
+btn.innerHTML="❤️";
+btn.style.color="red";
+}
+
+});
+
+}
+
+function toggleFollow(btn,username){
+
+if(btn.innerText=="Follow"){
+btn.innerText="Following";
+btn.style.background="#333";
+}else{
+btn.innerText="Follow";
+btn.style.background="#0095f6";
+}
+
+}
+
+function toggleCommentBox(id){
+
+let box=document.getElementById(id);
+
+if(box.style.display=="none"){
+box.style.display="block";
+}else{
+box.style.display="none";
+}
+
+}
+
+function openShareModal(){
+alert("Share Panel Open");
+}
+
+
+</script></body>
+</html>

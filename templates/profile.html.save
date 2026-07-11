@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>Profile</title>
+
+<link  href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+<style>
+
+body{
+    background:#000; /* Instagram jaisa pure black background */
+    color:white;
+    font-family:Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Profile Container - Tablet aur mobile dono par perfect standard size */
+.profile-container { 
+    max-width: 600px; 
+    width: 100%;
+    margin: 0 auto; 
+    padding: 20px; 
+    box-sizing: border-box;
+}
+
+/* Profile Header jisme left me name aur right me menu automatic upar chala jayega */
+.profile-header { 
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    position: relative;
+    padding-top: 40px; 
+    border-bottom: 1px solid #262626;
+    padding-bottom: 20px;
+}
+
+/* Name ki position - Profile photo ke thik upar left me */
+.profile-top-name {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    font-size: 18px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* 3 Lines Menu ki position */
+.profile-top-menu {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 5px;
+}
+
+/* Logout Dropdown */
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 40px;
+    right: 5px;
+    background: #262626;
+    border-radius: 8px;
+    width: 150px;
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.5);
+    z-index: 1000;
+    overflow: hidden;
+}
+.dropdown-menu a {
+    display: block;
+    color: #ff4d4d;
+    text-decoration: none;
+    padding: 12px 15px;
+    font-size: 15px;
+    font-weight: bold;
+    text-align: left;
+}
+.dropdown-menu a:hover { background: #363636; }
+
+/* Elements Sizing */
+.profile-pic-container { position: relative; width: 85px; height: 85px; cursor: pointer; }
+.profile-pic { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+.profile-info { text-align: left; flex-grow: 1; margin-left: 25px; }
+.stats-row { display: flex; gap: 20px; margin-top: 8px; font-size: 14px; }
+
+/* Action Buttons */
+.edit-row { display: flex; gap: 10px; margin-top: 15px; padding: 0 5px; }
+.edit-btn { background: #363636; color: #fff; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; flex: 1; font-size: 14px; }
+
+/* Bottom Navigation Tabs */
+.tabs { display: flex; justify-content: space-around; border-bottom: 1px solid #262626; margin-top: 15px; }
+.tab { padding: 12px 0; width: 50%; cursor: pointer; color: #8e8e8e; font-size: 20px; text-align: center; }
+.tab.active { color: #fff; border-bottom: 2px solid #fff; }
+
+/* 3-COLUMN VERTICAL POST GRID SYSTEM */
+.grid-layout {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 3px; 
+    margin-top: 15px;
+}
+
+.vertical-post-box {
+    position: relative;
+    width: 100%;
+    padding-top: 135%; 
+    background: #121212;
+    overflow: hidden;
+}
+
+.vertical-post-box img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Edit Profile PopUp Modal Styles */
+.modal { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #262626; padding: 20px; border-radius: 12px; z-index: 2000; width: 85%; max-width: 400px; box-sizing: border-box; text-align: left; }
+.modal h3 { margin-top: 0; margin-bottom: 15px; text-align: center; }
+.modal label { font-size: 13px; color: #b3b3b3; display: block; text-align: left; margin-top: 10px; }
+.modal input[type="text"], .modal textarea { width: 100%; padding: 10px; margin-top: 5px; background: #000; color: #fff; border: 1px solid #3d3d3d; border-radius: 6px; box-sizing: border-box; }
+.modal input[type="file"] { margin-top: 8px; font-size: 12px; color: #b3b3b3; }
+.modal-btns { display: flex; justify-content: space-between; margin-top: 20px; gap: 10px; }
+.overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1999; }
+
+/* Crop Box Styling */
+.crop-container {
+    max-width: 100%;
+    max-height: 250px;
+    margin-top: 10px;
+    display: none;
+    background: #000;
+}
+.crop-container img {
+    max-width: 100%;
+    display: block;
+}
+
+.profile-img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 2px solid #dbdbdb; cursor: pointer; }
+ #crop-box-wrapper { display: none; width: 300px; margin-top: 10px; }
+#image-to-crop { max-width: 100%; }
+</style>
+
+</head>
+
+<body>
+
+<div class="profile-container">
+        <label for="profile-pic-input">
+             <img src="{{ url_for('static', filename='images/' + session.get('pfp', 'default.jpg')) }}?t={{ range(1000, 9999) | random }}" 
+     class="profile-img" 
+     onclick="toggleModal(true)" 
+     style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; cursor: pointer;">
+
+        </label>
+        <input type="file" id="profile-pic-input" accept="image/*" style="display: none;">
+
+        <div id="crop-box-wrapper">
+            <img id="image-to-crop">
+            <button type="button" id="crop-btn">Crop & Confirm</button>
+        </div>
+
+        <form id="edit-profile-form" action="/update_profile" method="POST">
+            <input type="hidden" name="cropped_image" id="cropped-image-data">
+            
+            <label>Name:</label>
+            <input type="text" name="display_name" value="{{ session.get('name', '') }}">
+            
+            <label>Bio:</label>
+            <textarea name="user_bio">{{ session.get('bio', '') }}</textarea>
+            
+            <button type="submit">Save Changes</button>
+        </form>
+    </div>
+   
+
+    
+        <div class="profile-info">
+            <div class="stats-row">
+                <span><strong>{% if posts %}{{ posts|length }}{% else %}0{% endif %}</strong> posts</span>
+                <span><strong>0</strong> followers</span>
+                <span><strong>0</strong> following</span>
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align: left; padding: 10px 15px; font-size: 14px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+    <div style="font-weight: 600; color: #fff; margin-bottom: 2px;">{{ name if name else 'Username' }}</div>
+    
+    <div style="color: #8e8e8e; font-weight: normal; margin-bottom: 4px;">Photographer</div>
+    
+    <span style="white-space: pre-line; color: #b3b3b3; display: block;">{{ bio if bio else 'Welcome to my official clone profile! 📸' }}</span>
+</div>
+
+    <div class="edit-row">
+        <button class="edit-btn" onclick="toggleModal(true)">Edit profile</button>
+        <button class="edit-btn" onclick="shareProfileLink()">Share profile</button>
+    </div>
+
+    <div class="tabs">
+        <div class="tab active" id="posts-tab" onclick="switchTab('posts')"><i class="fas fa-th"></i></div>
+        <div class="tab" id="reels-tab" onclick="switchTab('reels')"><i class="fas fa-film"></i></div>
+    </div>
+
+    <div id="posts-grid" class="grid-layout">
+        {% for post in posts %}
+        <div class="vertical-post-box">
+            <img src="/static/uploads/{{ post[1] }}">
+        </div>
+        {% else %}
+        <div style="grid-column: span 3; margin-top: 30px;">
+            <h3 style="color: #8e8e8e;">No Post Upload Yet</h3></div>
+        {% endfor %}
+    </div>
+
+
+
+<div class="vertical-post-box" style="display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 4px !important; width: 100% !important; max-width: 100% !important; padding: 4px; box-sizing: border-box !important;">
+
+    {% for reel in reels %}
+        <div class="reel-box" style="position: relative !important; width: 100% !important; aspect-ratio: 9 / 16 !important; background: #000 !important; overflow: hidden !important; border-radius: 4px !important;">
+            
+         <form action="/delete/reel/{{ reel[1] }}" method="POST" onsubmit="return confirm('Kya aap is Reel ko delete karna chahte hain?');" style="position: absolute; top: 8px; right: 8px; z-index: 10; margin: 0;">
+             <button type="submit" style="background: rgba(255, 0, 0, 0.8); color: white; border: none; border-radius: 50%; width: 28px; height: 28px; font-weight: bold; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+               ✕
+          </button>
+         </form>
+
+            <video src="/static/uploads/{{ reel[1] }}" 
+                   controls 
+                   style="width: 100% !important; height: 100% !important; object-fit: cover !important; display: block !important;">
+            </video>
+            
+            <div style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8)); padding: 6px 4px;">
+                <p style="margin: 0; color: #fff; font-size: 11px; font-weight: bold; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    {{ reel[2] }}
+                </p>
+            </div>
+        </div>
+    {% else %}
+        <div style="grid-column: span 3; text-align: center; padding: 40px 0; color: #8e8e8e;">
+            <h3 style="margin: 0; font-size: 16px;">No Reels Uploaded Yet</h3>
+        </div>
+    {% endfor %}
+
+</div>
+
+
+
+
+
+<div class="overlay" id="overlay" onclick="toggleModal(false)"></div>
+<div class="modal" id="edit-modal">
+    <h3>Edit Profile</h3>
+    <form id="edit-profile-form" action="/update_profile" method="POST" enctype="multipart/form-data">
+        <label>Change Profile Photo:</label>
+        <input type="file" id="profile-pic-input" accept="image/*">
+        
+        <div class="crop-container" id="crop-box-wrapper">
+            <img id="image-to-crop" src="">
+        </div>
+        
+        <input type="hidden" name="cropped_image_data" id="cropped-image-data">
+        
+        <label>Name:</label>
+        <input type="text" name="display_name" value="{{ name if name else username }}">
+        
+        <label>Bio:</label>
+        <textarea name="user_bio" rows="3">{{ bio if bio else '' }}</textarea>
+        
+        <div class="modal-btns">
+            <button type="button" class="edit-btn" style="background:#121212" onclick="toggleModal(false)">Cancel</button>
+            <button type="submit" class="edit-btn" style="background:#0095f6;">Save</button>
+        </div>
+    </form>
+</div>
+
+<div id="edit-modal" style="display:none; position:fixed; top:10%; left:5%; right:5%; background:#1a1a1a; padding:20px; z-index:1000; border-radius:15px; color:#fff; overflow-y:auto; max-height:80%;">
+    <h3>Edit Profile</h3>
+    
+    <input type="file" id="profile-pic-input" accept="image/*">
+    <div id="crop-box-wrapper" style="display:none; margin-top:15px;">
+        <img id="image-to-crop" style="max-width:100%;">
+        <button type="button" id="crop-btn" style="margin-top:10px;">Crop & Confirm</button>
+    </div>
+
+    <form id="edit-profile-form" action="/update_profile" method="POST" style="margin-top:20px;">
+        <input type="hidden" name="cropped_image" id="cropped-image-data">
+        
+        <label>Display Name:</label>
+        <input type="text" name="display_name" value="{{ session.get('name', '') }}" style="width:100%; margin-bottom:10px;">
+        
+        <label>Bio:</label>
+        <textarea name="user_bio" style="width:100%; margin-bottom:10px;">{{ session.get('bio', '') }}</textarea>
+        
+        <button type="submit">Save All Changes</button>
+        <button type="button" onclick="toggleModal(false)">Cancel</button>
+    </form>
+</div>
+
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+<script>
+let cropper;
+const fileInput = document.getElementById('profile-pic-input');
+const imageToCrop = document.getElementById('image-to-crop');
+const cropWrapper = document.getElementById('crop-box-wrapper');
+const hiddenInput = document.getElementById('cropped-image-data');
+
+// Jab user photo select karega
+fileInput.addEventListener('change', function(e) {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+        const file = files[0];
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            imageToCrop.src = event.target.result;
+            cropWrapper.style.display = 'block';
+            
+            // Purana cropper instance reset karna
+            if (cropper) {
+                cropper.destroy();
+            }
+            
+            // Gol adjustment settings ke sath Cropper initiate karna
+            cropper = new Cropper(imageToCrop, {
+                aspectRatio: 1, // Gol selection ke liye 1:1 square box
+                viewMode: 1,
+                background: false,
+                autoCropArea: 1,
+                responsive: true
+            });
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+// Form submit hone se pehle cropped base64 image data nikalna
+document.getElementById('edit-profile-form').addEventListener('submit', function(e) {
+    if (cropper) {
+        // Photo ko 200x200 standard circle size me canvas par crop karna
+        const canvas = cropper.getCroppedCanvas({
+            width: 200,
+            height: 200
+        });
+        hiddenInput.value = canvas.toDataURL('image/jpeg');
+    }
+});
+
+function menuOpen(event){
+    if(event) event.stopPropagation();
+    let m = document.getElementById("menu");
+    m.style.display = (m.style.display == "block") ? "none" : "block";
+}
+
+document.addEventListener('click', function() {
+    document.getElementById("menu").style.display = "none";
+});
+
+function switchTab(type) {
+    if(type === 'posts') {
+        document.getElementById('posts-grid').style.display = 'grid';
+        document.getElementById('reels-grid').style.display = 'none';
+        document.getElementById('posts-tab').classList.add('active');
+        document.getElementById('reels-tab').classList.remove('active');
+    } else {
+        document.getElementById('posts-grid').style.display = 'none';
+        document.getElementById('reels-grid').style.display = 'grid';
+        document.getElementById('reels-tab').classList.add('active');
+        document.getElementById('posts-tab').classList.remove('active');
+    }
+}
+
+Function toggleModal(show) {                                          
+        const display = show ? 'block' : 'none';                          
+        document.getElementById('edit-modal').style.display = display;    
+        document.getElementById('overlay')
+        .style.display = display;cropWrapper.style.display = 'none';
+    if(!show && cropper) {
+        cropper.destroy();       
+cropWrapper.style.display = 'none';                               
+fileInput.value = '';
+    }                                                             
+}
+
+
+function shareProfileLink() {
+    const profileUrl = window.location.href;
+    navigator.clipboard.writeText(profileUrl).then(() => {
+        alert("Profile Link copied to clipboard!");
+    }).catch(err => {
+        alert("Error copying link.");
+    });
+}
+</script>
+
+</body>
+</html>

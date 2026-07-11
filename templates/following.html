@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Following</title>
+<style>
+body{
+    background:black;
+    color:white;
+    font-family:sans-serif;
+}
+.user{
+    padding:15px;
+    border-bottom:1px solid #333;
+}
+a{
+    color:white;
+    text-decoration:none;
+}
+</style>
+</head>
+<body>
+
+<h2>{{ username }} Following</h2>
+
+{% for user in following %}
+<div class="user">
+    {{ user[0] }}
+</div>
+{% endfor %}
+
+<br>
+<a href="/profile">⬅ Back</a>
+
+</body>
+</html>
+

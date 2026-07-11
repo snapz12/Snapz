@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Verify OTP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body style="
+background:#000;
+color:white;
+font-family:sans-serif;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+margin:0;
+">
+
+<div style="text-align:center;">
+
+<h2>Verify OTP</h2>
+
+{% if error %}
+<p style="color:red;">{{ error }}</p>
+{% endif %}
+
+<form method="POST">
+
+<input
+type="text"
+name="otp"
+placeholder="Enter 6 Digit OTP"
+required
+style="
+width:280px;
+padding:12px;
+border:none;
+border-radius:8px;
+font-size:16px;
+outline:none;">
+
+<br><br>
+
+<button
+type="submit"
+style="
+width:280px;
+padding:12px;
+background:#0095f6;
+color:white;
+border:none;
+border-radius:8px;
+font-size:16px;
+cursor:pointer;">
+Verify OTP
+</button>
+
+</form>
+
+<br>
+
+<a href="/resend_otp"
+style="
+color:#0095f6;
+text-decoration:none;
+font-size:16px;">
+🔄 Resend OTP
+</a>
+
+</div>
+
+</body>
+</html>

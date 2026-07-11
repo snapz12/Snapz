@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Post</title>
+</head>
+<body style="background: #000; color: #fff; font-family: sans-serif; padding: 20px;">
+
+    <h1>📸 Upload Post</h1>
+
+    <form action="/upload" method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 15px; max-width: 300px;">
+        
+        <input type="hidden" id="type" name="type" value="post">
+
+        <label>Select Media File:</label>
+        <input type="file" name="file" required style="color: #fff;">
+
+        <input type="text" name="caption" placeholder="Write Caption..." style="padding: 10px; background: #262626; border: 1px solid #555; color: #fff; border-radius: 4px;">
+
+        <button type="submit" style="padding: 10px; background: #0095f6; color: white; border: none; font-weight: bold; border-radius: 4px; cursor: pointer;">Post to Feed</button>
+    </form>
+
+</body>
+</html>
+

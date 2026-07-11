@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Messages</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #0b0214; /* Sleek Dark Instagram theme */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            color: white;
+        }
+
+        /* Top Bar Navigation */
+        .header {
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #1a0b2e;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #0b0214;
+            z-index: 1000;
+        }
+
+        .header h2 {
+            font-size: 22px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        /* Chat List Container */
+        .chat-list-container {
+            margin-top: 70px;
+            padding: 5px 0;
+        }
+
+        /* Individual Friend Row Item */
+        .friend-row {
+            display: flex;
+            align-items: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            color: white;
+            transition: background 0.2s;
+        }
+
+        .friend-row:active {
+            background-color: #1a0b36; /* Click ripple feedback */
+        }
+
+        /* Profile Avatar Style */
+        .avatar-container {
+            position: relative;
+            margin-right: 15px;
+        }
+
+        .avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid #33145a;
+        }
+
+        /* Text Block (Name & Last Msg) */
+        .chat-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .friend-name {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .last-message-details {
+            display: flex;
+            align-items: center;
+            font-size: 13px;
+            color: #b3a1cc;
+        }
+
+        .message-text {
+            max-width: 180px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .separator-dot {
+            margin: 0 5px;
+            font-size: 8px;
+            color: #6a528c;
+        }
+
+        .time-text {
+            color: #8c76ac;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h2>Messages</h2>
+        <div style="font-size: 20px;">📝</div>
+    </div>
+
+    <div class="chat-list-container">
+        {% for friend in friends %}
+            <a href="/chat/{{ friend.username }}" class="friend-row">
+                <div class="avatar-container">
+                    <img src="/static/images/{{ friend.profile_pic }}" class="avatar" onerror="this.src='/static/images/default.jpg'">
+                </div>
+                <div class="chat-info">
+                    <div class="friend-name">{{ friend.username }}</div>
+                    <div class="last-message-details">
+                        <span class="message-text">{{ friend.last_message }}</span>
+                        {% if friend.time %}
+                            <span class="separator-dot">•</span>
+                            <span class="time-text">{{ friend.time }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+
+</body>
+</html>

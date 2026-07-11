@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<style>
+.users-list{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+
+.user-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+</style>
+</head>
+<body style="background:black;color:white">
+
+<h2>Share Reel</h2>
+
+<div class="users-list">
+{% for u in users %}
+    <div class="user-row">
+        <img src="{{ url_for('static', filename='images/' + u[1]) }}"
+             width="40" height="40"
+             style="border-radius:50%;">
+
+        {{ u[0] }}
+
+<a href="/send_reel/{{ reel_id }}/{{ u[0] }}">
+    <button>Send</button>
+</a>
+    </div>
+{% endfor %}
+</div>
+
+	
+</body>
+</html>

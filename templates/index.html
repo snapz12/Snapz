@@ -1,0 +1,2054 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Snapz Clone</title>
+
+<style>
+ 
+ body {
+    background: #000;
+    color: #fff;
+    margin: 0;
+    padding: 0; 
+    width: 100%;
+    overflow-x: hidden; 
+}
+
+
+.story-buttons button{
+    background:none;
+    border:none;
+    color:white;
+    font-size:35px;
+    padding:15px;
+    cursor:pointer;
+}
+
+.story-ring{
+    border:3px solid #0095f6;
+}
+.story-ring.seen{
+    border:3px solid #666;
+}
+.story-avatar{
+    width:70px;
+    height:70px;
+    border-radius:50%;
+    object-fit:cover;
+}
+
+
+         .post {
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto 20px auto;
+            background: #000;
+            border-bottom: 1px solid #333;
+        }
+        .post-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+        }
+        .post-img {
+            width: 100%;
+            display: block;
+            aspect-ratio: 3/4;
+            object-fit: cover;
+        }
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+        }
+        .action-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .follow-btn {
+            background: #0095f6;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 5px;
+        }
+.comment-box {
+    padding: 0 10px 10px 10px;
+}
+
+.comment-input {
+    width: 70%;
+    padding: 5px;
+}
+
+
+
+
+.feed{
+    width:100%;
+    padding:0;
+}
+
+
+.post img {
+    width:100%;
+    height:400px;
+    object-fit:cover;
+    display:block;
+}
+
+
+.post{
+    width:100%;
+    margin:0;
+    padding:0;
+    border:none;
+    border-radius:0;
+    background:#000;
+}
+
+
+.post-image-container{
+    width:100%;
+    background:#000;
+    position:relative;
+}
+
+
+.post-image{
+    width:100%;
+    height:auto;
+    object-fit:cover;
+}
+
+
+.story-viewer{
+
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:black;
+z-index:999999;
+}
+
+
+.story-header{
+
+position:absolute;
+top:20px;
+left:0;
+width:100%;
+padding:10px;
+
+color:white;
+
+}
+
+
+.progress-box{
+
+width:90%;
+height:4px;
+background:#555;
+border-radius:20px;
+overflow:hidden;
+
+}
+
+
+#progress{
+
+height:100%;
+width:0%;
+background:white;
+
+}
+
+
+
+#storyUser{
+
+display:inline-block;
+margin-top:15px;
+font-size:20px;
+font-weight:bold;
+
+}
+
+
+.story-header button{
+
+float:right;
+background:none;
+border:none;
+color:white;
+font-size:30px;
+
+}
+
+
+
+.story-image{
+
+width:100%;
+height:100%;
+object-fit:contain;
+
+}
+
+
+
+.story-buttons{
+
+position:absolute;
+bottom:40px;
+width:100%;
+display:flex;
+justify-content:space-between;
+
+}
+
+
+
+.story-buttons button{
+
+background:#0008;
+color:white;
+border:none;
+font-size:35px;
+padding:15px;
+
+}
+
+
+@media (max-width: 360px){
+    body{
+        font-size:14px;
+        padding:5px;
+    }
+}
+
+@media (min-width: 361px) and (max-width: 480px){
+    body{
+        font-size:15px;
+        padding:8px;
+    }
+}
+
+@media (min-width: 481px) and (max-width: 768px){
+    body{
+        font-size:16px;
+        padding:10px;
+    }
+}
+
+@media (min-width: 769px){
+    body{
+        font-size:18px;
+        padding:15px;
+    }
+}
+
+.navbar{
+    background:#000;
+    padding:10px 15px;
+}
+.edit-profile{
+
+    background:white;
+
+    padding:15px;
+
+    margin:15px;
+
+    border-radius:10px;
+
+    text-align:center;
+
+}
+
+.edit-profile input{
+
+    padding:10px;
+
+    margin:5px;
+
+    width:220px;
+
+}
+
+.notify-icon svg{
+    position: relative;
+    top: 5px;
+}
+
+
+#notifications{
+    background:black;
+    margin:15px;
+    padding:10px;
+    border-radius:10px;
+    margin-top: 25px;
+}
+
+
+.search-icon svg{
+    position: relative;
+    top: 5px;
+}
+.search-box{
+    text-align:center;
+    margin:15px;
+}
+
+.search-box input{
+    padding:10px;
+    width:200px;
+}
+
+.search-box button{
+    padding:10px;
+}
+
+
+
+.create-post{
+    background:black;
+    color:white;
+    padding:15px;
+    margin:20px;
+    text-align:center;
+    border-radius:10px;
+}
+
+
+
+.profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 15px;
+}
+.profile img {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+
+
+.action-bar {
+    display: flex;
+    justify-content: flex-start;
+    padding: 10px;
+    gap: 15px;
+}
+
+.actions {
+    padding: 12px 15px;
+    display: flex;
+    gap: 18px;
+}
+.actions button {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+
+
+.profile{
+    display:flex;
+    align-items:center;
+    padding:10px;
+}
+
+.profile img{
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    object-fit:cover;
+    margin-right:10px;
+}
+
+
+@keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+cameraPage{
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:#000;
+    z-index:99999;
+}
+
+
+captionPage{
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:#fff;
+    z-index:100000;
+}
+
+
+	
+
+.actions{
+    padding:10px;
+}
+
+.actions button{
+    padding:8px 15px;
+    margin-right:5px;
+}
+
+
+
+
+
+.reels{
+    padding:15px;
+}
+
+.reel-card{
+    background:black;
+    margin:15px;
+    padding:10px;
+    border-radius:10px;
+    text-align:center;
+}
+
+.reel-card img{
+    width:100%;
+    max-width:300px;
+    height:500px;   
+    object-fit:cover;
+    border-radius:10px;
+    display:block;
+    margin:auto;
+}
+
+.bottom-nav{
+    position:fixed;
+    bottom:0;
+    left:0;
+    width:100%;
+    background:white;
+    display:flex;
+    justify-content:space-around;
+    padding:10px 0;
+    border-top:1px solid #ddd;
+}
+
+.bottom-nav button{
+    background:none;
+    border:none;
+    font-size:24px;
+}
+
+
+
+
+
+.logo-box{
+    text-align:left;
+    margin:10px 0;
+}
+
+.snapz-logo{
+    font-family:'Comfortaa', sans-serif;
+    font-size:35px;
+    font-weight:700;
+
+    /* extra bold effect */
+    -webkit-text-stroke:1.5px white;
+
+    color:white;
+    letter-spacing:-2px;
+}
+.snapz-logo span{
+    -webkit-text-stroke:1.2px #ff3d81;
+
+    background:linear-gradient(
+        45deg,
+        #ff8a00,
+        #ff007a
+    );
+
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+}
+
+
+.heart-row{
+    display:flex;
+    justify-content:left;
+    align-items:center;
+    gap:10px;
+    margin-top:-1px;
+    position:relative;
+    left:-18px;
+}
+
+.line{
+    width:55px;
+    height:2px;
+    background:#8f8f8f;
+    border-radius:10px;
+}
+
+.heart{
+    color:#ff69b4;      /* Pink */
+    font-size:18px;     /* Thoda chhota */
+    font-weight:200;    /* Bold remove */
+    line-height:1;
+    transform:translateY(-2px); /* Thoda upar */
+}
+
+
+
+
+.top-icons {
+    position: absolute;
+    top: 5px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    z-index: 9999;
+}
+
+.notify-icon, .search-icon {
+    color: #ffffff;
+    font-size: 30px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.notify-icon:hover, .search-icon:hover {
+    color: #aaa;
+}
+
+/* --- Modal Styling --- */
+.modal {
+    display: none; 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    background: #000; 
+    z-index: 10000; 
+    padding: 20px;
+    overflow-y: auto;
+}
+
+/* --- Search Input & Results --- */
+.search-input {
+    width: 100%; 
+    padding: 15px; 
+    background: #222; 
+    border: none; 
+    color: white; 
+    border-radius: 10px;
+    box-sizing: border-box; /* Taaki padding width se bahar na jaye */
+}
+
+.result-item {
+    display: block; 
+    padding: 15px; 
+    color: white; 
+    text-decoration: none; 
+    border-bottom: 1px solid #333;
+    transition: 0.2s;
+}
+
+.result-item:hover {
+    background-color: #1a1a1a;
+}
+
+/* --- Buttons & Utilities --- */
+.close-btn {
+    margin-top: 20px;
+    color: #888; 
+    background: none; 
+    border: none; 
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.close-btn:hover {
+    color: #fff;
+}
+
+
+</style>
+
+</head>
+
+<body>
+
+
+<div class="navbar">
+<div class="logo-box">
+<div class="snapz-logo">
+    Snap<span>z</span>
+<div class="heart-row">
+    <div class="line"></div>
+    <span class="heart">♡</span>
+    <div class="line"></div>
+</div>
+</div>
+
+</div>
+
+   <div class="top-bar">
+        <div class="top-icons">
+            <div class="notify-icon" 
+onclick="window.location.href='/notifications'">
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="28"
+     height="28"
+     viewBox="0 0 24 24"
+     fill="none"
+     stroke="currentColor"
+     stroke-width="2.8"
+     stroke-linecap="round"
+     stroke-linejoin="round">
+
+  <path d="M18 8a6 6 0 10-12 0c0 7-3 8-3 8h18s-3-1-3-8"/>
+  <path d="M10 20a2 2 0 004 0"/>
+
+</svg>
+</div>
+<div class="search-icon"
+onclick="document.getElementById('searchModal').style.display='block'">
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="28"
+     height="28"
+     viewBox="0 0 24 24"
+     fill="none"
+     stroke="currentColor"
+     stroke-width="2.8"
+     stroke-linecap="round"
+     stroke-linejoin="round">
+
+  <circle cx="11" cy="11" r="7"/>
+  <path d="M20 20l-4.2-4.2"/>
+
+</svg>
+</div>
+
+</div>
+
+<div id="searchModal" class="modal">
+
+    <input
+    type="text"
+    id="searchInput"
+    class="search-input"
+    placeholder="Search users...">
+
+    <br><br>
+
+    <button
+    onclick="searchUsers(document.getElementById('searchInput').value)"
+    style="
+    width:100%;
+    padding:12px;
+    background:#0095f6;
+    color:white;
+    border:none;
+    border-radius:8px;
+    font-size:16px;">
+    ⌕ Search
+    </button>
+
+    <div id="searchResults" style="margin-top:20px;"></div>
+
+    <button
+    class="close-btn"
+    onclick="document.getElementById('searchModal').style.display='none'">
+    Close
+    </button>
+
+</div>
+    </div>
+
+
+    <div id="notifyModal" class="modal">
+        <h2 style="color: white; padding-left: 10px;">Notifications</h2>
+        <div id="notifyResults" style="color: white; margin-top: 20px;">
+            <p style="padding-left: 10px;">Loading...</p>
+        </div>
+        <button class="close-btn" onclick="document.getElementById('notifyModal').style.display='none'" style="padding-left: 10px;">Close</button>
+    </div>
+
+
+
+
+
+
+<div style="display:flex;gap:15px;overflow-x:auto;padding:10px;">
+
+
+{% if my_story %}
+
+<div style="text-align:center;display:inline-block;cursor:pointer;"
+     onclick="openStory('{{ my_story[0] }}',
+                        '{{ my_story[2] }}',
+                        '{{ current_user }}')">
+
+    <div style="width:60px;height:60px;border-radius:50%;
+                border:2px solid #00c853;
+                padding:2px;
+                overflow:hidden;">
+
+        {% if my_story[2].endswith('.mp4') or my_story[2].endswith('.webm') %}
+
+        <video
+            src="/static/uploads/{{ my_story[2] }}"
+            muted
+            autoplay
+            loop
+            playsinline
+            style="width:100%;height:100%;
+                   border-radius:50%;
+                   object-fit:cover;">
+        </video>
+
+        {% else %}
+
+        <img
+            src="/static/uploads/{{ my_story[2] }}"
+            style="width:100%;height:100%;
+                   border-radius:50%;
+                   object-fit:cover;">
+
+        {% endif %}
+
+    </div>
+
+    <span style="font-size:12px;display:block;margin-top:5px;">
+        You
+    </span>
+
+</div>
+
+{% endif %}
+
+
+{% for story in story_circles %}
+
+<div style="text-align:center;display:inline-block;cursor:pointer;"
+     onclick="openStory('{{ story[0] }}',
+                        '{{ story[2] }}',
+                        '{{ story[1] }}')">
+
+<div style="width:60px;height:60px;border-radius:50%;border:2px solid #d62976;padding:2px;overflow:hidden;">
+
+        {% if story[2].endswith('.mp4') or story[2].endswith('.webm') %}
+
+        <video
+            src="/static/uploads/{{ story[2] }}"
+            muted
+            autoplay
+            loop
+            playsinline
+            style="width:100%;height:100%;border-radius:50%;object-fit:cover;">
+        </video>
+
+        {% else %}
+
+        <img
+            src="/static/uploads/{{ story[2] }}"
+            style="width:100%;height:100%;border-radius:50%;object-fit:cover;">
+
+        {% endif %}
+
+    </div>
+
+    <span style="font-size:12px;display:block;margin-top:5px;">
+        {{ story[1] }}
+    </span>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+
+<div style="position: fixed; bottom: 0; left: 0; right: 0; background-color: #000; border-top: 1px solid #262626; display: flex; justify-content: space-around; align-items: center; padding: 12px 0; z-index: 9999;">
+    
+    <a href="/" style="text-decoration: none; display: flex; flex-direction: column; align-items: center; color: #fff;">
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="28" height="28"
+     viewBox="0 0 24 24"
+     fill="none"
+     stroke="currentColor"
+     stroke-width="2.8"
+     stroke-linecap="round"
+     stroke-linejoin="round">
+
+  <path d="M3 10.5L12 3l9 7.5"/>
+  <path d="M5 9.8V20h14V9.8"/>
+</svg>
+	<span style="font-size: 11px; font-weight: bold;">Home</span>
+    </a>
+    <a href="/reels" style="text-decoration: none; display: flex; flex-direction: column; align-items: center; color: #a8a8a8;">
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="28" height="28"
+     viewBox="0 0 24 24"
+     fill="none"
+     stroke="currentColor"
+     stroke-width="2.8"
+     stroke-linecap="round"
+     stroke-linejoin="round">
+
+  <rect x="3" y="3" width="18" height="18" rx="3"/>
+  <path d="M3 8h18"/>
+  <path d="M8 3l3 5"/>
+  <path d="M13 3l3 5"/>
+  <path d="M10 10l5 3-5 3z"/>
+</svg>
+        <span style="font-size: 11px;">Reels</span>
+    </a>
+    <button id="createBtn" style="background:none; border:none; cursor:pointer; display: flex; flex-direction: column; align-items: center; color: #a8a8a8;">
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="28" height="28"
+     viewBox="0 0 24 24"
+     fill="none"
+     stroke="currentColor"
+     stroke-width="2.8"
+     stroke-linecap="round"
+     stroke-linejoin="round">
+
+  <rect x="3" y="3" width="18" height="18" rx="5"/>
+  <path d="M12 8v8"/>
+  <path d="M8 12h8"/>
+
+</svg>
+        <span style="font-size: 11px;">Create</span>
+    </button>
+    <a href="/users" style="text-decoration: none; display: flex; flex-direction: column; align-items: center; color: #a8a8a8;">
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="28"
+     height="28"
+     viewBox="0 0 24 24"
+     fill="none"
+     stroke="currentColor"
+     stroke-width="2.8"
+     stroke-linecap="round"
+     stroke-linejoin="round">
+
+  <path d="M22 2L11 13"/>
+  <path d="M22 2L15 22L11 13L2 9L22 2Z"/>
+
+</svg>
+        <span style="font-size: 11px;">Messages</span>
+    </a>
+    <a href="/profile" style="text-decoration: none; display: flex; flex-direction: column; align-items: center; color: #a8a8a8;">
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="28"
+     height="28"
+     viewBox="0 0 24 24"
+     fill="none"
+     stroke="currentColor"
+     stroke-width="2.8"
+     stroke-linecap="round"
+     stroke-linejoin="round">
+
+  <circle cx="12" cy="8" r="4"/>
+  <path d="M5 20c1.8-3.5 4.5-5 7-5s5.2 1.5 7 5"/>
+
+</svg>
+        <span style="font-size: 11px;">Profile</span>
+    </a>
+</div>
+
+
+
+
+<input type="hidden" id="type" value="post">
+
+<div id="cameraPage" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:black; z-index:9999999;">
+    <button onclick="closeCamera()" style="position:absolute; top:20px; left:20px; background:none; border:none; color:#fff; font-size:24px; z-index:10;">✕</button>
+    <button onclick="nextCaption()" style="position:absolute; top:20px; right:20px; background:none; border:none; color:#0095f6; font-size:18px; font-weight:bold; z-index:10;">NEXT</button>
+    
+    <div id="timer" style="position:absolute; top:20px; left:50%; transform:translateX(-50%); color:red; font-weight:bold; font-size:18px; z-index:10;">00:00</div>
+
+    <video id="cam" autoplay playsinline style="width:100%; height:100%; object-fit:cover;"></video>
+    
+    <div id="previewContainer" style="display:none; width:100%; height:100%; position:absolute; top:0; left:0;">
+        <img id="preview" style="width:100%; height:100%; object-fit:cover; display:none;">
+        <video id="previewVideo" autoplay loop muted playsinline style="width:100%; height:100%; object-fit:cover; display:none;"></video>
+    </div>
+
+    <div class="mode" style="position:absolute; bottom:110px; left:0; width:100%; display:flex; justify-content:center; gap:25px; z-index:10;">
+        <span id="opt-post" onclick="setMode('post')" style="cursor:pointer; color:#fff; font-weight:bold; text-shadow:1px 1px 2px #000;">Post</span>
+        <span id="opt-story" onclick="setMode('story')" style="cursor:pointer; color:gray; text-shadow:1px 1px 2px #000;">Story</span>
+        <span id="opt-reel" onclick="setMode('reel')" style="cursor:pointer; color:gray; text-shadow:1px 1px 2px #000;">Reels</span>
+    </div>
+
+    <div style="position:absolute; bottom:30px; left:0; width:100%; display:flex; justify-content:space-around; align-items:center; z-index:10;">
+        <button onclick="galleryOpen()" style="background:none; border:none; color:#fff; font-size:28px; cursor:pointer;">🖼</button>
+        <input id="gallery" type="file" accept="image/*,video/*" hidden onchange="gallerySelect()">
+
+        <button id="captureBtn" onclick="capture()" style="width:75px; height:75px; border-radius:50%; background:#fff; border:5px solid rgba(255,255,255,0.3); font-size:0; cursor:pointer;"></button>
+
+        <button onclick="switchCamera()" style="background:none; border:none; color:#fff; font-size:28px; cursor:pointer;">🔄</button>
+    </div>
+</div>
+
+<div id="captionPage" style="display:none; width:100%; height:100%; position:fixed; top:0; left:0; background:#000; color:#fff; z-index:9999999; padding:20px; box-sizing:border-box;">
+    <h2 style="margin-top:20px;">New Caption</h2>
+    <textarea id="caption" placeholder="Write a caption..." style="width:100%; height:120px; background:#121212; color:#fff; border:1px solid #262626; border-radius:8px; padding:10px; font-size:16px; outline:none; resize:none; margin-bottom:20px;"></textarea>
+    <button onclick="finalUpload()" style="width:100%; background:#0095f6; border:none; color:#fff; padding:12px; font-size:16px; font-weight:bold; border-radius:8px; cursor:pointer;">Upload</button>
+</div>
+
+
+
+<script>
+// Master Global Variables
+let mode = "post";
+let facing = "environment"; // 'environment' matlab Back Camera, 'user' matlab Front Camera
+let stream = null;
+let selectedFile = null;
+let mediaRecorder;
+let chunks = [];
+let recording = false;
+let allStories = {{ all_stories|tojson }};
+let storyList = {{ all_stories|tojson }};
+console.log("ALL STORIES =", allStories);
+
+
+// Camera page open karne ke liye
+document.getElementById("createBtn").onclick = function() {
+    let camera = document.getElementById("cameraPage");
+    camera.style.display = "block";
+    document.body.style.overflow = "hidden";
+    
+    setMode("post");
+    startCamera();
+};
+
+// Mode switch karne ke liye (Post, Story, Reels)
+function setMode(value) {
+    mode = value;
+    document.getElementById("type").value = value;
+    console.log("Active Mode:", mode);
+
+    document.querySelectorAll(".mode span").forEach(x => x.style.color = "gray");
+    let activeOption = document.getElementById("opt-" + value);
+    if (activeOption) {
+        activeOption.style.color = "white";
+        activeOption.style.fontWeight = "bold";
+    }
+
+    resetMediaView();
+}
+
+// 🔄 Camera Start karne ka dynamic function (Front/Back handle ke saath)
+async function startCamera() {
+    try {
+        // Pehle se chal rahe camera tracks ko achhe se stop karo taaki switch smoothly ho
+        if (stream) {
+            stream.getTracks().forEach(t => t.stop());
+        }
+
+stream = await navigator.mediaDevices.getUserMedia({
+    video: { facingMode: facing },
+    audio: true
+});
+
+        let camVideo = document.getElementById("cam");
+        camVideo.srcObject = stream;
+        camVideo.style.display = "block";
+    } catch (e) {
+        alert("Camera permission allow kijiye!");
+    }
+}
+
+// 🔄 Front aur Back camera toggle switch handler
+function switchCamera() {
+    facing = (facing === "environment") ? "user" : "environment";
+    console.log("Switching camera to:", facing);
+    startCamera();
+}
+
+// Camera close handler
+function closeCamera() {
+    if (stream) {
+        stream.getTracks().forEach(t => t.stop());
+        stream = null;
+    }
+    document.getElementById("cameraPage").style.display = "none";
+    document.body.style.overflow = "auto";
+    resetMediaView();
+}
+
+// Preview Reset Function
+function resetMediaView() {
+    let video = document.getElementById("cam");
+    let previewCont = document.getElementById("previewContainer");
+    let previewImg = document.getElementById("preview");
+    let previewVid = document.getElementById("previewVideo");
+
+    if (video) video.style.display = "block";
+    if (previewCont) previewCont.style.display = "none";
+    if (previewImg) previewImg.style.display = "none";
+    if (previewVid) {
+        previewVid.pause();
+        previewVid.style.display = "none";
+    }
+    selectedFile = null;
+    document.getElementById("timer").innerHTML = "00:00";
+    recording = false;
+}
+
+// Next dabane par caption page par le jane ke liye
+function nextCaption() {
+    if (!selectedFile) {
+        alert("Pehle photo ya video click kijiye ya Gallery se select kijiye!");
+        return;
+    }
+
+    if (stream) {
+        stream.getTracks().forEach(t => t.stop());
+        stream = null;
+    }
+
+    document.getElementById("cameraPage").style.display = "none";
+    document.getElementById("captionPage").style.display = "block";
+}
+
+// Photo click ya Video Record trigger capture button
+function capture() {
+    if (mode === "reel") {
+        if (recording) {
+            mediaRecorder.stop();
+            recording = false;
+        } else {
+            startRecording();
+            recording = true;
+        }
+        return;
+    }
+
+    // Photo Capture Logic (Post & Story)
+    let video = document.getElementById("cam");
+    let canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    let ctx = canvas.getContext("2d");
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    canvas.toBlob(function(blob) {
+        selectedFile = new File([blob], "photo.jpg", { type: "image/jpeg" });
+        
+        let previewImg = document.getElementById("preview");
+        let previewCont = document.getElementById("previewContainer");
+        
+        previewImg.src = URL.createObjectURL(blob);
+        video.style.display = "none";
+        previewCont.style.display = "block";
+        previewImg.style.display = "block";
+    }, "image/jpeg");
+}
+
+// 🖼️ Gallery open karne ke liye click trigger
+function galleryOpen() {
+    document.getElementById("gallery").click();
+}
+
+// 🖼️ Gallery se photo/video select hone ke baad ka logic
+function gallerySelect() {
+    let file = document.getElementById("gallery").files[0];
+    if (!file) return;
+
+    selectedFile = file; // Select ki hui file variable me save ho gayi
+    
+    let video = document.getElementById("cam");
+    let previewCont = document.getElementById("previewContainer");
+    let previewImg = document.getElementById("preview");
+    let previewVid = document.getElementById("previewVideo");
+
+    video.style.display = "none";
+    previewCont.style.display = "block";
+
+    // Agar user ne video select kiya hai
+    if (file.type.startsWith("video/")) {
+        previewImg.style.display = "none";
+        previewVid.src = URL.createObjectURL(file);
+        previewVid.style.display = "block";
+        previewVid.play();
+        console.log("Gallery se Video select hua.");
+    } else {
+        // Agar user ne photo select ki hai
+        previewVid.style.display = "none";
+        previewImg.src = URL.createObjectURL(file);
+        previewImg.style.display = "block";
+        console.log("Gallery se Image select hui.");
+    }
+}
+
+// Reels ke liye recording module
+function startRecording() {
+    let video = document.getElementById("cam");
+    let camStream = video.srcObject;
+
+    if (!camStream) {
+        alert("Camera taiyar nahi hai");
+        return;
+    }
+
+    chunks = [];
+    mediaRecorder = new MediaRecorder(camStream, { mimeType: 'video/webm' });
+
+    mediaRecorder.ondataavailable = function(e) {
+        if (e.data.size > 0) chunks.push(e.data);
+    };
+
+    mediaRecorder.onstop = function() {
+        let blob = new Blob(chunks, { type: "video/webm" });
+        selectedFile = new File([blob], "reel.webm", { type: "video/webm" });
+
+        let previewCont = document.getElementById("previewContainer");
+        let previewVid = document.getElementById("previewVideo");
+
+        video.style.display = "none";
+        previewCont.style.display = "block";
+        previewVid.src = URL.createObjectURL(blob);
+        previewVid.style.display = "block";
+        previewVid.play();
+
+        document.getElementById("timer").innerHTML = "00:00";
+        alert("Video recorded from camera!");
+    };
+
+    mediaRecorder.start();
+    document.getElementById("timer").innerHTML = "🔴 REC";
+
+    // 15 seconds automatic record stopper
+    setTimeout(() => {
+        if (mediaRecorder && mediaRecorder.state === "recording") {
+            mediaRecorder.stop();
+            recording = false;
+        }
+    }, 15000);
+}
+
+// Server par final fetch request post data send karne ke liye
+function finalUpload() {
+    if (!selectedFile) {
+        alert("Koi file select nahi hui hai.");
+        return;
+    }
+
+    let formData = new FormData();
+    formData.append("file", selectedFile);
+    formData.append("caption", document.getElementById("caption").value.trim());
+    formData.append("type", mode); 
+
+    fetch("/upload", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => {
+        if (res.ok) {
+            alert("Uploaded Successfully!");
+            window.location.href = "/"; 
+        } else {
+            alert("Upload Failed!");
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert("Network Error!");
+    });
+}
+</script>
+
+<script>
+
+function searchUsers(query){
+
+    if(query.trim()==""){
+        document.getElementById("searchResults").innerHTML="";
+        return;
+    }
+
+    fetch("/search?q="+encodeURIComponent(query))
+
+    .then(response=>response.json())
+
+    .then(users=>{
+
+        let html="";
+
+        users.forEach(function(user){
+
+            let pic=user[2];
+
+            if(!pic){
+                pic="default.png";
+            }
+
+            let following=user[3];
+
+            html += `
+
+            <div style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            padding:12px;
+            border-bottom:1px solid #333;">
+
+                <div
+                onclick="window.location='/profile/${user[0]}'"
+                style="
+                display:flex;
+                align-items:center;
+                gap:12px;
+                cursor:pointer;">
+
+                    <img
+                    src="/static/images/${pic}"
+                    style="
+                    width:45px;
+                    height:45px;
+                    border-radius:50%;
+                    object-fit:cover;">
+
+                    <div>
+
+                        <b>@${user[0]}</b><br>
+
+                        <span style="color:gray;">
+                        ${user[1] || ""}
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <button
+                id="followBtn_${user[0]}"
+		onclick="event.stopPropagation();toggleSearchFollow('${user[0]}')"
+                style="
+                padding:8px 18px;
+                background:${following ? "#333" : "#0095f6"};
+                color:white;
+                border:none;
+                border-radius:8px;
+                cursor:pointer;">
+
+                ${following ? "Following" : "Follow"}
+
+                </button>
+
+            </div>
+
+            `;
+
+        });
+
+        document.getElementById("searchResults").innerHTML=html;
+
+    });
+
+}
+
+
+
+function toggleSearchFollow(username){
+
+    let btn=document.getElementById("followBtn_"+username);
+
+    if(btn.innerHTML.trim()=="Follow"){
+
+        fetch("/follow/"+username,{
+            method:"POST"
+        })
+
+        .then(r=>r.json())
+
+        .then(data=>{
+
+            if(data.status=="followed"){
+
+                btn.innerHTML="Following";
+                btn.style.background="#333";
+
+            }
+
+        });
+
+    }
+
+    else{
+
+        fetch("/unfollow/"+username,{
+            method:"POST"
+        })
+
+        .then(r=>r.json())
+
+        .then(data=>{
+
+            if(data.status=="unfollowed"){
+
+                btn.innerHTML="Follow";
+                btn.style.background="#0095f6";
+
+            }
+
+        });
+
+    }
+
+}
+
+</script>
+
+
+<div id="storyViewer" class="story-viewer"><div class="story-header">
+
+    <div class="progress-box">
+        <div id="progress"></div>
+    </div>
+
+    <span id="storyUser">User</span>
+
+    <button onclick="closeStory()">✕</button>
+
+</div>
+
+<img id="storyImage"
+     style="width:100%;height:80vh;object-fit:contain;display:block;margin:auto;">
+
+<div class="story-buttons">
+
+<button onclick="prevStory()">◀</button>
+
+<button
+onclick="showViewers()"
+style="
+background:none;
+border:none;
+color:white;
+font-size:28px;">
+👁️
+</button>
+
+<button onclick="nextStory()">▶</button>
+</div>
+
+<div id="viewerList"></div>
+
+<button
+onclick="document.getElementById('viewerPopup').style.display='none'"
+style="
+position:absolute;
+top:10px;
+left:10px;
+border:none;
+background:none;
+font-size:30px;">
+✕
+</button>
+
+</div>
+
+<script>
+
+let currentStory = 0;
+storyList = [];
+let timer;
+let barInterval;
+let firstUser = "";
+
+console.log("STORY LIST =", storyList);
+
+function openStory(storyId, image, user){
+    console.log(allStories);
+
+    console.log("openStory called", storyId, image, user);
+
+
+    console.log("CLICK USER =", user);
+    console.log("ALL STORIES =", allStories);
+
+    storyList = allStories.filter(
+        x => String(x[1]).trim() === String(user).trim()
+    );
+
+    firstUser = user;
+
+    console.log("FILTERED =", storyList);
+
+    if(storyList.length === 0){
+        alert("No stories found for: " + user);
+        return;
+    }
+
+    currentStory = 0;
+
+    document.getElementById("storyViewer").style.display = "block";
+
+    showStory();
+}
+
+function showStory(){
+
+
+    console.log(storyList);
+    let s = storyList[currentStory];
+
+
+    console.log("showStory called");
+
+    if(!storyList || storyList.length === 0){
+        alert("No stories found");
+        return;
+    }
+
+
+    console.log("CURRENT STORY =", s);
+
+    if(!s){
+        alert("Story data missing");
+        return;
+    }
+
+    fetch("/view_story/" + s[0], {
+        method: "POST"
+    })
+    .then(r => r.json())
+    .then(data => {
+        console.log(data);
+    })
+    .catch(err => {
+        console.log(err);
+    });
+
+    fetch("/story_views/" + s[0])
+    .then(r => r.json())
+    .then(data => {
+        document.getElementById("viewerCount").innerHTML = data.length;
+    });
+
+    let file = s[2];
+
+    console.log("FILE =", file);
+
+    if(!file){
+        alert("Story file missing");
+        return;
+    }
+
+    let oldMedia = document.getElementById("storyImage");
+
+    if(file.endsWith(".mp4") || file.endsWith(".webm")){
+
+        oldMedia.outerHTML = `
+        <video id="storyImage"
+               autoplay
+               muted
+               controls
+               playsinline
+               style="width:100%;height:80vh;object-fit:contain;">
+            <source src="/static/uploads/${file}">
+        </video>`;
+
+    }else{
+
+        oldMedia.outerHTML = `
+        <img id="storyImage"
+             src="/static/uploads/${file}"
+             style="width:100%;height:80vh;object-fit:contain;">`;
+
+    }
+
+    document.getElementById("storyUser").innerHTML = s[1];
+
+    let eyeBtn = document.getElementById("eyeBtn");
+
+    if(s[1] == "{{ session['username'] }}"){
+        eyeBtn.style.display = "block";
+    }else{
+        eyeBtn.style.display = "none";
+    }
+
+    clearTimeout(timer);
+
+    let duration = 15000;
+
+    if(file.endsWith(".mp4") || file.endsWith(".webm")){
+
+        let video = document.getElementById("storyImage");
+
+        if(video){
+
+            video.onloadedmetadata = function(){
+
+                let videoDuration = video.duration * 1000;
+
+                duration = Math.min(videoDuration,180000);
+
+                clearTimeout(timer);
+
+                timer = setTimeout(nextStory,duration);
+
+            };
+
+        }
+
+    }else{
+
+        timer = setTimeout(nextStory,duration);
+
+    }
+
+}
+
+function showViewers(){
+
+    let s = storyList[currentStory];
+
+    fetch("/story_views/" + s[0])
+    .then(r=>r.json())
+    .then(users=>{
+
+        let html = "<h2>Story Viewers</h2>";
+
+        html += "👁️ " + users.length + "<hr>";
+
+        users.forEach(u=>{
+            html += `
+            <div style="padding:12px;border-bottom:1px solid #333;">
+                ${u}
+            </div>`;
+        });
+
+        html += `<button onclick="closeViewer()">Close</button>`;
+
+        document.getElementById("viewerBox").innerHTML = html;
+        document.getElementById("viewerBox").style.display = "block";
+
+    });
+
+}
+
+
+function nextStory(){
+
+    if(currentStory < storyList.length-1){
+
+        currentStory++;
+        showStory();
+
+    }else{
+
+        nextUserStory();
+
+    }
+
+}
+
+function nextUserStory(){
+
+    let currentUser = storyList[0][1];
+
+    let users = [...new Set(allStories.map(x => x[1]))];
+
+    let index = users.indexOf(currentUser);
+
+    let nextIndex = index + 1;
+
+    if(nextIndex >= users.length){
+        nextIndex = 0;
+    }
+
+    let nextUser = users[nextIndex];
+
+    if(nextUser === firstUser){
+        closeStory();
+        return;
+    }
+
+    storyList = allStories.filter(x => x[1] === nextUser);
+
+    currentStory = 0;
+
+    showStory();
+}
+
+
+function closeStory(){
+
+    document.getElementById("storyViewer").style.display="none";
+
+    clearTimeout(timer);
+    clearInterval(barInterval);
+
+}
+
+function openCamera(){
+
+    alert("Camera trigger open!");
+
+}
+
+</script>
+
+
+<body>
+{% for post in posts %}
+<div class="post">
+    <div class="post-header">
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <img src="/static/images/{{ post[3] if post[3] else 'default.jpg' }}"
+     style="width:35px; height:35px; border-radius:50%; object-fit:cover;">
+            <h3 style="margin: 0; color: white; font-size: 16px;">{{post[0]}}</h3>
+        </div>
+       <button onclick="toggleFollow(this, '{{ post[0]|trim }}')">
+{% if post[0]|trim in following_users %}
+    Following
+{% else %}
+    Follow
+{% endif %}
+</button>
+    </div>
+
+    <img src="/static/uploads/{{post[1]}}" class="post-img">
+
+    <div class="action-bar">
+<button onclick="toggleLike(this, '{{ post[4] }}')" class="action-btn">
+    <span class="heart-icon">🤍</span>
+    <span class="like-count">{{ post[5] }}</span>
+</button>
+
+<button onclick="openComments('{{post[4]}}')" class="action-btn">
+    💬
+</button>
+<div id="commentModal" style="
+display:none;
+position:fixed;
+bottom:0;
+left:0;
+width:100%;
+height:70%;
+background:black;
+color:white;
+z-index:9999;
+overflow:auto;
+border-top-left-radius:20px;
+border-top-right-radius:20px;
+">
+
+    <div style="padding:15px;">
+        <h3>Comments</h3>
+
+        <div id="modalComments"></div>
+
+        <input
+            id="modalCommentInput"
+            placeholder="Add comment..."
+            style="width:70%;padding:8px;"
+        >
+
+        <button onclick="postModalComment()">
+            Post
+        </button>
+
+<button onclick="closeComments()">✖ Close</button>
+    </div>
+
+</div>
+
+<button onclick="openShare({{ post[4] }})" class="action-btn">
+📥
+</button>
+    </div>
+
+    <div id="comment-box-{{loop.index}}" style="display: none; padding: 10px; color: white;">
+        <input id="comment-input-{{loop.index}}" placeholder="Add comment..." style="width: 70%; padding: 5px;">
+
+<button onclick="addComment('{{loop.index}}','{{post[4]}}')">
+ Post
+</button>
+        <div id="comments-list-{{loop.index}}" style="margin-top: 5px;"></div>
+    </div>
+</div>
+{% endfor %}
+</body>
+
+
+<script>
+// Like Logic (With Count)
+function toggleLike(btn, postId) {
+
+fetch("/like/" + postId,{
+    method:"POST"
+})
+.then(res => res.json())
+.then(data => {
+
+    let heart = btn.querySelector(".heart-icon");
+    let countSpan = btn.querySelector(".like-count");
+
+    countSpan.innerText = data.likes;
+
+    if(data.status == "liked"){
+
+        btn.classList.add("active");
+        heart.innerText = "❤️";
+
+    }else{
+
+        btn.classList.remove("active");
+        heart.innerText = "🤍";
+
+    }
+
+});
+
+}
+
+
+// Toggle Comment Box
+function toggleCommentBox(id) {
+    let box = document.getElementById(id);
+    box.style.display = (box.style.display === "none" || box.style.display === "") ? "block" : "none";
+}
+
+// Add Comment
+let currentPostId = null;
+
+function openComments(postId){
+
+    currentPostId = postId;
+
+    fetch("/comments/" + postId)
+
+    .then(r => r.json())
+
+    .then(data => {
+
+        let html = "";
+
+        data.forEach(c => {
+
+            html += `
+            <div style="margin-bottom:10px;">
+                <b>${c[0]}</b>: ${c[1]}
+            </div>
+            `;
+
+        });
+
+        document.getElementById("modalComments")
+            .innerHTML = html;
+
+        document.getElementById("commentModal")
+            .style.display = "block";
+
+    });
+
+}
+
+function closeComments() {
+    document.getElementById("commentsModal").style.display = "none";
+}
+
+
+function postModalComment(){
+
+    let text =
+        document.getElementById(
+            "modalCommentInput"
+        ).value;
+
+    fetch("/comment/" + currentPostId, {
+
+        method:"POST",
+
+        headers:{
+            "Content-Type":
+            "application/x-www-form-urlencoded"
+        },
+
+        body:"comment=" +
+        encodeURIComponent(text)
+
+    })
+
+    .then(r => r.json())
+
+    .then(data => {
+
+        document.getElementById("modalComments")
+        .innerHTML +=
+        `<div><b>${data.username}</b>: ${data.comment}</div>`;
+
+        document.getElementById(
+            "modalCommentInput"
+        ).value = "";
+
+    });
+
+}
+
+
+// Share Logic (Ensure shareBox ID exists in HTML)
+function openShare() {
+    let box = document.getElementById('shareBox');
+    if (box) box.style.display = "block";
+}
+
+function closeComments() {
+    document.getElementById("commentModal").style.display = "none";
+}
+
+// Follow Logic
+function toggleFollow(btn, username) {
+
+    if (btn.innerText.trim() == "Following") {
+
+        fetch("/unfollow/" + username, {
+            method: "POST"
+        })
+        .then(res => res.json())
+        .then(data => {
+
+            if (data.status == "unfollowed") {
+                btn.innerText = "Follow";
+                btn.style.background = "#0095f6";
+                btn.style.color = "#fff";
+            }
+
+        });
+
+    } else {
+
+        fetch("/follow/" + username, {
+            method: "POST"
+        })
+        .then(res => res.json())
+        .then(data => {
+
+            if (data.status == "followed") {
+                btn.innerText = "Following";
+                btn.style.background = "#333";
+                btn.style.color = "#888";
+            }
+
+        });
+
+    }
+}
+
+
+
+</script>
+
+<!-- SHARE PANEL -->
+
+<div id="shareBox"
+style="display:none;
+position:fixed;
+left:0;
+top:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,.6);
+z-index:999999;">
+
+<div style="
+position:absolute;
+bottom:0;
+left:0;
+width:100%;
+height:65%;
+background:#111;
+border-radius:20px 20px 0 0;
+padding:15px;
+overflow:auto;">
+
+<h3 style="color:white;text-align:center;">
+Share Post
+</h3>
+
+<input
+id="shareSearch"
+placeholder="Search user..."
+style="
+width:100%;
+padding:10px;
+border:none;
+border-radius:8px;
+margin-bottom:15px;">
+
+<div id="shareUsers">
+
+{% for f in friends %}
+
+<div
+style="
+display:flex;
+align-items:center;
+justify-content:space-between;
+margin-bottom:12px;">
+
+<div style="display:flex;align-items:center;">
+
+<img
+src="/static/images/{{ f.profile_pic }}"
+style="
+width:45px;
+height:45px;
+border-radius:50%;
+margin-right:10px;">
+
+<span style="color:white;">
+{{ f.username }}
+</span>
+
+</div>
+
+<button
+onclick="sharePost('{{ f.username }}')"
+style="
+background:#0095f6;
+color:white;
+border:none;
+padding:8px 15px;
+border-radius:8px;">
+
+Send
+
+</button>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+<button
+onclick="closeShare()"
+style="
+width:100%;
+margin-top:15px;
+padding:10px;
+border:none;
+background:#333;
+color:white;
+border-radius:8px;">
+
+Close
+
+</button>
+
+</div>
+
+</div>
+
+<script>
+
+let currentSharePost = null;
+
+function openShare(postId){
+
+    currentSharePost = postId;
+
+    document.getElementById("shareBox").style.display="block";
+
+}
+
+function closeShare(){
+
+    document.getElementById("shareBox").style.display="none";
+
+}
+
+function sharePost(username){
+
+    fetch("/share_post",{
+
+        method:"POST",
+
+        headers:{
+            "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+
+            receiver:username,
+
+            post_id:currentSharePost
+
+        })
+
+    })
+
+    .then(r=>r.json())
+
+    .then(data=>{
+
+        if(data.status=="ok"){
+
+            alert("Post Shared ✅");
+
+            closeShare();
+
+        }else{
+
+            alert(data.message);
+
+        }
+
+    });
+
+}
+
+</script>
+
+
+</body>
+</html>
+
+
+

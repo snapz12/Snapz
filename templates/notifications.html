@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Notifications</title>
+<style>
+body{
+    background:black;
+    color:white;
+    font-family:sans-serif;
+}
+.notification{
+    padding:15px;
+    border-bottom:1px solid #333;
+}
+a{
+    color:white;
+}
+</style>
+</head>
+<body>
+
+<h2>♡ Notifications</h2>
+
+{% if notifications %}
+
+    {% for n in notifications %}
+    <div class="notification">
+
+        <b>{{ n[0] }}</b>
+
+        {% if n[1] == "follow" %}
+        started following you
+
+        {% elif n[1] == "liked your post" %}
+        liked your post ❤️
+
+        {% elif n[1] == "liked your reel ❤️" %}
+        liked your reel ❤️
+
+        {% else %}
+        {{ n[1] }}
+
+        {% endif %}
+        <small>{{ n[2] }}</small>
+{% if n[3] %}
+<form action="/unfollow_back/{{ n[0]|trim }}" method="POST">
+    <button style="background:#333;color:white;padding:6px 12px;border:none;border-radius:6px;">
+        Following
+    </button>
+</form>
+{% else %}
+<form action="/follow_back/{{ n[0]|trim }}" method="POST">
+    <button style="background:#0095f6;color:white;padding:6px 12px;border:none;border-radius:6px;">
+        Follow Back
+    </button>
+</form>
+{% endif %}
+    </div>
+    {% endfor %}
+
+{% else %}
+
+    <p>No notifications yet.</p>
+
+{% endif %}
+
+<br>
+<a href="/">⬅ Back</a>
+
+</body>
+</html>

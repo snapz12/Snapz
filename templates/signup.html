@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Sign Up</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<style>
+
+body{
+  background: #222;
+  color: white;
+  text-align: center;
+  font-family: Arial;
+  margin: 0;
+  padding: 0;
+}
+
+.box{
+  background: #333;
+  width: 300px;
+  margin: auto;
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 100px;
+}
+
+input{
+  width: 90%;
+  padding: 10px;
+  margin: 10px;
+  border: none;
+  border-radius: 5px;
+}
+
+button{
+  padding: 10px 20px;
+  background: red;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover{
+  background: orange;
+}
+
+@media (max-width: 360px){
+  .box{
+    width: 90%;
+    margin-top: 60px;
+    padding: 15px;
+  }
+
+  input{
+    width: 95%;
+    margin: 8px 0;
+  }
+
+  button{
+    width: 95%;
+    padding: 10px;
+  }
+}
+
+@media (min-width: 361px) and (max-width: 480px){
+  .box{
+    width: 85%;
+    margin-top: 70px;
+  }
+
+  input{
+    width: 92%;
+  }
+
+  button{
+    width: 92%;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px){
+  .box{
+    width: 70%;
+    margin-top: 90px;
+  }
+
+  input{
+    width: 90%;
+  }
+}
+
+button:huver{
+  backgorund:orange;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="box">
+
+<h1>Create Account</h1>
+
+<form method="POST">
+
+
+<input type="text" name="name" placeholder="Full Name">
+
+<input type="text" name="username" placeholder="Username">
+
+<input type="email" name="email" placeholder="Email">
+
+<input type="text" name="otp" placeholder="OTP">
+
+<input type="password" name="password" placeholder="Password">
+
+<button formaction="/send_otp" formmethod="post">
+Send OTP
+</button>
+
+<button type="submit">
+Signup
+</button>
+
+</form>
+</div>
+
+</body>
+</html>

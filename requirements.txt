@@ -2,4 +2,4 @@ Flask
 Flask-Mail
 Flask-SocketIO
 gunicorn
-numpy
+Werkzeug

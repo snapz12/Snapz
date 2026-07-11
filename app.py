@@ -460,7 +460,9 @@ def login():
         return "<pre>" + str(e) + "</pre>"
 
     user = cur.fetchone()
-        if user:
+
+    if user:
+
             cur.execute("""
                 UPDATE users
                 SET is_online=1
@@ -476,7 +478,7 @@ def login():
             conn.close()
             return redirect(url_for("home"))
 
-        else:
+    else:
             conn.close()
             return "Invalid username or password"
 

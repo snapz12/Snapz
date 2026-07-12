@@ -447,45 +447,42 @@ def signup():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
 
-    if request.method == 'POST':
+    if request.method == "POST":
 
-        username = request.form['username']
-        password = request.form['password']
+        username = request.form.get("username")
+        password = request.form.get("password")
 
         conn = sqlite3.connect("snapz.db")
+        conn.row_factory = sqlite3.Row
         cur = conn.cursor()
 
-        try:
-            cur.execute(
-                "SELECT name, bio, profile_pic FROM users WHERE username=? AND password=?",
-                (username, password)
-            )
-	except Exception as e:
-	    import traceback
-	    return "<pre>" + traceback.format_exc() + "</pre>"
+        cur.execute(
+            "SELECT * FROM users WHERE username=? AND password=?",
+            (username, password)
+        )
+
         user = cur.fetchone()
 
         if user:
+
             cur.execute(
                 "UPDATE users SET is_online=1 WHERE username=?",
                 (username,)
             )
             conn.commit()
 
-            session['username'] = username
-            session['name'] = user[0]
-            session['bio'] = user[1]
-            session['profile_pic'] = user[2]
+            session["username"] = user["username"]
+            session["name"] = user["name"]
+            session["bio"] = user["bio"]
+            session["profile_pic"] = user["profile_pic"]
 
             conn.close()
             return redirect(url_for("home"))
 
-        else:
-            conn.close()
-            return "Invalid username or password"
+        conn.close()
+        return "Invalid username or password"
 
     return render_template("login.html")
-
 
 
 @app.route("/users")
@@ -501,31 +498,31 @@ def users():
     cur = conn.cursor()
 
     cur.execute("""
-	SELECT DISTINCT
-	u.username,
-	u.profile_pic
+    SELECT DISTINCT
+    u.username,
+    u.profile_pic
 
-	FROM users u
+    FROM users u
 
-	JOIN messages m
-	ON
-	(
-	u.username=m.sender
-	OR
-	u.username=m.receiver
-	)
+    JOIN messages m
+    ON
+    (
+    u.username=m.sender
+    OR
+    u.username=m.receiver
+    )
 
-	WHERE
-	u.username!=?
+    WHERE
+    u.username!=?
 
-	AND
-	(
-	m.sender=?
-	OR
-	m.receiver=?
-	)
+    AND
+    (
+    m.sender=?
+    OR
+    m.receiver=?
+    )
 
-	ORDER BY u.username
+    ORDER BY u.username
     """,(
             my_username,
             my_username,
@@ -728,8 +725,8 @@ def chat_messages(username):
     cur = conn.cursor()
 
     cur.execute("""
-	SELECT id, sender, message, timestamp, is_seen, image, audio, deleted
-	FROM messages
+    SELECT id, sender, message, timestamp, is_seen, image, audio, deleted
+    FROM messages
         WHERE
         (sender=? AND receiver=?)
         OR
@@ -1540,7 +1537,7 @@ def create_tables():
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     user_to TEXT,
                     user_from TEXT,
-	                    action TEXT,
+                        action TEXT,
                     post_id INTEGER,
                     is_read BOOLEAN DEFAULT 0)''')
     conn.commit()

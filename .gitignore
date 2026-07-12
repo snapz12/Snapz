@@ -1,5 +1,4 @@
 uploads/
-static/uploads/
 __pycache__/
 cloudflared-linux-arm64
 ngrok-v3-stable-linux-arm64.zip

@@ -735,7 +735,7 @@ onclick="document.getElementById('searchModal').style.display='block'">
         {% if my_story[2].endswith('.mp4') or my_story[2].endswith('.webm') %}
 
         <video
-            src="/static/uploads/{{ my_story[2] }}"
+  	    src="{{ my_story[2] }}"
             muted
             autoplay
             loop
@@ -748,7 +748,7 @@ onclick="document.getElementById('searchModal').style.display='block'">
         {% else %}
 
         <img
-            src="/static/uploads/{{ my_story[2] }}"
+	    src="{{ my_story[2] }}"
             style="width:100%;height:100%;
                    border-radius:50%;
                    object-fit:cover;">
@@ -778,7 +778,7 @@ onclick="document.getElementById('searchModal').style.display='block'">
         {% if story[2].endswith('.mp4') or story[2].endswith('.webm') %}
 
         <video
-            src="/static/uploads/{{ story[2] }}"
+            src="{{ story[2] }}"
             muted
             autoplay
             loop
@@ -789,7 +789,7 @@ onclick="document.getElementById('searchModal').style.display='block'">
         {% else %}
 
         <img
-            src="/static/uploads/{{ story[2] }}"
+	    src="{{ story[2] }}"
             style="width:100%;height:100%;border-radius:50%;object-fit:cover;">
 
         {% endif %}
@@ -1652,7 +1652,7 @@ function openCamera(){
 </button>
     </div>
 
-    <img src="/static/uploads/{{post[1]}}" class="post-img">
+    <img src="{{ post[1] }}" class="post-img">
 
     <div class="action-bar">
 <button onclick="toggleLike(this, '{{ post[4] }}')" class="action-btn">
@@ -1708,7 +1708,8 @@ border-top-right-radius:20px;
 
 <button onclick="addComment('{{loop.index}}','{{post[4]}}')">
  Post
-</button>
+</y
+<button>
         <div id="comments-list-{{loop.index}}" style="margin-top: 5px;"></div>
     </div>
 </div>

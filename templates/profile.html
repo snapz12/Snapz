@@ -409,7 +409,7 @@ Share Profile
 {% for post in posts %}
 
 <img
-src="/static/uploads/{{post[2]}}"
+src="{{ post[2] }}"
 class="grid-item"
 
 onclick="openPost(
@@ -426,7 +426,7 @@ onclick="openPost(
 {% for reel in reels %}
 
 <video
-src="/static/uploads/{{reel[2]}}"
+src="{{ reel[2] }}"
 class="grid-item"
 
 onclick="openReel(

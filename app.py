@@ -1127,7 +1127,7 @@ def upload():
     original_filename = file.filename
     filename = f"{int(time.time())}_{original_filename}"
 
-try:
+    try:
     result = cloudinary.uploader.upload(file)
     filename = result["secure_url"]
     print("Cloudinary Upload Success:", filename)

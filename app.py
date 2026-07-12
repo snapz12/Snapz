@@ -16,7 +16,8 @@ import random
 from flask import session
 from flask_mail import Mail, Message
 from flask_socketio import SocketIO, emit, join_room, leave_room
-
+import cloudinary
+import cloudinary.uploader
 
 REELS = []
 
@@ -30,6 +31,12 @@ socketio = SocketIO(
     async_mode="threading"
 )
 
+cloudinary.config(
+    cloud_name="riwhnyql",
+    api_key="962575776577664",
+    api_secret="krJQRV7ayw1ki57pUdQtjJl0reY",
+    secure=True
+)
 
 app.config["MAIL_SERVER"] = "smtp.gmail.com"
 app.config["MAIL_PORT"] = 587
@@ -477,8 +484,7 @@ def login():
             session["profile_pic"] = user["profile_pic"]
 
             conn.close()
-            return redirect(url_for("home"))
-
+        return redirect("/")
         conn.close()
         return "Invalid username or password"
 
@@ -808,7 +814,10 @@ def send_image(username):
 
     filename = str(int(time.time())) + "_" + file.filename
 
-    file.save("static/uploads/" + filename)
+
+    result = cloudinary.uploader.upload(file)
+
+    filename = result["secure_url"]
 
     conn = sqlite3.connect("snapz.db")
     cur = conn.cursor()
@@ -852,7 +861,10 @@ def send_audio(username):
 
     filename = str(int(time.time())) + "_voice.webm"
 
-    file.save("static/uploads/" + filename)
+    result = cloudinary.uploader.upload(file)
+
+    filename = result["secure_url"]
+
 
     conn = sqlite3.connect("snapz.db")
     cur = conn.cursor()
@@ -1115,7 +1127,9 @@ def upload():
     original_filename = file.filename
     filename = f"{int(time.time())}_{original_filename}"
 
-    file.save("static/uploads/" + filename)
+    result = cloudinary.uploader.upload(file)
+
+    filename = result["secure_url"]
 
     if "username" not in session:
         return "User not logged in", 401
@@ -1177,14 +1191,16 @@ def upload():
             (username, filename, caption, profile_pic)
        )
 
+    print("USERNAME =", username)
+    print("TYPE =", upload_type)
+    print("FILE =", filename)
+    print("CAPTION =", caption)
+
     conn.commit()
+    print("UPLOAD SAVED SUCCESSFULLY")
     conn.close()
 
-    return {"status": "followed"}
-
-    return redirect("/")
-
-
+    return jsonify({"status":"ok"})
 
 @app.route("/profile")
 def profile():
@@ -1360,34 +1376,30 @@ def logout():
 @app.route("/story", methods=["POST"])
 def story():
 
-    image=request.files["image"]
+    if "username" not in session:
+        return redirect("/login")
 
-    filename=secure_filename(image.filename)
+    image = request.files["image"]
 
-    image.save(
-        os.path.join(
-            app.config["UPLOAD_FOLDER"],
-            filename
-        )
-    )
+    result = cloudinary.uploader.upload(image)
 
+    filename = result["secure_url"]
 
-    conn=sqlite3.connect("snapz.db")
-    cur=conn.cursor()
+    conn = sqlite3.connect("snapz.db")
+    cur = conn.cursor()
 
     cur.execute(
-    "INSERT INTO stories(username,image) VALUES(?,?)",
-    (
-        session["username"],
-        filename
-    )
+        "INSERT INTO stories(username,image) VALUES(?,?)",
+        (
+            session["username"],
+            filename
+        )
     )
 
     conn.commit()
     conn.close()
 
-    return redirect("/")
-
+    return redirect(url_for("home"))
 
 @app.route('/update_profile', methods=['POST'])
 def update_profile():
@@ -1471,7 +1483,9 @@ def update_profile():
 
         filename = f"{new_username}.jpg"
 
-        file.save(os.path.join(folder_path, filename))
+	result = cloudinary.uploader.upload(file)
+
+	filename = result["secure_url"]
 
         print("PHOTO SAVED:", filename)
 

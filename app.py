@@ -441,48 +441,51 @@ def signup():
     return render_template('signup.html')
 
 
+
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
 
     if request.method == 'POST':
+
         username = request.form['username']
         password = request.form['password']
 
-    conn = sqlite3.connect("snapz.db")
-    cur = conn.cursor()
+        conn = sqlite3.connect("snapz.db")
+        cur = conn.cursor()
 
-    try:
-        cur.execute(
-            "SELECT name, bio, profile_pic FROM users WHERE username=? AND password=?",
-            (username, password)
-        )
-    except Exception as e:
-        return "<pre>" + str(e) + "</pre>"
+        try:
+            cur.execute(
+                "SELECT name, bio, profile_pic FROM users WHERE username=? AND password=?",
+                (username, password)
+            )
+	except Exception as e:
+	    import traceback
+	    return "<pre>" + traceback.format_exc() + "</pre>"
+        user = cur.fetchone()
 
-    user = cur.fetchone()
-
-    if user:
-
-            cur.execute("""
-                UPDATE users
-                SET is_online=1
-                WHERE username=?
-            """, (username,))
+        if user:
+            cur.execute(
+                "UPDATE users SET is_online=1 WHERE username=?",
+                (username,)
+            )
             conn.commit()
 
             session['username'] = username
             session['name'] = user[0]
             session['bio'] = user[1]
-            session['pfp'] = user[2] if user[2] else 'default.jpg'
+            session['profile_pic'] = user[2]
 
             conn.close()
             return redirect(url_for("home"))
 
-    else:
+        else:
             conn.close()
             return "Invalid username or password"
 
-    return render_template('login.html')
+    return render_template("login.html")
+
 
 
 @app.route("/users")

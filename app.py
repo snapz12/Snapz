@@ -1189,18 +1189,18 @@ def upload():
         cur.execute(
             "INSERT INTO posts(username, image, caption, profile_pic) VALUES(?,?,?,?)",
             (username, filename, caption, profile_pic)
-       )
+        )
 
-    print("USERNAME =", username)
-    print("TYPE =", upload_type)
-    print("FILE =", filename)
-    print("CAPTION =", caption)
+        print("USERNAME =", username)
+        print("TYPE =", upload_type)
+        print("FILE =", filename)
+        print("CAPTION =", caption)
 
-    conn.commit()
-    print("UPLOAD SAVED SUCCESSFULLY")
-    conn.close()
+        conn.commit()
+        print("UPLOAD SAVED SUCCESSFULLY")
+        conn.close()
 
-    return jsonify({"status":"ok"})
+        return jsonify({"status": "ok"})
 
 @app.route("/profile")
 def profile():
@@ -1483,9 +1483,9 @@ def update_profile():
 
         filename = f"{new_username}.jpg"
 
-	result = cloudinary.uploader.upload(file)
+        result = cloudinary.uploader.upload(file)
 
-	filename = result["secure_url"]
+        filename = result["secure_url"]
 
         print("PHOTO SAVED:", filename)
 
@@ -1496,7 +1496,6 @@ def update_profile():
 
         session["pfp"] = filename
 
-        print("PHOTO SAVED:", filename)
 
     conn.commit() 
     conn.close()

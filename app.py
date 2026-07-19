@@ -3240,6 +3240,7 @@ def end_call(data):
         room=data["to"]
     )
 
+
 @socketio.on("call-user")
 def call_user(data):
 
@@ -3250,6 +3251,7 @@ def call_user(data):
         data,
         room=data["to"]
     )
+
 
 @socketio.on("missed-call")
 def missed_call(data):

@@ -1448,6 +1448,7 @@ document.querySelector(".send-btn").onclick=function(e){
 
 <script>
 let callSeconds = 0;
+let ringTimeout = null;
 let timerInterval = null;
 let currentCaller = "";
 
@@ -1479,6 +1480,15 @@ function startCall(type){
         from:"{{ session['username'] }}",
         type:type
     });
+
+ringTimeout = setTimeout(function(){
+
+    cancelCall();
+
+    alert("No Answer");
+
+},30000);
+
 
 }
 
@@ -1529,6 +1539,8 @@ function stopTimer(){
 
 function cancelCall(){
 
+clearTimeout(ringTimeout);
+
     stopTimer();
 
     document.getElementById("callPopup").style.display="none";
@@ -1540,6 +1552,8 @@ function cancelCall(){
 }
 
 function rejectCall(){
+
+clearTimeout(ringTimeout);
 
     stopTimer();
 
@@ -1553,6 +1567,8 @@ socket.emit("end-call",{
 
 
 function acceptCall(){
+
+clearTimeout(ringTimeout);
 
     document.getElementById("incomingCallPopup").style.display="none";
 

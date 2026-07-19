@@ -3257,14 +3257,14 @@ def missed_call(data):
 
     if data["type"] == "video":
 
-        # Caller ko
+        # Sirf caller ke chat me
         save_system_message(
             data["from"],
             data["to"],
             "📹 Video call ended"
         )
 
-        # Receiver ko
+        # Sirf receiver ke chat me
         save_system_message(
             data["to"],
             data["from"],
@@ -3273,14 +3273,14 @@ def missed_call(data):
 
     else:
 
-        # Caller ko
+        # Sirf caller ke chat me
         save_system_message(
             data["from"],
             data["to"],
             "📞 Voice call ended"
         )
 
-        # Receiver ko
+        # Sirf receiver ke chat me
         save_system_message(
             data["to"],
             data["from"],

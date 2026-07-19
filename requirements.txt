@@ -12,7 +12,7 @@ Flask-SocketIO==5.6.1
 geographiclib==2.1
 geopy==2.5.0
 greenlet==3.3.2
-gunicorn==26.0.0
+gunicorn==23.0.0
 h11==0.16.0
 idna==3.18
 itsdangerous==2.2.0

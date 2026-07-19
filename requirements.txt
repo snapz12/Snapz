@@ -18,7 +18,7 @@ idna==3.18
 itsdangerous==2.2.0
 Jinja2==3.1.6
 MarkupSafe==3.0.3
-numpy @ file:///home/builder/.termux-build/python-numpy/src/dist/numpy-2.4.4-cp314-cp314-android_aarch64.whl#sha256=68ef31f0d8925d96da2b5e014c2c3d32a16dd68887329eeecb7f3a548222e24d
+numpy==2.4.4
 packaging==26.2
 pillow==12.3.0
 python-engineio==4.13.3

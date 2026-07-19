@@ -1484,21 +1484,18 @@ function startCall(type){
 ringTimeout = setTimeout(function(){
 
     socket.emit("missed-call",{
-
         from:"{{ session['username'] }}",
-
         to:"{{ chat_with }}",
-
         type:type
-
     });
 
-    cancelCall();
+    stopTimer();
+    document.getElementById("callPopup").style.display="none";
+
+    // ❌ cancelCall() mat bulao
+    // cancelCall();
 
 },30000);
-
-
-}
 
 
 socket.on("incoming-call",function(data){

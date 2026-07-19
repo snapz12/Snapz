@@ -3276,37 +3276,33 @@ def call_user(data):
 @socketio.on("missed-call")
 def missed_call(data):
 
-    if data["type"] == "video":
+    conn = sqlite3.connect("snapz.db")
+    cur = conn.cursor()
 
-        # Sirf caller ke chat me
-        save_system_message(
-            data["from"],
-            data["to"],
-            "📹 Video call ended"
+    cur.execute("""
+        UPDATE calls
+        SET status=?,
+            ended_at=datetime('now','localtime')
+        WHERE id=(
+            SELECT id FROM calls
+            WHERE caller=? AND receiver=?
+            ORDER BY id DESC
+            LIMIT 1
         )
+    """,(
+        "missed",
+        data["from"],
+        data["to"]
+    ))
 
-        # Sirf receiver ke chat me
-        save_system_message(
-            data["to"],
-            data["from"],
-            "📹 Missed video call"
-        )
+    conn.commit()
+    conn.close()
 
-    else:
-
-        # Sirf caller ke chat me
-        save_system_message(
-            data["from"],
-            data["to"],
-            "📞 Voice call ended"
-        )
-
-        # Sirf receiver ke chat me
-        save_system_message(
-            data["to"],
-            data["from"],
-            "📞 Missed voice call"
-        )
+    emit(
+        "call-ended",
+        {},
+        room=data["to"]
+    )
 
 
 

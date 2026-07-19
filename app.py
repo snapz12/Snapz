@@ -1,6 +1,6 @@
 import sqlite3
 import os
-import base64  
+import base64
 from flask import Flask, request, session, redirect, url_for
 import time
 from datetime import datetime
@@ -18,6 +18,9 @@ from flask_mail import Mail, Message
 from flask_socketio import SocketIO, emit, join_room, leave_room
 import cloudinary
 import cloudinary.uploader
+from flask import redirect
+from flask import send_from_directory
+from flask import request, jsonify
 
 REELS = []
 
@@ -372,6 +375,10 @@ def home():
     print("STORY CIRCLES =", story_circles)
     print("ALL STORIES =", all_stories)
 
+    print("MY STORY =", my_story)
+    print("STORY CIRCLES =", story_circles)
+    print("ALL STORIES =", all_stories)
+
 
     return render_template(
         "index.html",
@@ -408,74 +415,116 @@ def send_otp():
     return "OTP Sent Successfully"
 
 
-@app.route('/signup', methods=['GET', 'POST'])
+@app.route("/signup", methods=["GET", "POST"])
 def signup():
 
-    if request.method == 'POST':
+    if request.method == "POST":
 
-        name = request.form.get('name')
-        username = request.form.get('username')
-        email = request.form.get('email')
-        password = request.form.get('password')
-        otp = request.form.get('otp')
+        name = request.form.get("name", "").strip()
+        username = request.form.get("username", "").strip()
+        email = request.form.get("email", "").strip().lower()
+        password = request.form.get("password")
+        confirm_password = request.form.get("confirm_password")
+        otp = request.form.get("otp")
 
+        # OTP Check
         if otp != session.get("signup_otp"):
             return "Invalid OTP"
 
-        conn = sqlite3.connect('snapz.db')
+        # Password Match
+        if confirm_password and password != confirm_password:
+            return "Passwords do not match"
+
+        conn = sqlite3.connect("snapz.db")
         cur = conn.cursor()
 
-        cur.execute("""
-        INSERT INTO users
-        (username, name, email, profile_pic, password)
-        VALUES (?, ?, ?, ?, ?)
-        """,
-        (
-            username,
-            name,
-            email,
-            "default.jpg",
-            password
-        ))
+        # Username exists
+        cur.execute(
+            "SELECT id FROM users WHERE username=?",
+            (username,)
+        )
+
+        if cur.fetchone():
+            conn.close()
+            return "Username already exists"
+
+        # Email exists
+        cur.execute(
+            "SELECT id FROM users WHERE email=?",
+            (email,)
+        )
+
+        if cur.fetchone():
+            conn.close()
+            return "Email already registered"
+
+        # Insert user
+        cur.execute(
+            """
+            INSERT INTO users
+            (
+                username,
+                name,
+                email,
+                profile_pic,
+                password,
+                bio,
+                is_online
+            )
+            VALUES(?,?,?,?,?,?,?)
+            """,
+            (
+                username,
+                name,
+                email,
+                "default.jpg",
+                password,
+                "",
+                0
+            )
+        )
 
         conn.commit()
         conn.close()
 
         session.pop("signup_otp", None)
 
-        return redirect('/login')
+        return redirect("/login")
 
-    return render_template('signup.html')
-
-
+    return render_template("signup.html")
 
 
 
-@app.route('/login', methods=['GET', 'POST'])
+
+@app.route("/login", methods=["GET", "POST"])
 def login():
 
     if request.method == "POST":
 
-        username = request.form.get("username")
-        password = request.form.get("password")
+        username = request.form.get("username", "").strip()
+        password = request.form.get("password", "").strip()
 
         conn = sqlite3.connect("snapz.db")
         conn.row_factory = sqlite3.Row
         cur = conn.cursor()
 
-        cur.execute(
-            "SELECT * FROM users WHERE username=? AND password=?",
-            (username, password)
-        )
+        cur.execute("""
+            SELECT *
+            FROM users
+            WHERE username=?
+            AND password=?
+        """,(username,password))
 
         user = cur.fetchone()
 
         if user:
 
-            cur.execute(
-                "UPDATE users SET is_online=1 WHERE username=?",
-                (username,)
-            )
+            cur.execute("""
+                UPDATE users
+                SET is_online=1
+                WHERE username=?
+            """,(username,))
+
             conn.commit()
 
             session["username"] = user["username"]
@@ -484,9 +533,15 @@ def login():
             session["profile_pic"] = user["profile_pic"]
 
             conn.close()
-        return redirect("/")
+
+            return redirect("/")
+
         conn.close()
-        return "Invalid username or password"
+
+        return render_template(
+            "login.html",
+            error="Invalid username or password"
+        )
 
     return render_template("login.html")
 
@@ -504,49 +559,49 @@ def users():
     cur = conn.cursor()
 
     cur.execute("""
-    SELECT DISTINCT
-    u.username,
-    u.profile_pic
+        SELECT DISTINCT
+            u.username,
+            u.profile_pic
+        FROM users u
 
-    FROM users u
+        JOIN messages m
+        ON (
+            u.username=m.sender
+            OR
+            u.username=m.receiver
+        )
 
-    JOIN messages m
-    ON
-    (
-    u.username=m.sender
-    OR
-    u.username=m.receiver
-    )
+        WHERE
+            u.username!=?
+        AND
+        (
+            m.sender=?
+            OR
+            m.receiver=?
+        )
+    """, (
+        my_username,
+        my_username,
+        my_username
+    ))
 
-    WHERE
-    u.username!=?
-
-    AND
-    (
-    m.sender=?
-    OR
-    m.receiver=?
-    )
-
-    ORDER BY u.username
-    """,(
-            my_username,
-            my_username,
-            my_username
-        ))
     all_users = cur.fetchall()
 
     friends_data = []
 
     for user in all_users:
 
+        # Last message
         cur.execute("""
-            SELECT sender, message, timestamp
+            SELECT
+                sender,
+                message,
+                timestamp
             FROM messages
             WHERE
-            (sender=? AND receiver=?)
+                (sender=? AND receiver=?)
             OR
-            (sender=? AND receiver=?)
+                (sender=? AND receiver=?)
             ORDER BY id DESC
             LIMIT 1
         """, (
@@ -558,19 +613,52 @@ def users():
 
         row = cur.fetchone()
 
-        last_message = row[1] if row else "Tap to chat"
+        if row:
+            last_message = row["message"]
+            last_time = row["timestamp"]
+        else:
+            last_message = "Tap to chat"
+            last_time = ""
+
+        # Unread count
+        cur.execute("""
+            SELECT COUNT(*)
+            FROM messages
+            WHERE
+                sender=?
+            AND
+                receiver=?
+            AND
+                is_seen=0
+        """, (
+            user["username"],
+            my_username
+        ))
+
+        unread = cur.fetchone()[0]
 
         friends_data.append({
             "username": user["username"],
             "profile_pic": user["profile_pic"] or "default.jpg",
-            "last_message": last_message
+            "last_message": last_message,
+            "last_time": last_time,
+            "unread": unread,
+            "online": False
         })
+
+    # Latest chat first
+    friends_data.sort(
+        key=lambda x: x.get("last_time") or "",
+        reverse=True
+    )
+
 
     conn.close()
 
     return render_template(
         "users.html",
-        friends=friends_data
+        friends=friends_data,
+        current_user=my_username
     )
 
 
@@ -604,19 +692,20 @@ def chat(username):
 
     my_username = session["username"]
 
-    # Send text message
+    conn = sqlite3.connect("snapz.db")
+    cur = conn.cursor()
+
+    # Send message
     if request.method == "POST":
 
         msg = request.form.get("message", "").strip()
 
         if msg:
 
-            conn = sqlite3.connect("snapz.db")
-            cur = conn.cursor()
-
             cur.execute("""
-                INSERT INTO messages (sender, receiver, message)
-                VALUES (?, ?, ?)
+                INSERT INTO messages
+                (sender, receiver, message)
+                VALUES(?,?,?)
             """, (
                 my_username,
                 username,
@@ -624,19 +713,17 @@ def chat(username):
             ))
 
             conn.commit()
-            conn.close()
+
+        conn.close()
 
         return redirect(f"/chat/{username}")
-
-    # Load chat
-    conn = sqlite3.connect("snapz.db")
-    cur = conn.cursor()
 
     # Seen update
     cur.execute("""
         UPDATE messages
         SET is_seen=1
-        WHERE sender=? AND receiver=?
+        WHERE sender=?
+        AND receiver=?
     """, (
         username,
         my_username
@@ -646,7 +733,10 @@ def chat(username):
 
     # User info
     cur.execute("""
-        SELECT profile_pic,is_online,last_seen
+        SELECT
+        profile_pic,
+        is_online,
+        last_seen
         FROM users
         WHERE username=?
     """, (username,))
@@ -662,7 +752,13 @@ def chat(username):
         is_online = 0
         last_seen = ""
 
-    # Chat messages
+    if profile_pic and profile_pic.startswith("http"):
+        profile_url = profile_pic
+    elif profile_pic:
+        profile_url = "/static/images/" + profile_pic
+    else:
+        profile_url = "/static/images/default.jpg"
+# Chat messages
     cur.execute("""
         SELECT
             sender,
@@ -672,12 +768,13 @@ def chat(username):
             reel_id,
             image,
             audio,
+	    video,
             deleted
         FROM messages
         WHERE
-        (sender=? AND receiver=?)
-        OR
-        (sender=? AND receiver=?)
+            (sender=? AND receiver=?)
+            OR
+            (sender=? AND receiver=?)
         ORDER BY id ASC
     """, (
         my_username,
@@ -688,13 +785,12 @@ def chat(username):
 
     rows = cur.fetchall()
 
-    conn.close()
-
     chats = []
 
     for r in rows:
 
         chats.append({
+
             "sender": r[0],
             "message": r[1],
             "time": time_ago(r[2]),
@@ -702,28 +798,27 @@ def chat(username):
             "reel_id": r[4],
             "image": r[5],
             "audio": r[6],
-            "deleted": r[7]
+            "video": r[7],
+            "deleted": r[8]
         })
+
+    conn.close()
 
     return render_template(
         "chat.html",
         chats=chats,
         chat_with=username,
-        profile_pic=profile_pic,
+        profile_url=profile_url,
         is_online=is_online,
         last_seen=last_seen
     )
 
+
 @app.route("/chat_messages/<username>")
 def chat_messages(username):
 
-    print("SESSION =", session)
-    print("USERNAME =", session.get("username"))
-    print("CHAT WITH =", username)
-
-
     if "username" not in session:
-        return []
+        return jsonify([])
 
     my_username = session["username"]
 
@@ -731,15 +826,25 @@ def chat_messages(username):
     cur = conn.cursor()
 
     cur.execute("""
-    SELECT id, sender, message, timestamp, is_seen, image, audio, deleted
-    FROM messages
+	SELECT
+	    id,
+	    sender,
+	    receiver,
+	    message,
+	    reel_id,
+	    is_seen,
+	    timestamp,
+	    image,
+	    audio,
+	    deleted,
+	    video
+	FROM messages
         WHERE
-        (sender=? AND receiver=?)
-        OR
-        (sender=? AND receiver=?)
+            (sender=? AND receiver=?)
+            OR
+            (sender=? AND receiver=?)
         ORDER BY id ASC
-    """,
-    (
+    """, (
         my_username,
         username,
         username,
@@ -749,42 +854,49 @@ def chat_messages(username):
     rows = cur.fetchall()
     conn.close()
 
-    data=[]
+    data = []
 
     for row in rows:
+
+
         data.append({
             "id": row[0],
             "sender": row[1],
-            "message": row[2],
-            "time": time_ago(row[3]),
-            "is_seen": row[4],
-            "image": row[5],
-            "audio": row[6],
-            "deleted": row[7]
+            "receive": row[2],
+            "message": row[3],
+            "reel_id": row[4],
+            "is_seen": row[5],
+            "time": time_ago(row[6]),
+            "image": row[7],
+            "audio": row[8],
+            "deleted": row[9],
+            "video": row[10]
         })
 
     return jsonify(data)
+
+
 
 
 @app.route("/send_message/<username>", methods=["POST"])
 def send_message(username):
 
     if "username" not in session:
-        return jsonify({"status": "error"})
+        return jsonify({"status":"error"})
 
-    message = request.form.get("message", "").strip()
+    message = request.form.get("message","").strip()
 
     if message == "":
-        return jsonify({"status": "empty"})
+        return jsonify({"status":"empty"})
 
     conn = sqlite3.connect("snapz.db")
     cur = conn.cursor()
 
     cur.execute("""
         INSERT INTO messages
-        (sender, receiver, message)
-        VALUES (?, ?, ?)
-    """, (
+        (sender,receiver,message)
+        VALUES(?,?,?)
+    """,(
         session["username"],
         username,
         message
@@ -793,426 +905,122 @@ def send_message(username):
     conn.commit()
     conn.close()
 
-    return jsonify({"status": "ok"})
-
-
-
-
-@app.route("/send_image/<username>", methods=["POST"])
-def send_image(username):
-
-    if "username" not in session:
-        return jsonify({"status":"error"})
-
-    if "image" not in request.files:
-        return jsonify({"status":"no_image"})
-
-    file = request.files["image"]
-
-    if file.filename == "":
-        return jsonify({"status":"empty"})
-
-    filename = str(int(time.time())) + "_" + file.filename
-
-
-    result = cloudinary.uploader.upload(file)
-
-    filename = result["secure_url"]
-
-    conn = sqlite3.connect("snapz.db")
-    cur = conn.cursor()
-
-    cur.execute("""
-        INSERT INTO messages
-        (sender, receiver, message, image)
-        VALUES (?, ?, ?, ?)
-    """, (
-        session["username"],
-        username,
-        "",
-        filename
-    ))
-
-    conn.commit()
-    conn.close()
-
     return jsonify({"status":"ok"})
-
-
-
-
-
-
-
-
-@app.route("/send_audio/<username>", methods=["POST"])
-def send_audio(username):
-
-    if "username" not in session:
-        return jsonify({"status": "error"})
-
-    if "audio" not in request.files:
-        return jsonify({"status": "no_audio"})
-
-    file = request.files["audio"]
-
-    if file.filename == "":
-        return jsonify({"status": "empty"})
-
-    filename = str(int(time.time())) + "_voice.webm"
-
-    result = cloudinary.uploader.upload(file)
-
-    filename = result["secure_url"]
-
-
-    conn = sqlite3.connect("snapz.db")
-    cur = conn.cursor()
-
-    cur.execute("""
-        INSERT INTO messages
-        (sender, receiver, message, audio)
-        VALUES (?, ?, ?, ?)
-    """, (
-        session["username"],
-        username,
-        "",
-        filename
-    ))
-
-    conn.commit()
-    conn.close()
-
-    return jsonify({"status": "ok"})
-
-
-@app.route("/typing", methods=["POST"])
-def typing():
-
-    sender=request.form["sender"]
-    receiver=request.form["receiver"]
-    status=request.form["typing"]
-
-    conn=sqlite3.connect("snapz.db")
-    cur=conn.cursor()
-
-    cur.execute("""
-    SELECT id
-    FROM typing
-    WHERE sender=?
-    AND receiver=?
-    """,(sender,receiver))
-
-    row=cur.fetchone()
-
-    if row:
-
-        cur.execute("""
-        UPDATE typing
-        SET typing=?
-        WHERE id=?
-        """,(status,row[0]))
-
-    else:
-
-        cur.execute("""
-        INSERT INTO typing
-        (sender,receiver,typing)
-        VALUES(?,?,?)
-        """,(sender,receiver,status))
-
-    conn.commit()
-    conn.close()
-
-    return {"status":"ok"}
-
-@app.route("/typing_status/<username>")
-def typing_status(username):
-
-    me=session["username"]
-
-    conn=sqlite3.connect("snapz.db")
-    cur=conn.cursor()
-
-    cur.execute("""
-    SELECT typing
-    FROM typing
-    WHERE sender=?
-    AND receiver=?
-    """,(username,me))
-
-    row=cur.fetchone()
-
-    conn.close()
-
-    if row and row[0]==1:
-        return {"typing":True}
-
-    return {"typing":False}
-
-@app.route("/delete_message/<int:msg_id>", methods=["POST"])
-def delete_message(msg_id):
-
-    if "username" not in session:
-        return {"status":"error"}
-
-    conn = sqlite3.connect("snapz.db")
-    cur = conn.cursor()
-
-    cur.execute("""
-    UPDATE messages
-    SET
-    message='',
-    image='',
-    audio='',
-    deleted=1
-    WHERE id=?
-    AND sender=?
-    """,
-    (msg_id, session["username"]))
-
-    conn.commit()
-    conn.close()
-
-    return {"status":"ok"}
-
-
-@app.route("/voice_call/<username>")
-def voice_call(username):
-
-    if "username" not in session:
-        return redirect("/login")
-
-    return render_template(
-        "voice_call.html",
-        username=username
-    )
-
-
-@app.route("/video_call/<username>")
-def video_call(username):
-
-    if "username" not in session:
-        return redirect("/login")
-
-    return render_template(
-        "video_call.html",
-        username=username
-    )
-
-@app.route("/start_call/<username>/<call_type>", methods=["POST"])
-def start_call(username, call_type):
-
-    if "username" not in session:
-        return jsonify({"status":"login_required"})
-
-    caller = session["username"]
-
-    conn = sqlite3.connect("snapz.db")
-    cur = conn.cursor()
-
-    cur.execute("""
-    INSERT INTO calls
-    (caller, receiver, call_type)
-    VALUES (?,?,?)
-    """,(caller, username, call_type))
-
-    conn.commit()
-    conn.close()
-
-    return jsonify({"status":"ok"})
-
-@app.route("/check_call")
-def check_call():
-
-    if "username" not in session:
-        return jsonify({})
-
-    conn=sqlite3.connect("snapz.db")
-    cur=conn.cursor()
-
-    cur.execute("""
-    SELECT id,caller,call_type
-    FROM calls
-    WHERE receiver=?
-    AND status='ringing'
-    ORDER BY id DESC
-    LIMIT 1
-    """,(session["username"],))
-
-    row=cur.fetchone()
-
-    conn.close()
-
-    if row:
-
-        return jsonify({
-            "id":row[0],
-            "caller":row[1],
-            "type":row[2]
-        })
-
-    return jsonify({})
-
-@app.route("/accept_call/<int:call_id>", methods=["POST"])
-def accept_call(call_id):
-
-    conn = sqlite3.connect("snapz.db")
-    cur = conn.cursor()
-
-    cur.execute("""
-    UPDATE calls
-    SET status='accepted'
-    WHERE id=?
-    """,(call_id,))
-
-    conn.commit()
-    conn.close()
-
-    return jsonify({"status":"ok"})
-
-@app.route("/reject_call/<int:call_id>", methods=["POST"])
-def reject_call(call_id):
-
-    conn = sqlite3.connect("snapz.db")
-    cur = conn.cursor()
-
-    cur.execute("""
-    UPDATE calls
-    SET status='rejected'
-    WHERE id=?
-    """,(call_id,))
-
-    conn.commit()
-    conn.close()
-
-    return jsonify({"status":"ok"})
-
-@app.route("/call_status/<int:call_id>")
-def call_status(call_id):
-
-    conn = sqlite3.connect("snapz.db")
-    cur = conn.cursor()
-
-    cur.execute("""
-    SELECT status
-    FROM calls
-    WHERE id=?
-    """,(call_id,))
-
-    row = cur.fetchone()
-
-    conn.close()
-
-    if row:
-        return jsonify({"status":row[0]})
-
-    return jsonify({"status":"not_found"})
-
-
-
 
 
 
 @app.route("/upload", methods=["POST"])
 def upload():
+
     print("UPLOAD START")
     print(request.files)
     print(request.form)
 
-    file = request.files.get("file") or request.files.get("image")
-    if not file or file.filename == '':
-        return "No file uploaded", 400
-
-    original_filename = file.filename
-    filename = f"{int(time.time())}_{original_filename}"
-
-    try:
-    result = cloudinary.uploader.upload(file)
-    filename = result["secure_url"]
-    print("Cloudinary Upload Success:", filename)
-
-    except Exception as e:
-        print("Cloudinary Error:", e)
+    # Login check
+    if "username" not in session:
         return jsonify({
             "status": "error",
-            "message": str(e)
-        }), 500
-    filename = result["secure_url"]
+            "message": "User not logged in"
+        }), 401
 
-    if "username" not in session:
-        return "User not logged in", 401
+    # File get
+    file = request.files.get("file") or request.files.get("image")
+
+    print("FILE OBJECT =", file)
+    print("FILENAME =", file.filename if file else None)
+
+
+    if not file or file.filename == "":
+        return jsonify({
+            "status": "error",
+            "message": "No file uploaded"
+        }), 400
 
     username = session["username"]
     caption = request.form.get("caption", "")
     upload_type = request.form.get("type", "post")
 
-    print("LOGGED USER:", username)
-    print("RECEIVED TYPE:", upload_type)
+    print("LOGGED USER =", username)
+    print("TYPE =", upload_type)
+
+    # Cloudinary upload
+    try:
+        result = cloudinary.uploader.upload(file)
+        file_url = result["secure_url"]
+        print("Cloudinary Upload Success =", file_url)
+
+    except Exception as e:
+        print("Cloudinary Error =", e)
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
 
     conn = sqlite3.connect("snapz.db")
     cur = conn.cursor()
 
-    if upload_type == "reel":
-        global REELS
-        cur.execute(
-            "INSERT INTO reels(username, video, caption) VALUES(?,?,?)",
-             (username, filename, caption)
-        )
+    try:
 
-        REELS.append((username, filename, caption))
+        # REEL
+        if upload_type == "reel":
 
+            cur.execute(
+                "INSERT INTO reels(username, video, caption) VALUES(?,?,?)",
+                (username, file_url, caption)
+            )
 
+        # STORY
+        elif upload_type == "story":
 
-    elif upload_type == "story":
-        cur.execute("""
-            INSERT INTO stories
-            (username,image)
-            VALUES (?,?)
-        """,
-        (username, filename))
+            cur.execute(
+                "INSERT INTO stories(username, image) VALUES(?,?)",
+                (username, file_url)
+            )
 
-    else:
-        cur.execute(
-            "SELECT * FROM posts WHERE image=? AND caption=?",
-            (filename, caption)
-        )
-        exist = cur.fetchone()
-
-        if exist:
-            conn.close()
-            return redirect("/notifications")
-
-        cur.execute(
-            "SELECT profile_pic FROM users WHERE username=?",
-            (username,)
-        )
-
-        user_data = cur.fetchone()
-
-        if user_data:
-            profile_pic = user_data[0]
+        # POST
         else:
-            profile_pic = None
 
-        cur.execute(
-            "INSERT INTO posts(username, image, caption, profile_pic) VALUES(?,?,?,?)",
-            (username, filename, caption, profile_pic)
-        )
+            cur.execute(
+                "SELECT profile_pic FROM users WHERE username=?",
+                (username,)
+            )
 
-        print("USERNAME =", username)
-        print("TYPE =", upload_type)
-        print("FILE =", filename)
-        print("CAPTION =", caption)
+            row = cur.fetchone()
+            profile_pic = row[0] if row else "default.jpg"
+
+            cur.execute(
+                "INSERT INTO posts(username, image, caption, profile_pic) VALUES(?,?,?,?)",
+                (username, file_url, caption, profile_pic)
+            )
 
         conn.commit()
+
         print("UPLOAD SAVED SUCCESSFULLY")
+        print("FILE =", file_url)
+        print("CAPTION =", caption)
+
+        return jsonify({
+            "status": "ok",
+            "url": file_url
+        })
+
+    except Exception as e:
+
+        conn.rollback()
+        print("DB Error =", e)
+
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
+
+    finally:
         conn.close()
 
-        return jsonify({"status": "ok"})
 
 @app.route("/profile")
 def profile():
+
     if "username" not in session:
         return redirect("/login")
 
@@ -1221,43 +1029,96 @@ def profile():
     conn = sqlite3.connect("snapz.db")
     cur = conn.cursor()
 
-    cur.execute(
-        "SELECT id, username, image, caption FROM posts WHERE username=? ORDER BY id DESC",
-        (username,)
-    )
+    # User Details
+    cur.execute("""
+        SELECT name, bio, profile_pic
+        FROM users
+        WHERE username=?
+    """, (username,))
+
+    row = cur.fetchone()
+
+    if row:
+        name = row[0]
+        bio = row[1]
+        profile_pic = row[2] if row[2] else "default.jpg"
+    else:
+        name = username
+        bio = ""
+        profile_pic = "default.jpg"
+
+    # Posts
+    cur.execute("""
+        SELECT id, username, image, caption
+        FROM posts
+        WHERE username=?
+        ORDER BY id DESC
+    """, (username,))
+
     posts = cur.fetchall()
 
-    cur.execute(
-        "SELECT id, username, video, caption FROM reels WHERE username=? ORDER BY id DESC",
-        (username,)
-    )
+    # Reels
+    cur.execute("""
+        SELECT id, username, video, caption
+        FROM reels
+        WHERE username=?
+        ORDER BY id DESC
+    """, (username,))
 
     reels = cur.fetchall()
 
-    cur.execute(
-        "SELECT COUNT(*) FROM posts WHERE username=?",
-        (username,)
-    )
+    # Posts Count
+    cur.execute("""
+        SELECT COUNT(*)
+        FROM posts
+        WHERE username=?
+    """, (username,))
+
     posts_count = cur.fetchone()[0]
 
+    # Reels Count
     cur.execute("""
-        SELECT COUNT(*) FROM followers WHERE followed_username=?
-        """, (username,))
+        SELECT COUNT(*)
+        FROM reels
+        WHERE username=?
+    """, (username,))
+
+    reels_count = cur.fetchone()[0]
+
+    # Followers
+    cur.execute("""
+        SELECT COUNT(*)
+        FROM followers
+        WHERE followed_username=?
+    """, (username,))
+
     followers = cur.fetchone()[0]
 
+    # Following
     cur.execute("""
-        SELECT COUNT(*) FROM followers WHERE follower_username=?
+        SELECT COUNT(*)
+        FROM followers
+        WHERE follower_username=?
     """, (username,))
+
     following = cur.fetchone()[0]
 
     conn.close()
 
     return render_template(
         "profile.html",
+
         username=username,
+        name=name,
+        bio=bio,
+        profile_pic=profile_pic,
+
         posts=posts,
         reels=reels,
+
         posts_count=posts_count,
+        reels_count=reels_count,
+
         followers=followers,
         following=following
     )
@@ -1265,63 +1126,114 @@ def profile():
 @app.route("/reels")
 def reels():
 
+    if "username" not in session:
+        return redirect("/login")
+
+    current_user = session["username"]
+
     conn = sqlite3.connect("snapz.db")
     cur = conn.cursor()
 
     cur.execute("""
-        SELECT id, username, video, caption
+        SELECT
+            reels.id,
+            reels.username,
+            reels.video,
+            reels.caption,
+            users.profile_pic
         FROM reels
-        ORDER BY id DESC
+        LEFT JOIN users
+        ON reels.username = users.username
+        ORDER BY reels.id DESC
     """)
 
-    reels = cur.fetchall()
+    data = cur.fetchall()
 
-    new_reels = []
+    reels = []
 
-    for r in reels:
+    for r in data:
 
+        reel_id = r[0]
+
+        # Like count
         cur.execute(
             "SELECT COUNT(*) FROM reel_likes WHERE reel_id=?",
-            (r[0],)
+            (reel_id,)
         )
-
         like_count = cur.fetchone()[0]
 
-        new_reels.append((
-            r[0],  # id
-            r[1],  # username
-            r[2],  # video
-            r[3],  # caption
-            like_count
-        ))
+        # Current user liked?
+        cur.execute(
+            """
+            SELECT id
+            FROM reel_likes
+            WHERE reel_id=?
+            AND username=?
+            """,
+            (reel_id, current_user)
+        )
 
-    reels = new_reels
+        liked = cur.fetchone() is not None
+
+        # Comment count
+        cur.execute(
+            """
+            SELECT COUNT(*)
+            FROM reel_comments
+            WHERE reel_id=?
+            """,
+            (reel_id,)
+        )
+
+        comment_count = cur.fetchone()[0]
+
+        reels.append({
+            "id": reel_id,
+            "username": r[1],
+            "video": r[2],
+            "caption": r[3],
+            "profile_pic": r[4] if r[4] else "/static/default.png",
+            "likes": like_count,
+            "comments": comment_count,
+            "liked": liked
+        })
 
     conn.close()
 
-    print("SENDING REELS TO HTML:", reels)
+    print("REELS =", reels)
 
     return render_template(
         "reels.html",
-        reels=reels
+        reels=reels,
+        current_user=current_user
     )
+
+
 
 @app.route("/share_post", methods=["POST"])
 def share_post():
 
     if "username" not in session:
-        return {"status":"error"}
+        return jsonify({
+            "status":"error",
+            "message":"Login required"
+        }),401
 
     data = request.get_json()
 
-    receiver = data["receiver"]
-    post_id = data["post_id"]
+    receiver = data.get("receiver")
+    post_id = data.get("post_id")
 
     conn = sqlite3.connect("snapz.db")
     cur = conn.cursor()
 
+    # Post data
     cur.execute(
-        "SELECT image, caption FROM posts WHERE id=?",
+        """
+        SELECT username,image,caption
+        FROM posts
+        WHERE id=?
+        """,
         (post_id,)
     )
 
@@ -1329,26 +1241,54 @@ def share_post():
 
     if not post:
         conn.close()
-        return {"status":"error"}
+        return jsonify({
+            "status":"error",
+            "message":"Post not found"
+        })
 
-    image = post[0]
-    caption = post[1]
+    owner = post[0]
+    image = post[1]
+    caption = post[2]
 
-    cur.execute("""
+    # Message
+    cur.execute(
+        """
         INSERT INTO messages
         (sender,receiver,message,image,timestamp)
         VALUES(?,?,?,?,datetime('now','localtime'))
-    """,(
-        session["username"],
-        receiver,
-        caption,
-        image
-    ))
+        """,
+        (
+            session["username"],
+            receiver,
+            caption,
+            image
+        )
+    )
+
+    # Notification
+    if receiver != session["username"]:
+
+        cur.execute(
+            """
+            INSERT INTO notifications
+            (user_to,user_from,action)
+            VALUES(?,?,?)
+            """,
+            (
+                receiver,
+                session["username"],
+                "shared a post with you 📤"
+            )
+        )
 
     conn.commit()
     conn.close()
 
-    return {"status":"ok"}
+    return jsonify({
+        "status":"ok"
+    })
+
+
 
 @app.route("/uploads/<filename>")
 def uploaded_file(filename):
@@ -1379,7 +1319,13 @@ def logout():
 
     session.clear()
 
-    return redirect("/login")
+    response = redirect("/login")
+
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+
+    return response
 
 
 @app.route("/story", methods=["POST"])
@@ -1388,20 +1334,30 @@ def story():
     if "username" not in session:
         return redirect("/login")
 
-    image = request.files["image"]
+    image = request.files.get("image")
 
-    result = cloudinary.uploader.upload(image)
+    if not image or image.filename == "":
+        return redirect("/")
 
-    filename = result["secure_url"]
+    try:
+        result = cloudinary.uploader.upload(image)
+        image_url = result["secure_url"]
+
+    except Exception as e:
+        print("Story Upload Error:", e)
+        return redirect("/")
 
     conn = sqlite3.connect("snapz.db")
     cur = conn.cursor()
 
     cur.execute(
-        "INSERT INTO stories(username,image) VALUES(?,?)",
+        """
+        INSERT INTO stories(username,image)
+        VALUES(?,?)
+        """,
         (
             session["username"],
-            filename
+            image_url
         )
     )
 
@@ -1410,24 +1366,24 @@ def story():
 
     return redirect(url_for("home"))
 
-@app.route('/update_profile', methods=['POST'])
+
+@app.route("/update_profile", methods=["POST"])
 def update_profile():
 
-    if 'username' not in session:
-        return redirect(url_for('login'))
+    if "username" not in session:
+        return redirect(url_for("login"))
 
     print(request.files)
     print(request.form)
 
-    new_name = request.form.get('name')
-    new_username = request.form.get('username')
-    new_bio = request.form.get('bio')
+    new_name = request.form.get("name", "").strip()
+    new_username = request.form.get("username", "").strip()
+    new_bio = request.form.get("bio", "").strip()
 
-    old_username = session['username']
+    old_username = session["username"]
 
-    conn = sqlite3.connect('snapz.db')
+    conn = sqlite3.connect("snapz.db")
     cur = conn.cursor()
-    
 
     # Username already exists check
     cur.execute(
@@ -1441,114 +1397,323 @@ def update_profile():
         conn.close()
         return "Username already taken"
 
-    # Users table update
-    cur.execute(
-        "UPDATE users SET name=?, username=?, bio=? WHERE username=?",
-        (new_name, new_username, new_bio, old_username)
-    )
-
-    # Posts update
-    cur.execute(
-        "UPDATE posts SET username=? WHERE username=?",
-        (new_username, old_username)
-    )
-
-    # Reels update
-    cur.execute(
-        "UPDATE reels SET username=? WHERE username=?",
-        (new_username, old_username)
-    )
-
-    # Stories update
-    cur.execute(
-        "UPDATE stories SET username=? WHERE username=?",
-        (new_username, old_username)
-    )
-
-    # Followers update
-    cur.execute(
-        "UPDATE followers SET follower_username=? WHERE follower_username=?",
-        (new_username, old_username)
-    )
+    # ---------------- USERS ----------------
 
     cur.execute(
-        "UPDATE followers SET followed_username=? WHERE followed_username=?",
-        (new_username, old_username)
+        """
+        UPDATE users
+        SET
+            name=?,
+            username=?,
+            bio=?
+        WHERE username=?
+        """,
+        (
+            new_name,
+            new_username,
+            new_bio,
+            old_username
+        )
     )
 
+    # ---------------- POSTS ----------------
 
+    cur.execute(
+        """
+        UPDATE posts
+        SET username=?
+        WHERE username=?
+        """,
+        (
+            new_username,
+            old_username
+        )
+    )
 
-# Profile Photo Update
+    # ---------------- REELS ----------------
+
+    cur.execute(
+        """
+        UPDATE reels
+        SET username=?
+        WHERE username=?
+        """,
+        (
+            new_username,
+            old_username
+        )
+    )
+
+    # ---------------- STORIES ----------------
+
+    cur.execute(
+        """
+        UPDATE stories
+        SET username=?
+        WHERE username=?
+        """,
+        (
+            new_username,
+            old_username
+        )
+    )
+
+    # ---------------- FOLLOWERS ----------------
+
+    cur.execute(
+        """
+        UPDATE followers
+        SET follower_username=?
+        WHERE follower_username=?
+        """,
+        (
+            new_username,
+            old_username
+        )
+    )
+
+    cur.execute(
+        """
+        UPDATE followers
+        SET followed_username=?
+        WHERE followed_username=?
+        """,
+        (
+            new_username,
+            old_username
+        )
+    )
+
+    # ---------------- COMMENTS ----------------
+
+    cur.execute(
+        """
+        UPDATE comments
+        SET username=?
+        WHERE username=?
+        """,
+        (
+            new_username,
+            old_username
+        )
+    )
+
+    # ---------------- LIKES ----------------
+
+    cur.execute(
+        """
+        UPDATE likes
+        SET username=?
+        WHERE username=?
+        """,
+        (
+            new_username,
+            old_username
+        )
+    )
+
+    # ---------------- REEL LIKES ----------------
+
+    cur.execute(
+        """
+        UPDATE reel_likes
+        SET username=?
+        WHERE username=?
+        """,
+        (
+            new_username,
+            old_username
+        )
+    )
+
+    # ---------------- NOTIFICATIONS ----------------
+
+    cur.execute(
+        """
+        UPDATE notifications
+        SET user_from=?
+        WHERE user_from=?
+        """,
+        (
+            new_username,
+            old_username
+        )
+    )
+
+    cur.execute(
+        """
+        UPDATE notifications
+        SET user_to=?
+        WHERE user_to=?
+        """,
+        (
+            new_username,
+            old_username
+        )
+    )
+
+    # ---------------- MESSAGES ----------------
+
+    cur.execute(
+        """
+        UPDATE messages
+        SET sender=?
+        WHERE sender=?
+        """,
+        (
+            new_username,
+            old_username
+        )
+    )
+
+    cur.execute(
+        """
+        UPDATE messages
+        SET receiver=?
+        WHERE receiver=?
+        """,
+        (
+            new_username,
+            old_username
+        )
+    )
+
+    # ---------------- PROFILE PHOTO ----------------
 
     file = request.files.get("profile_pic")
 
-    print(request.files)
-    print(file)
-
     if file and file.filename:
 
-        folder_path = os.path.join("static", "images")
-        os.makedirs(folder_path, exist_ok=True)
+        try:
 
-        filename = f"{new_username}.jpg"
+            result = cloudinary.uploader.upload(file)
 
-        result = cloudinary.uploader.upload(file)
+            photo_url = result["secure_url"]
 
-        filename = result["secure_url"]
+            cur.execute(
+                """
+                UPDATE users
+                SET profile_pic=?
+                WHERE username=?
+                """,
+                (
+                    photo_url,
+                    new_username
+                )
+            )
 
-        print("PHOTO SAVED:", filename)
+            session["profile_pic"] = photo_url
 
-        cur.execute(
-            "UPDATE users SET profile_pic=? WHERE username=?",
-            (filename, new_username)
-        )
+        except Exception as e:
+            print("Cloudinary Error:", e)
 
-        session["pfp"] = filename
-
-
-    conn.commit() 
+    conn.commit()
     conn.close()
 
+    # ---------------- SESSION UPDATE ----------------
 
-    session['name'] = new_name
-    session['username'] = new_username
-    session['bio'] = new_bio
+    session["name"] = new_name
+    session["username"] = new_username
+    session["bio"] = new_bio
 
-    return redirect(url_for('profile'))
-
-
+    return redirect(url_for("profile"))
 
 
-@app.route('/search')
+@app.route("/search")
 def search():
-    query = request.args.get('q', '')
-    conn = sqlite3.connect('snapz.db')
+
+    if "username" not in session:
+        return jsonify([])
+
+    current_user = session["username"]
+
+    query = request.args.get("q", "").strip()
+
+    conn = sqlite3.connect("snapz.db")
+    conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
     cur.execute("""
+
     SELECT
-        users.username,
-        users.name,
-        users.profile_pic,
+
+        u.username,
+        u.name,
+        u.profile_pic,
+
         CASE
-            WHEN followers.follower_username IS NULL THEN 0
+            WHEN f.follower_username IS NULL
+            THEN 0
             ELSE 1
-        END
-    FROM users
-    LEFT JOIN followers
-    ON followers.followed_username = users.username
-    AND followers.follower_username = ?
-    WHERE users.username LIKE ?
-       OR users.name LIKE ?
-    """, (
-        session.get("username", ""),
-        "%"+query+"%",
-        "%"+query+"%"
+        END AS following,
+
+        (
+            SELECT COUNT(*)
+            FROM followers
+            WHERE followed_username=u.username
+        ) AS followers_count,
+
+        (
+            SELECT COUNT(*)
+            FROM posts
+            WHERE username=u.username
+        ) AS posts_count
+
+    FROM users u
+
+    LEFT JOIN followers f
+    ON
+        f.followed_username=u.username
+    AND
+        f.follower_username=?
+
+    WHERE
+
+        u.username LIKE ?
+
+        OR
+
+        u.name LIKE ?
+
+    ORDER BY
+
+        u.username ASC
+
+    """,(
+
+        current_user,
+
+        "%" + query + "%",
+
+        "%" + query + "%"
+
     ))
 
-    results = cur.fetchall()
+    users = []
+
+    for row in cur.fetchall():
+
+        users.append({
+
+            "username": row["username"],
+
+            "name": row["name"],
+
+            "profile_pic": row["profile_pic"] or "default.jpg",
+
+            "following": bool(row["following"]),
+
+            "followers": row["followers_count"],
+
+            "posts": row["posts_count"],
+
+            "verified": False
+
+        })
+
     conn.close()
-    return jsonify(results)
+
+    return jsonify(users)
 
 
 def create_tables():
@@ -1572,20 +1737,22 @@ def notifications():
     if "username" not in session:
         return redirect("/login")
 
+    current_user = session["username"]
+
     conn = sqlite3.connect("snapz.db")
     cur = conn.cursor()
 
     cur.execute("""
-        SELECT user_from, action, timestamp
+        SELECT
+            user_from,
+            action,
+            timestamp
         FROM notifications
         WHERE user_to=?
         ORDER BY id DESC
-    """, (session["username"],))
+    """, (current_user,))
 
     rows = cur.fetchall()
-
-    print("SESSION USER =", session["username"])
-    print("ROWS =", rows)
 
     notifications = []
 
@@ -1593,29 +1760,54 @@ def notifications():
 
         user_from = row[0]
 
+        # profile photo
+        cur.execute("""
+            SELECT profile_pic
+            FROM users
+            WHERE username=?
+        """, (user_from,))
+
+        pic = cur.fetchone()
+
+        if pic:
+            profile_pic = pic[0]
+        else:
+            profile_pic = "/static/default.png"
+
+        # Follow status
         cur.execute("""
             SELECT 1
             FROM followers
             WHERE follower_username=?
             AND followed_username=?
-        """, (session["username"], user_from))
+        """, (
+            current_user,
+            user_from
+        ))
 
         is_following = cur.fetchone() is not None
 
-        notifications.append((
-            row[0],
-            row[1],
-            row[2],
-            is_following
-        ))
+        notifications.append({
+
+            "username": user_from,
+
+            "action": row[1],
+
+            "time": row[2],
+
+            "profile_pic": profile_pic,
+
+            "following": is_following
+
+        })
 
     conn.close()
 
     return render_template(
         "notifications.html",
-        notifications=notifications
+        notifications=notifications,
+        current_user=current_user
     )
-
 
 
 @app.route("/profile/<username>")
@@ -1687,81 +1879,350 @@ def profile_view(username):
 def follow(username):
 
     if "username" not in session:
-        return {"status": "error"}
+        return jsonify({
+            "status":"error",
+            "message":"Login required"
+        }),401
 
     follower = session["username"]
 
     if follower == username:
-        return {"status": "error"}
+        return jsonify({
+            "status":"error",
+            "message":"You can't follow yourself"
+        })
 
     conn = sqlite3.connect("snapz.db")
     cur = conn.cursor()
 
-    # Already followed check
+    # User exists
+    cur.execute(
+        "SELECT 1 FROM users WHERE username=?",
+        (username,)
+    )
+
+    if not cur.fetchone():
+        conn.close()
+        return jsonify({
+            "status":"error",
+            "message":"User not found"
+        })
+
+    # Already following?
     cur.execute("""
         SELECT 1
         FROM followers
-        WHERE follower_username=? AND followed_username=?
-    """, (follower, username))
+        WHERE follower_username=?
+        AND followed_username=?
+    """,(follower,username))
 
-    if cur.fetchone():
+    already = cur.fetchone()
+
+    # ======================
+    # UNFOLLOW
+    # ======================
+    if already:
+
+        cur.execute("""
+            DELETE FROM followers
+            WHERE follower_username=?
+            AND followed_username=?
+        """,(follower,username))
+
+        conn.commit()
+
+        cur.execute("""
+            SELECT COUNT(*)
+            FROM followers
+            WHERE followed_username=?
+        """,(username,))
+
+        followers_count = cur.fetchone()[0]
+
         conn.close()
-        from flask import redirect
 
-        return redirect("/")
+        return jsonify({
+            "status":"unfollowed",
+            "followers":followers_count
+        })
 
-    # Insert follow
+    # ======================
+    # FOLLOW
+    # ======================
+
     cur.execute("""
-        INSERT INTO followers (follower_username, followed_username)
-        VALUES (?, ?)
-    """, (follower, username))
+        INSERT INTO followers(
+            follower_username,
+            followed_username
+        )
+        VALUES(?,?)
+    """,(follower,username))
 
     # Notification
     cur.execute("""
-        INSERT INTO notifications (user_to, user_from, action)
-        VALUES (?, ?, ?)
-    """, (username, follower, "follow"))
+        INSERT INTO notifications(
+            user_to,
+            user_from,
+            action
+        )
+        VALUES(?,?,?)
+    """,(username,follower,"follow"))
 
     conn.commit()
+
+    cur.execute("""
+        SELECT COUNT(*)
+        FROM followers
+        WHERE followed_username=?
+    """,(username,))
+
+    followers_count = cur.fetchone()[0]
+
     conn.close()
 
-    return {"status": "followed"}
+    return jsonify({
+        "status":"followed",
+        "followers":followers_count
+    })
+
+
+
+@app.route("/like_post/<int:post_id>", methods=["POST"])
+def like_post(post_id):
+
+    if "username" not in session:
+        return jsonify({"status": "error"}), 401
+
+    username = session["username"]
+
+    conn = sqlite3.connect("snapz.db")
+    cur = conn.cursor()
+
+    try:
+
+        # Check post exists
+        cur.execute(
+            "SELECT username FROM posts WHERE id=?",
+            (post_id,)
+        )
+
+        owner = cur.fetchone()
+
+        if not owner:
+            conn.close()
+            return jsonify({"status": "post_not_found"}), 404
+
+        owner_username = owner[0]
+
+        # Already liked?
+        cur.execute(
+            """
+            SELECT 1
+            FROM likes
+            WHERE post_id=?
+            AND username=?
+            """,
+            (post_id, username)
+        )
+
+        if cur.fetchone():
+
+            # Unlike
+            cur.execute(
+                """
+                DELETE FROM likes
+                WHERE post_id=?
+                AND username=?
+                """,
+                (post_id, username)
+            )
+
+            conn.commit()
+
+            cur.execute(
+                """
+                SELECT COUNT(*)
+                FROM likes
+                WHERE post_id=?
+                """,
+                (post_id,)
+            )
+
+            like_count = cur.fetchone()[0]
+
+            conn.close()
+
+            return jsonify({
+                "status": "unliked",
+                "likes": like_count
+            })
+
+        # Like
+        cur.execute(
+            """
+            INSERT INTO likes(post_id, username)
+            VALUES(?,?)
+            """,
+            (post_id, username)
+        )
+
+        # Notification
+        if owner_username != username:
+
+            cur.execute(
+                """
+                INSERT INTO notifications
+                (user_to, user_from, action)
+                VALUES(?,?,?)
+                """,
+                (
+                    owner_username,
+                    username,
+                    "liked your post ❤️"
+                )
+            )
+
+        conn.commit()
+
+        cur.execute(
+            """
+            SELECT COUNT(*)
+            FROM likes
+            WHERE post_id=?
+            """,
+            (post_id,)
+        )
+
+        like_count = cur.fetchone()[0]
+
+        conn.close()
+
+        return jsonify({
+            "status": "liked",
+            "likes": like_count
+        })
+
+    except Exception as e:
+
+        conn.rollback()
+        conn.close()
+
+        print("LIKE ERROR =", e)
+
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
 
 
 @app.route("/unfollow/<username>", methods=["POST"])
 def unfollow(username):
 
     if "username" not in session:
-        return {"status": "error"}
+        return jsonify({"status": "error"}), 401
 
     follower = session["username"]
+
+    if follower == username:
+        return jsonify({"status": "error"}), 400
 
     conn = sqlite3.connect("snapz.db")
     cur = conn.cursor()
 
-    cur.execute("""
-        DELETE FROM followers
-        WHERE follower_username=? AND followed_username=?
-    """, (follower, username))
+    try:
 
-    conn.commit()
-    conn.close()
+        cur.execute(
+            """
+            DELETE FROM followers
+            WHERE follower_username=?
+            AND followed_username=?
+            """,
+            (follower, username)
+        )
 
-    return {"status": "unfollowed"}
+        conn.commit()
+
+        return jsonify({
+            "status": "unfollowed"
+        })
+
+    except Exception as e:
+
+        conn.rollback()
+
+        print("UNFOLLOW ERROR =", e)
+
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
+
+    finally:
+        conn.close()
 
 
 @app.route("/delete_post/<int:id>", methods=["POST"])
 def delete_post(id):
 
+    if "username" not in session:
+        return jsonify({
+            "status":"error",
+            "message":"Login required"
+        }),401
+
+    username = session["username"]
+
     conn = sqlite3.connect("snapz.db")
     cur = conn.cursor()
 
-    cur.execute("DELETE FROM posts WHERE id=?", (id,))
+    # Check owner
+    cur.execute("""
+        SELECT username
+        FROM posts
+        WHERE id=?
+    """,(id,))
+
+    post = cur.fetchone()
+
+    if post is None:
+        conn.close()
+        return jsonify({
+            "status":"error",
+            "message":"Post not found"
+        })
+
+    if post[0] != username:
+        conn.close()
+        return jsonify({
+            "status":"error",
+            "message":"Permission denied"
+        }),403
+
+    # Delete likes
+    cur.execute("""
+        DELETE FROM likes
+        WHERE post_id=?
+    """,(id,))
+
+    # Delete comments
+    cur.execute("""
+        DELETE FROM comments
+        WHERE post_id=?
+    """,(id,))
+
+    # Delete post
+    cur.execute("""
+        DELETE FROM posts
+        WHERE id=?
+    """,(id,))
 
     conn.commit()
     conn.close()
 
-    return "deleted"
+    return jsonify({
+        "status":"deleted"
+    })
+
 
 @app.route("/edit_reel", methods=["POST"])
 def edit_reel():
@@ -1784,15 +2245,64 @@ def edit_reel():
 @app.route("/delete_reel/<int:id>", methods=["POST"])
 def delete_reel(id):
 
+    if "username" not in session:
+        return jsonify({
+            "status":"error",
+            "message":"Login required"
+        }),401
+
+    username = session["username"]
+
     conn = sqlite3.connect("snapz.db")
     cur = conn.cursor()
 
-    cur.execute("DELETE FROM reels WHERE id=?", (id,))
+    # Check owner
+    cur.execute("""
+        SELECT username
+        FROM reels
+        WHERE id=?
+    """,(id,))
+
+    reel = cur.fetchone()
+
+    if reel is None:
+        conn.close()
+        return jsonify({
+            "status":"error",
+            "message":"Reel not found"
+        })
+
+    if reel[0] != username:
+        conn.close()
+        return jsonify({
+            "status":"error",
+            "message":"Permission denied"
+        }),403
+
+    # Delete reel likes
+    cur.execute("""
+        DELETE FROM reel_likes
+        WHERE reel_id=?
+    """,(id,))
+
+    # Delete reel comments
+    cur.execute("""
+        DELETE FROM reel_comments
+        WHERE reel_id=?
+    """,(id,))
+
+    # Delete reel
+    cur.execute("""
+        DELETE FROM reels
+        WHERE id=?
+    """,(id,))
 
     conn.commit()
     conn.close()
 
-    return "deleted"
+    return jsonify({
+        "status":"deleted"
+    })
 
 
 @app.route("/follow_back/<username>", methods=["POST"])
@@ -1891,117 +2401,134 @@ def following(username):
     )
 
 
-@app.route("/like/<int:post_id>", methods=["POST"])
-def like_post(post_id):
-
-    username = session["username"]
-
-    conn = sqlite3.connect("snapz.db")
-    cur = conn.cursor()
-
-    cur.execute(
-        "SELECT * FROM likes WHERE post_id=? AND username=?",
-        (post_id, username)
-    )
-
-    already = cur.fetchone()
-
-    if already:
-
-        cur.execute(
-            "DELETE FROM likes WHERE post_id=? AND username=?",
-            (post_id, username)
-        )
-
-        status = "unliked"
-
-    else:
-
-        cur.execute(
-            "INSERT INTO likes(post_id, username) VALUES(?, ?)",
-            (post_id, username)
-        )
-
-        status = "liked"
-
-    conn.commit()
-
-    cur.execute(
-        "SELECT COUNT(*) FROM likes WHERE post_id=?",
-        (post_id,)
-    )
-
-    total_likes = cur.fetchone()[0]
-
-    conn.close()
-
-    return jsonify({
-        "status": status,
-        "likes": total_likes
-    })
 
 @app.route("/comments/<int:post_id>")
 def get_comments(post_id):
 
     conn = sqlite3.connect("snapz.db")
+    conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
     cur.execute("""
-        SELECT username, comment
+        SELECT
+            username,
+            comment,
+            timestamp
         FROM comments
         WHERE post_id=?
         ORDER BY id ASC
-    """, (post_id,))
+    """,(post_id,))
 
-    comments = cur.fetchall()
+    comments=[]
+
+    for row in cur.fetchall():
+
+        comments.append({
+            "username":row["username"],
+            "comment":row["comment"],
+            "time":row["timestamp"]
+        })
 
     conn.close()
 
     return jsonify(comments)
 
+
 @app.route("/comment/<int:post_id>", methods=["POST"])
 def comment_post(post_id):
 
     if "username" not in session:
-        return jsonify({"error":"login required"}), 401
+        return jsonify({
+            "status":"error",
+            "message":"Login required"
+        }),401
 
-    username = session["username"]
-    comment = request.form.get("comment")
+    username=session["username"]
 
-    conn = sqlite3.connect("snapz.db")
-    cur = conn.cursor()
+    comment=request.form.get("comment","").strip()
 
-    cur.execute(
-        "INSERT INTO comments(post_id, username, comment) VALUES(?,?,?)",
-        (post_id, username, comment)
-    )
+    if comment=="":
+        return jsonify({
+            "status":"error",
+            "message":"Comment is empty"
+        })
+
+    conn=sqlite3.connect("snapz.db")
+    cur=conn.cursor()
+
+    # Post owner
+    cur.execute("""
+        SELECT username
+        FROM posts
+        WHERE id=?
+    """,(post_id,))
+
+    owner=cur.fetchone()
+
+    if owner is None:
+        conn.close()
+        return jsonify({
+            "status":"error",
+            "message":"Post not found"
+        })
+
+    # Save comment
+    cur.execute("""
+        INSERT INTO comments(
+            post_id,
+            username,
+            comment
+        )
+        VALUES(?,?,?)
+    """,(post_id,username,comment))
+
+    # Notification
+    if owner[0]!=username:
+
+        cur.execute("""
+            INSERT INTO notifications(
+                user_to,
+                user_from,
+                action
+            )
+            VALUES(?,?,?)
+        """,(owner[0],username,"comment"))
 
     conn.commit()
+
+    # Comment count
+    cur.execute("""
+        SELECT COUNT(*)
+        FROM comments
+        WHERE post_id=?
+    """,(post_id,))
+
+    comment_count=cur.fetchone()[0]
+
     conn.close()
 
     return jsonify({
-        "username": username,
-        "comment": comment
+        "status":"ok",
+        "username":username,
+        "comment":comment,
+        "comments":comment_count
     })
 
 
+
+
 @app.route("/like_reel/<int:reel_id>", methods=["POST"])
-def like_reel(reel_id):
+def like_reel():
 
     if "username" not in session:
-        return {"status": "error"}
-
+        return jsonify({"status":"error"}),401
 
     liker = session["username"]
-
-    
-    print("REEL LIKE HIT")
-    print("REEL ID =", reel_id)
 
     conn = sqlite3.connect("snapz.db")
     cur = conn.cursor()
 
-    # Reel owner nikalo
+    # Reel owner
     cur.execute(
         "SELECT username FROM reels WHERE id=?",
         (reel_id,)
@@ -2011,68 +2538,96 @@ def like_reel(reel_id):
 
     if not row:
         conn.close()
-        return {"status": "error"}
+        return jsonify({"status":"error"})
 
     owner = row[0]
 
-    cur.execute("""
+    # Already liked?
+    cur.execute(
+        """
         SELECT 1
         FROM reel_likes
         WHERE username=? AND reel_id=?
-    """, (liker, reel_id))
-
-
-    print("REEL ID:", reel_id)
-    print("LIKER:", liker)
+        """,
+        (liker,reel_id)
+    )
 
     if cur.fetchone():
         conn.close()
-        return {"status": "already_liked"}
+        return jsonify({"status":"already_liked"})
 
-    cur.execute("SELECT * FROM reel_likes")
-    print("REEL LIKES:", cur.fetchall())
-    # Reel like save
-    cur.execute("""
-        INSERT INTO reel_likes (username, reel_id)
-        VALUES (?, ?)
-    """, (liker, reel_id))
-
-    print("OWNER =", owner)
-    print("LIKER =", liker)
+    # Save like
+    cur.execute(
+        """
+        INSERT INTO reel_likes(username,reel_id)
+        VALUES(?,?)
+        """,
+        (liker,reel_id)
+    )
 
     # Notification
     if owner != liker:
-     cur.execute("""
-        INSERT INTO notifications
-        (user_to, user_from, action)
-        VALUES (?, ?, ?)
-     """, (
-        owner,
-        liker,
-        "liked your reel ❤️"
-     ))
 
-    print("NOTIFICATION SAVED")
-
-    cur.execute("""
-        SELECT reel_id
-        FROM reel_likes
-        WHERE username=?
-    """, (session["username"],))
-
-    liked_reels = [row[0] for row in cur.fetchall()]
-
-    print("CURRENT USER =", session["username"])
-    print("LIKED REELS =", liked_reels)
+        cur.execute(
+            """
+            INSERT INTO notifications
+            (user_to,user_from,action)
+            VALUES(?,?,?)
+            """,
+            (
+                owner,
+                liker,
+                "liked your reel ❤️"
+            )
+        )
 
     conn.commit()
+
+    # Like count
+    cur.execute(
+        """
+        SELECT COUNT(*)
+        FROM reel_likes
+        WHERE reel_id=?
+        """,
+        (reel_id,)
+    )
+
+    like_count = cur.fetchone()[0]
+
     conn.close()
 
-    return render_template(
-    "reels.html",
-    reels=reels,
-    liked_reels=liked_reels
+    return jsonify({
+        "status":"liked",
+        "likes":like_count
+    })
+
+
+@app.route("/download_reel/<int:reel_id>")
+def download_reel(reel_id):
+
+    conn = sqlite3.connect("snapz.db")
+    cur = conn.cursor()
+
+    cur.execute(
+        "SELECT video FROM reels WHERE id=?",
+        (reel_id,)
     )
+
+    row = cur.fetchone()
+    conn.close()
+
+    if not row:
+        return "Not Found", 404
+
+    video_url = row[0]
+
+    if "?" in video_url:
+        video_url += "&fl_attachment=Snapz_Reel.mp4"
+    else:
+        video_url += "?fl_attachment=Snapz_Reel.mp4"
+
+    return redirect(video_url)
 
 
 @app.route("/like_story/<int:story_id>", methods=["POST"])
@@ -2162,18 +2717,35 @@ def single_reel(reel_id):
 @app.route("/share_reel/<int:reel_id>")
 def share_reel(reel_id):
 
-    conn = sqlite3.connect("snapz.db")
-    cur = conn.cursor()
+    if "username" not in session:
+        return redirect("/login")
+
     my_username = session["username"]
 
+    conn = sqlite3.connect("snapz.db")
+    cur = conn.cursor()
+
+    # Check reel exists
     cur.execute(
-        "SELECT username, profile_pic FROM users WHERE username != ?",
+        "SELECT id FROM reels WHERE id=?",
+        (reel_id,)
+    )
+
+    if not cur.fetchone():
+        conn.close()
+        return "Reel not found"
+
+    cur.execute(
+        """
+        SELECT username, profile_pic
+        FROM users
+        WHERE username!=?
+        ORDER BY username
+        """,
         (my_username,)
     )
 
     users = cur.fetchall()
-
-    print("USERS =", users)
 
     conn.close()
 
@@ -2183,28 +2755,66 @@ def share_reel(reel_id):
         reel_id=reel_id
     )
 
+
 @app.route("/send_reel/<int:reel_id>/<username>")
-def send_reel(reel_id,username):
+def send_reel(reel_id, username):
+
+    if "username" not in session:
+        return redirect("/login")
+
+    sender = session["username"]
 
     conn = sqlite3.connect("snapz.db")
     cur = conn.cursor()
 
-    cur.execute("""
-    INSERT INTO messages
-    (sender,receiver,message,reel_id)
-    VALUES (?,?,?,?)
-    """,
-    (
-        session["username"],
-        username,
-        "🎬 Shared a Reel",
-        reel_id
-    ))
+    # Check reel exists
+    cur.execute(
+        "SELECT id FROM reels WHERE id=?",
+        (reel_id,)
+    )
+
+    if not cur.fetchone():
+        conn.close()
+        return "Reel not found"
+
+    # Send message
+    cur.execute(
+        """
+        INSERT INTO messages
+        (sender,receiver,message,reel_id,timestamp)
+        VALUES(?,?,?,?,datetime('now','localtime'))
+        """,
+        (
+            sender,
+            username,
+            "🎬 Shared a Reel",
+            reel_id
+        )
+    )
+
+    # Notification
+    if sender != username:
+
+        cur.execute(
+            """
+            INSERT INTO notifications
+            (user_to,user_from,action)
+            VALUES(?,?,?)
+            """,
+            (
+                username,
+                sender,
+                "shared a reel with you 🎬"
+            )
+        )
 
     conn.commit()
     conn.close()
 
     return redirect(f"/chat/{username}")
+
+
+
 
 @app.route("/testmail")
 def testmail():
@@ -2406,63 +3016,217 @@ This OTP is valid for 5 minutes.
 
     return redirect("/verify_otp")
 
+
+@app.route("/send_images/<username>", methods=["POST"])
+def send_images(username):
+
+
+
+    if "username" not in session:
+        return jsonify({"status":"error"})
+
+    files = request.files.getlist("file")
+
+    if not files:
+        return jsonify({"status":"no_file"})
+
+    conn = sqlite3.connect("snapz.db")
+    cur = conn.cursor()
+
+    os.makedirs("static/uploads", exist_ok=True)
+
+    for file in files:
+
+        if file.filename == "":
+            continue
+
+        filename = str(int(time.time()*1000)) + "_" + secure_filename(file.filename)
+
+        file.save(os.path.join("static/uploads", filename))
+
+        cur.execute("""
+            INSERT INTO messages
+            (sender, receiver, image)
+            VALUES (?,?,?)
+        """,(
+            session["username"],
+            username,
+            filename
+        ))
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({"status":"ok"})
+
+@app.route("/send_video/<username>", methods=["POST"])
+def send_video(username):
+
+    if "username" not in session:
+        return jsonify({"status":"error"})
+
+    files = request.files.getlist("file")
+
+    if not files:
+        return jsonify({"status":"no_file"})
+
+    conn = sqlite3.connect("snapz.db")
+    cur = conn.cursor()
+
+    os.makedirs("static/uploads", exist_ok=True)
+
+    for file in files:
+
+        if file.filename == "":
+            continue
+
+        filename = str(int(time.time()*1000)) + "_" + secure_filename(file.filename)
+
+        file.save(os.path.join("static/uploads", filename))
+
+        # ===== Thumbnail =====
+        thumb = filename.rsplit(".",1)[0] + ".jpg"
+
+        os.system(
+            f'ffmpeg -y -i "static/uploads/{filename}" '
+            f'-ss 00:00:01 -vframes 1 '
+            f'"static/uploads/{thumb}" > /dev/null 2>&1'
+        )
+
+        cur.execute("""
+            INSERT INTO messages
+            (sender, receiver, video, video_thumb)
+            VALUES (?,?,?,?)
+        """,(
+            session["username"],
+            username,
+            filename,
+            thumb
+        ))
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({"status":"ok"})
+
+
+@app.route("/send_voice/<username>", methods=["POST"])
+def send_voice(username):
+
+    print("VOICE ROUTE START")
+    print(request.files)
+
+    if "username" not in session:
+        return jsonify({"status":"error"})
+
+
+    if "audio" not in request.files:
+        return jsonify({"status":"no audio"})
+
+
+    audio = request.files["audio"]
+
+
+    filename = "voice_" + str(int(time.time())) + ".webm"
+
+
+    voice_path = os.path.join(
+        "static/uploads",
+        filename
+    )
+
+
+
+    audio.save(voice_path)
+
+
+
+    conn = sqlite3.connect("snapz.db")
+    cur = conn.cursor()
+
+
+    cur.execute("""
+        INSERT INTO messages
+        (sender, receiver, message, audio)
+        VALUES(?,?,?,?)
+    """,(
+        session["username"],
+        username,
+        "",
+        filename
+    ))
+
+
+    conn.commit()
+    conn.close()
+
+
+    return jsonify({
+        "status":"ok",
+        "audio":filename
+    })
+
+
+
+@app.route("/delete_message/<int:id>", methods=["POST"])
+def delete_message(id):
+
+    if "username" not in session:
+        return jsonify({"status":"error"})
+
+    conn=sqlite3.connect("snapz.db")
+    cur=conn.cursor()
+
+    cur.execute("""
+        DELETE FROM messages
+        WHERE id=?
+        AND sender=?
+    """,(id,session["username"]))
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({"status":"ok"})
+
+
 @socketio.on("join")
 def join(data):
-
-    join_room(data["room"])
-
-    if "username" in data:
-        join_room(data["username"])
-
-    emit(
-        "joined",
-        {"room": data["room"]},
-        room=data["room"]
-    )
-
-@socketio.on("offer")
-def offer(data):
-
-    emit(
-        "offer",
-        data,
-        room=data["room"],
-        include_self=False
-    )
+    join_room(data["username"])
 
 
-@socketio.on("answer")
-def answer(data):
-
-    emit(
-        "answer",
-        data,
-        room=data["room"],
-        include_self=False
-    )
-
-
-@socketio.on("ice_candidate")
-def ice_candidate(data):
-
-    emit(
-        "ice_candidate",
-        data,
-        room=data["room"],
-        include_self=False
-    )
-
-@socketio.on("call_user")
+@socketio.on("call-user")
 def call_user(data):
-
     emit(
-        "incoming_call",
-        {
-            "caller": data["caller"],
-            "room": data["room"],
-            "type": data["type"]
-        },
-        room=data["receiver"]
+        "incoming-call",
+        data,
+        room=data["to"]
+    )
+
+
+@socketio.on("answer-call")
+def answer_call(data):
+    emit(
+        "call-answered",
+        data,
+        room=data["to"]
+    )
+
+
+@socketio.on("ice-candidate")
+def ice(data):
+    emit(
+        "ice-candidate",
+        data,
+        room=data["to"]
+    )
+
+
+@socketio.on("end-call")
+def end_call(data):
+    emit(
+        "call-ended",
+        data,
+        room=data["to"]
     )
 
 

@@ -122,7 +122,15 @@
         {% for friend in friends %}
             <a href="/chat/{{ friend.username }}" class="friend-row">
                 <div class="avatar-container">
-                    <img src="/static/images/{{ friend.profile_pic }}" class="avatar" onerror="this.src='/static/images/default.jpg'">
+		{% if friend.profile_pic and friend.profile_pic.startswith('http') %}
+		<img src="{{ friend.profile_pic }}"
+		     class="avatar"
+		     onerror="this.src='/static/images/default.jpg'">
+		{% else %}
+		<img src="/static/images/{{ friend.profile_pic or 'default.jpg' }}"
+		     class="avatar"
+		     onerror="this.src='/static/images/default.jpg'">
+		{% endif %}
                 </div>
                 <div class="chat-info">
                     <div class="friend-name">{{ friend.username }}</div>

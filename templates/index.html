@@ -1180,22 +1180,22 @@ function finalUpload() {
     formData.append("caption", document.getElementById("caption").value.trim());
     formData.append("type", mode); 
 
-    fetch("/upload", {
-        method: "POST",
-        body: formData
-    })
-    .then(res => {
-        if (res.ok) {
-            alert("Uploaded Successfully!");
-            window.location.href = "/"; 
-        } else {
-            alert("Upload Failed!");
-        }
-    })
-    .catch(err => {
-        console.error(err);
-        alert("Network Error!");
-    });
+
+.then(data => {
+    console.log(data);
+
+    if (data.status === "ok") {
+        window.location.href = "/";
+        // ya
+        // location.reload();
+    } else {
+        alert(data.message || "Upload Failed");
+    }
+})
+
+.catch(err => { console.log(err); alert("Network Error");
+});
+
 }
 </script>
 
@@ -1430,38 +1430,13 @@ function openStory(storyId, image, user){
     showStory();
 }
 
-function showStory(){
+function showStory() {
 
+    if (!storyList || storyList.length === 0) return;
 
-    console.log(storyList);
     let s = storyList[currentStory];
 
-
-    console.log("showStory called");
-
-    if(!storyList || storyList.length === 0){
-        alert("No stories found");
-        return;
-    }
-
-
-    console.log("CURRENT STORY =", s);
-
-    if(!s){
-        alert("Story data missing");
-        return;
-    }
-
-    fetch("/view_story/" + s[0], {
-        method: "POST"
-    })
-    .then(r => r.json())
-    .then(data => {
-        console.log(data);
-    })
-    .catch(err => {
-        console.log(err);
-    });
+    document.getElementById("storyUser").innerHTML = s[1];
 
     fetch("/story_views/" + s[0])
     .then(r => r.json())
@@ -1471,16 +1446,13 @@ function showStory(){
 
     let file = s[2];
 
-    console.log("FILE =", file);
-
-    if(!file){
-        alert("Story file missing");
-        return;
-    }
+    let storyUrl = file.startsWith("http")
+        ? file
+        : "/static/uploads/" + file;
 
     let oldMedia = document.getElementById("storyImage");
 
-    if(file.endsWith(".mp4") || file.endsWith(".webm")){
+    if (storyUrl.endsWith(".mp4") || storyUrl.endsWith(".webm")) {
 
         oldMedia.outerHTML = `
         <video id="storyImage"
@@ -1489,59 +1461,20 @@ function showStory(){
                controls
                playsinline
                style="width:100%;height:80vh;object-fit:contain;">
-            <source src="/static/uploads/${file}">
+            <source src="${storyUrl}" type="video/mp4">
         </video>`;
 
-    }else{
+    } else {
 
         oldMedia.outerHTML = `
         <img id="storyImage"
-             src="/static/uploads/${file}"
+             src="${storyUrl}"
              style="width:100%;height:80vh;object-fit:contain;">`;
-
     }
 
-    document.getElementById("storyUser").innerHTML = s[1];
-
-    let eyeBtn = document.getElementById("eyeBtn");
-
-    if(s[1] == "{{ session['username'] }}"){
-        eyeBtn.style.display = "block";
-    }else{
-        eyeBtn.style.display = "none";
-    }
-
-    clearTimeout(timer);
-
-    let duration = 15000;
-
-    if(file.endsWith(".mp4") || file.endsWith(".webm")){
-
-        let video = document.getElementById("storyImage");
-
-        if(video){
-
-            video.onloadedmetadata = function(){
-
-                let videoDuration = video.duration * 1000;
-
-                duration = Math.min(videoDuration,180000);
-
-                clearTimeout(timer);
-
-                timer = setTimeout(nextStory,duration);
-
-            };
-
-        }
-
-    }else{
-
-        timer = setTimeout(nextStory,duration);
-
-    }
-
+    document.getElementById("storyViewer").style.display = "block";
 }
+
 
 function showViewers(){
 
@@ -1639,8 +1572,19 @@ function openCamera(){
 <div class="post">
     <div class="post-header">
         <div style="display: flex; align-items: center; gap: 10px;">
-            <img src="/static/images/{{ post[3] if post[3] else 'default.jpg' }}"
-     style="width:35px; height:35px; border-radius:50%; object-fit:cover;">
+{% set pic = post[3] or 'default.jpg' %}
+
+{% if pic.startswith('http') %}
+<img src="{{ pic }}"
+     style="width:35px;height:35px;border-radius:50%;object-fit:cover;"
+     onerror="this.src='/static/images/default.jpg'">
+{% else %}
+<img src="{{ url_for('static', filename='images/' + pic) }}"
+     style="width:35px;height:35px;border-radius:50%;object-fit:cover;"
+     onerror="this.src='/static/images/default.jpg'">
+{% endif %}
+
+
             <h3 style="margin: 0; color: white; font-size: 16px;">{{post[0]}}</h3>
         </div>
        <button onclick="toggleFollow(this, '{{ post[0]|trim }}')">
@@ -1936,7 +1880,12 @@ margin-bottom:12px;">
 <div style="display:flex;align-items:center;">
 
 <img
-src="/static/images/{{ f.profile_pic }}"
+{% if f.profile_pic and f.profile_pic.startswith('http') %}
+<img src="{{ f.profile_pic }}">
+{% else %}
+<img src="/static/images/{{ f.profile_pic or 'default.jpg' }}">
+{% endif %}
+
 style="
 width:45px;
 height:45px;

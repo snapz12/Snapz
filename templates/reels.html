@@ -10,6 +10,29 @@ body{
     font-family:sans-serif;
 }
 
+
+.actions{
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+}
+
+.actions a{
+    text-decoration:none;
+}
+
+.actions button{
+    width:45px;
+    height:45px;
+    border:none;
+    border-radius:50%;
+    background:rgba(0,0,0,.5);
+    color:white;
+    font-size:20px;
+    cursor:pointer;
+}
+
+
 .header{
     position:fixed;
     top:0;
@@ -179,12 +202,19 @@ Post
 
     </div>
 
+   <!-- Download -->
+    <a href="/download_reel/{{ r[0] }}">
+        <button>📥</button>
+    </a>
+
 </div>
 
 <div id="c{{ loop.index }}" style="display:none;">
     <input type="text" placeholder="Add comment...">
     <button>Post</button>
 </div>
+
+
 
 {% endfor %}
 

@@ -260,7 +260,13 @@ body{
 <div class="profile-header">
 
     <div class="profile-pic">
-        <img src="{{ url_for('static', filename='images/' + ((user[5] if user else session.get('pfp')) or 'default.jpg')) }}">
+{% set pic = profile_pic or session.get('profile_pic') or 'default.jpg' %}
+
+{% if pic.startswith('http') %}
+<img src="{{ pic }}">
+{% else %}
+<img src="{{ url_for('static', filename='images/' + pic) }}">
+{% endif %}
     </div>
 
 <div class="profile-stats">

@@ -3264,6 +3264,37 @@ def end_call(data):
         room=data["to"]
     )
 
+@socketio.on("missed-call")
+def missed_call(data):
+
+    if data["type"] == "video":
+
+        save_system_message(
+            data["from"],
+            data["to"],
+            "❌ No Answer"
+        )
+
+        save_system_message(
+            data["to"],
+            data["from"],
+            "📹 Missed Video Call"
+        )
+
+    else:
+
+        save_system_message(
+            data["from"],
+            data["to"],
+            "❌ No Answer"
+        )
+
+        save_system_message(
+            data["to"],
+            data["from"],
+            "📞 Missed Voice Call"
+        )
+
 
 
 init_db()

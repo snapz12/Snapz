@@ -1483,9 +1483,17 @@ function startCall(type){
 
 ringTimeout = setTimeout(function(){
 
-    cancelCall();
+    socket.emit("missed-call",{
 
-    alert("No Answer");
+        from:"{{ session['username'] }}",
+
+        to:"{{ chat_with }}",
+
+        type:type
+
+    });
+
+    cancelCall();
 
 },30000);
 

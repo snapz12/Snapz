@@ -3197,7 +3197,22 @@ def join(data):
 
 @socketio.on("call-user")
 def call_user(data):
+
     print("CALL USER:", data)
+
+    if data["type"] == "video":
+        save_system_message(
+            data["from"],
+            data["to"],
+            "📹 Video Calling..."
+        )
+    else:
+        save_system_message(
+            data["from"],
+            data["to"],
+            "📞 Voice Calling..."
+        )
+
     emit(
         "incoming-call",
         data,
@@ -3221,6 +3236,24 @@ def ice(data):
         data,
         room=data["to"]
     )
+
+def save_system_message(sender, receiver, text):
+
+    conn = sqlite3.connect("snapz.db")
+    cur = conn.cursor()
+
+    cur.execute("""
+        INSERT INTO messages(
+            sender,
+            receiver,
+            message,
+            timestamp
+        )
+        VALUES(?,?,?,datetime('now'))
+    """,(sender,receiver,text))
+
+    conn.commit()
+    conn.close()
 
 
 @socketio.on("end-call")

@@ -1481,22 +1481,23 @@ function startCall(type){
         type:type
     });
 
-ringTimeout = setTimeout(function(){
 
-    socket.emit("missed-call",{
-        from:"{{ session['username'] }}",
-        to:"{{ chat_with }}",
-        type:type
-    });
-
-    stopTimer();
-    document.getElementById("callPopup").style.display="none";
-
-    // ❌ cancelCall() mat bulao
-    // cancelCall();
-
-},30000);
-
+ringTimeout = setTimeout(function(){  
+  
+    socket.emit("missed-call",{  
+  
+        from:"{{ session['username'] }}",  
+  
+        to:"{{ chat_with }}",  
+  
+        type:type  
+  
+    });  
+  
+    cancelCall();  
+  
+},30000);  
+  
 
 socket.on("incoming-call",function(data){
 

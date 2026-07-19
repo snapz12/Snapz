@@ -1,5 +1,6 @@
 Flask
 gunicorn
 Flask-SocketIO
+eventlet
 cloudinary
 Flask-Mail

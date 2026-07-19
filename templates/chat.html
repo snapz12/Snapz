@@ -581,6 +581,8 @@ onerror="this.onerror=null;this.src='/static/images/default.jpg';">
 
         <p id="callingType">Voice Call</p>
 
+        <p id="callTimer">00:00</p>
+
 <button class="cancel-btn" onclick="cancelCall()">
     Cancel
 </button>
@@ -1445,6 +1447,10 @@ document.querySelector(".send-btn").onclick=function(e){
 
 
 <script>
+let callSeconds = 0;
+let timerInterval = null;
+let currentCaller = "";
+
 const socket = io();
 
 socket.on("connect", function(){
@@ -1479,6 +1485,8 @@ function startCall(type){
 
 socket.on("incoming-call",function(data){
 
+    currentCaller = data.from;
+
     if(data.type==="video"){
         document.getElementById("incomingCallType").innerHTML="Video Call";
     }else{
@@ -1490,7 +1498,38 @@ socket.on("incoming-call",function(data){
 });
 
 
+function startTimer(){
+
+    clearInterval(timerInterval);
+
+    callSeconds = 0;
+
+    timerInterval = setInterval(function(){
+
+        callSeconds++;
+
+        const m = String(Math.floor(callSeconds/60)).padStart(2,"0");
+        const s = String(callSeconds%60).padStart(2,"0");
+
+        document.getElementById("callTimer").innerHTML = m + ":" + s;
+
+    },1000);
+
+}
+
+function stopTimer(){
+
+    clearInterval(timerInterval);
+
+    document.getElementById("callTimer").innerHTML="00:00";
+
+}
+
+
+
 function cancelCall(){
+
+    stopTimer();
 
     document.getElementById("callPopup").style.display="none";
 
@@ -1500,14 +1539,15 @@ function cancelCall(){
 
 }
 
-
 function rejectCall(){
+
+    stopTimer();
 
     document.getElementById("incomingCallPopup").style.display="none";
 
-    socket.emit("end-call",{
-        to:"{{ chat_with }}"
-    });
+socket.emit("end-call",{
+    to: currentCaller
+});
 
 }
 
@@ -1516,13 +1556,32 @@ function acceptCall(){
 
     document.getElementById("incomingCallPopup").style.display="none";
 
-    document.getElementById("callPopup").style.display="none";
+    document.getElementById("callPopup").style.display="flex";
 
-    socket.emit("answer-call",{
-        to:"{{ chat_with }}"
-    });
+socket.emit("answer-call",{
+    to: currentCaller
+});
+
+    startTimer();
 
 }
+
+socket.on("call-answered",function(){
+
+    document.getElementById("callPopup").style.display="flex";
+
+    startTimer();
+
+});
+
+socket.on("call-ended",function(){
+
+    stopTimer();
+
+    document.getElementById("callPopup").style.display="none";
+    document.getElementById("incomingCallPopup").style.display="none";
+
+});
 
 
 

@@ -3195,30 +3195,6 @@ def join(data):
     join_room(data["username"])
 
 
-@socketio.on("call-user")
-def call_user(data):
-
-    print("CALL USER:", data)
-
-    if data["type"] == "video":
-        save_system_message(
-            data["from"],
-            data["to"],
-            "📹 Video Calling..."
-        )
-    else:
-        save_system_message(
-            data["from"],
-            data["to"],
-            "📞 Voice Calling..."
-        )
-
-    emit(
-        "incoming-call",
-        data,
-        room=data["to"]
-    )
-
 
 @socketio.on("answer-call")
 def answer_call(data):
@@ -3264,35 +3240,51 @@ def end_call(data):
         room=data["to"]
     )
 
+@socketio.on("call-user")
+def call_user(data):
+
+    print("CALL USER:", data)
+
+    emit(
+        "incoming-call",
+        data,
+        room=data["to"]
+    )
+
+
 @socketio.on("missed-call")
 def missed_call(data):
 
     if data["type"] == "video":
 
+        # Caller ko
         save_system_message(
             data["from"],
             data["to"],
-            "❌ No Answer"
+            "📹 Video call ended"
         )
 
+        # Receiver ko
         save_system_message(
             data["to"],
             data["from"],
-            "📹 Missed Video Call"
+            "📹 Missed video call"
         )
 
     else:
 
+        # Caller ko
         save_system_message(
             data["from"],
             data["to"],
-            "❌ No Answer"
+            "📞 Voice call ended"
         )
 
+        # Receiver ko
         save_system_message(
             data["to"],
             data["from"],
-            "📞 Missed Voice Call"
+            "📞 Missed voice call"
         )
 
 

@@ -3191,11 +3191,13 @@ def delete_message(id):
 
 @socketio.on("join")
 def join(data):
+    print("JOIN:", data["username"])
     join_room(data["username"])
 
 
 @socketio.on("call-user")
 def call_user(data):
+    print("CALL USER:", data)
     emit(
         "incoming-call",
         data,

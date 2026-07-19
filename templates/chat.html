@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+a<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -1447,9 +1447,16 @@ document.querySelector(".send-btn").onclick=function(e){
 <script>
 const socket = io();
 
-socket.emit("join", {
-    username: "{{ session['username'] }}"
+socket.on("connect", function(){
+
+    console.log("Socket Connected:", socket.id);
+
+    socket.emit("join", {
+        username: "{{ session['username'] }}"
+    });
+
 });
+
 
 function startCall(type){
 

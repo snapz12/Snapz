@@ -3245,33 +3245,11 @@ def call_user(data):
 
     print("CALL USER:", data)
 
-    conn = sqlite3.connect("snapz.db")
-    cur = conn.cursor()
-
-    cur.execute("""
-        INSERT INTO calls(
-            caller,
-            receiver,
-            call_type,
-            status
-        )
-        VALUES(?,?,?,?)
-    """,(
-        data["from"],
-        data["to"],
-        data["type"],
-        "ringing"
-    ))
-
-    conn.commit()
-    conn.close()
-
     emit(
         "incoming-call",
         data,
         room=data["to"]
     )
-
 
 @socketio.on("missed-call")
 def missed_call(data):

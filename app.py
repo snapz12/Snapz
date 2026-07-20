@@ -830,7 +830,7 @@ def chat(username):
         chat_with=username,
         profile_url=profile_url,
         is_online=is_online,
-        last_seen=last_seen
+        last_seen=last_seen,
 	calls=calls
     )
 

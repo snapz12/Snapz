@@ -318,7 +318,7 @@
 }
 
 #recordStatus{
-    position:absolute;
+    position:fixed;
     bottom:45px;
     right:0;
     background:#222;
@@ -1563,12 +1563,11 @@ socket.on("connect", function(){
 
 });
 
+async function startCall(type){
 
-function startCall(type){
+const ok = await startLocalMedia(type);
 
-    const ok = await startLocalMedia(type);
-
-    if(!ok) return;
+if(!ok) return;
 
     if(type==="video"){
         document.getElementById("callingType").innerHTML="Video Call";
@@ -1685,7 +1684,8 @@ clearTimeout(ringTimeout);
     document.getElementById("callPopup").style.display="flex";
 
 socket.emit("answer-call",{
-    to: currentCaller
+    from: currentCaller,
+    to: "{{ session['username'] }}"
 });
 
     startTimer();

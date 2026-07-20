@@ -3198,6 +3198,27 @@ def join(data):
 
 @socketio.on("answer-call")
 def answer_call(data):
+
+    conn = sqlite3.connect("snapz.db")
+    cur = conn.cursor()
+
+    cur.execute("""
+        UPDATE calls
+        SET status='answered'
+        WHERE id=(
+            SELECT id FROM calls
+            WHERE caller=? AND receiver=?
+            ORDER BY id DESC
+            LIMIT 1
+        )
+    """,(
+        data["from"],
+        data["to"]
+    ))
+
+    conn.commit()
+    conn.close()
+
     emit(
         "call-answered",
         data,
@@ -3234,6 +3255,24 @@ def save_system_message(sender, receiver, text):
 
 @socketio.on("end-call")
 def end_call(data):
+
+    conn = sqlite3.connect("snapz.db")
+    cur = conn.cursor()
+
+    cur.execute("""
+        UPDATE calls
+        SET status='ended',
+            ended_at=datetime('now','localtime')
+        WHERE id=(
+            SELECT id FROM calls
+            ORDER BY id DESC
+            LIMIT 1
+        )
+    """)
+
+    conn.commit()
+    conn.close()
+
     emit(
         "call-ended",
         data,
@@ -3261,7 +3300,7 @@ def missed_call(data):
 
     cur.execute("""
         UPDATE calls
-        SET status=?,
+        SET status='missed',
             ended_at=datetime('now','localtime')
         WHERE id=(
             SELECT id FROM calls
@@ -3270,20 +3309,12 @@ def missed_call(data):
             LIMIT 1
         )
     """,(
-        "missed",
         data["from"],
         data["to"]
     ))
 
     conn.commit()
     conn.close()
-
-    emit(
-        "call-ended",
-        {},
-        room=data["to"]
-    )
-
 
 
 init_db()

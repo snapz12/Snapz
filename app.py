@@ -3263,11 +3263,7 @@ def end_call(data):
         UPDATE calls
         SET status='ended',
             ended_at=datetime('now','localtime')
-        WHERE id=(
-            SELECT id FROM calls
-            ORDER BY id DESC
-            LIMIT 1
-        )
+        WHERE status='answered'
     """)
 
     conn.commit()
@@ -3285,13 +3281,32 @@ def call_user(data):
 
     print("CALL USER:", data)
 
+    conn = sqlite3.connect("snapz.db")
+    cur = conn.cursor()
+
+    cur.execute("""
+        INSERT INTO calls(
+            caller,
+            receiver,
+            call_type,
+            status
+        )
+        VALUES(?,?,?,?)
+    """,(
+        data["from"],
+        data["to"],
+        data["type"],
+        "ringing"
+    ))
+
+    conn.commit()
+    conn.close()
+
     emit(
         "incoming-call",
         data,
         room=data["to"]
     )
-
-
 @socketio.on("missed-call")
 def missed_call(data):
 
@@ -3302,12 +3317,9 @@ def missed_call(data):
         UPDATE calls
         SET status='missed',
             ended_at=datetime('now','localtime')
-        WHERE id=(
-            SELECT id FROM calls
-            WHERE caller=? AND receiver=?
-            ORDER BY id DESC
-            LIMIT 1
-        )
+        WHERE caller=?
+        AND receiver=?
+        AND status='ringing'
     """,(
         data["from"],
         data["to"]
@@ -3315,6 +3327,12 @@ def missed_call(data):
 
     conn.commit()
     conn.close()
+
+    emit(
+        "call-ended",
+        {},
+        room=data["to"]
+    )
 
 
 init_db()

@@ -20,32 +20,89 @@
             min-height: 100vh;
         }
 
-
-.call-history{
-display:flex;
-justify-content:center;
-margin:10px 0;
+.history-toggle{
+    text-align: content;
+    position: fixed;
+    padding:10px;
+    font-weight:bold;
+    cursor:pointer;
+    background:#1d0933;
+    color:#fff;
+}
+#callHistoryBox{
+    position: absolute;
+    top: 100px;      /* header ke niche */
+    left: 0;
+    width: 100%;
+    height: calc(100% - 160px);
+    background: #1b0730;
+    overflow-y: auto;
+    display: none;
+    z-index: 999;
 }
 
+.dark-mode #callHistoryBox{
+    background: #111;
+}
+
+#callHistoryBox.show{
+    display: block;
+}
+
+.history-header{
+    display:none;
+}
+
+.history-body{
+    padding:10px;
+}
+
+
 .call-card{
-background:#f4f4f4;
-padding:8px 14px;
-border-radius:18px;
-font-size:14px;
-text-align:center;
-color:#444;
+    margin:10px 0;
+    padding:12px;
+    border-radius:15px;
+    background:#f5f5f5;
 }
 
 .dark-mode .call-card{
-background:#262626;
-color:white;
+    background:#262626;
+}
+
+
+.call-history{
+    display:flex;
+    width:100%;
+    margin:10px 0;
+}
+
+.call-history.outgoing{
+    justify-content:flex-end;
+}
+
+.call-history.incoming{
+    justify-content:flex-start;
+}
+
+.call-card{
+    max-width:75%;
+    padding:10px 15px;
+    border-radius:18px;
+    background:#f4f4f4;
+    color:#222;
+    font-size:15px;
+}
+
+.dark-mode .call-card{
+    background:#262626;
+    color:#fff;
 }
 
 .call-card small{
-display:block;
-margin-top:3px;
-font-size:11px;
-opacity:.7;
+    display:block;
+    margin-top:4px;
+    font-size:11px;
+    opacity:.7;
 }
 
 
@@ -644,124 +701,10 @@ onerror="this.onerror=null;this.src='/static/images/default.jpg';">
 </div>
 
 
-{% for c in calls %}
 
-<div class="call-history">
-
-{% if c[0]==session["username"] %}
-
-    {% if c[2]=="voice" %}
-
-        <div class="call-card">
-            📞 Voice call ended
-            <br>
-            <small>{{ c[4] }}</small>
-        </div>
-
-    {% else %}
-
-        <div class="call-card">
-<svg xmlns="http://www.w3.org/2000/svg"
-     width="24"
-     height="24"
-     viewBox="0 0 24 24">
-
-  <path fill="#111111"
-        d="M3 7a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v2.2l5-3v9.6l-5-3V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-
-
-</svg>
-            
- Video call ended
-            <br>
-            <small>{{ c[4] }}</small>
-        </div>
-
-    {% endif %}
-
-{% else %}
-
-    {% if c[3]=="missed" %}
-
-        {% if c[2]=="voice" %}
-
-        <div class="call-card">
-<svg xmlns="http://www.w3.org/2000/svg"
-     width="20"
-     height="20"
-     viewBox="0 0 24 24"
-     fill="#E53935">
-
-  <path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.3 21 3 13.7 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.24.2 2.45.57 3.57a1 1 0 0 1-.24 1.02l-2.21 2.2z"/>
-</svg>
-	 Missed voice call
-            <br>
-            <small>{{ c[4] }}</small>
-        </div>
-
-        {% else %}
-
-        <div class="call-card">
-<svg xmlns="http://www.w3.org/2000/svg"
-     width="24"
-     height="24"
-     viewBox="0 0 24 24">
-
-  <!-- Red Video Camera -->
-  <path fill="#E53935"
-        d="M3 7a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v2.2l5-3v9.6l-5-3V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-
-  <!-- Black Missed Call Arrow -->
-  <path fill="#111111"
-        d="M8 21H5v-3h1.8v1.2l4.5-4.5 1.4 1.4-4.5 4.5H9.5V21z"/>
-
-</svg>
-            Missed video call
-            <br>
-            <small>{{ c[4] }}</small>
-        </div>
-
-        {% endif %}
-
-    {% else %}
-
-        {% if c[2]=="voice" %}
-
-        <div class="call-card">
-            📞 Voice call ended
-            <br>
-            <small>{{ c[4] }}</small>
-        </div>
-
-        {% else %}
-
-        <div class="call-card">
-            <svg xmlns="http://www.w3.org/2000/svg"
-     width="24"
-     height="24"
-     viewBox="0 0 24 24">
-
-  <path fill="#111111"
-        d="M3 7a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v2.2l5-3v9.6l-5-3V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-
-
-</svg>
-Video call ended
-            <br>
-            <small>{{ c[4] }}</small>
-        </div>
-
-        {% endif %}
-
-    {% endif %}
-
-{% endif %}
-
+<div class="history-toggle" onclick="toggleCallHistory()">
+    ⬇ Call History
 </div>
-
-{% endfor %}
-
-
 
 
 <!-- ================= INPUT AREA ================= -->
@@ -853,7 +796,6 @@ Send
 </form>
 
 </div>
-
 
 
 
@@ -1573,6 +1515,8 @@ document.querySelector(".send-btn").onclick=function(e){
 
 </script>
 
+
+	
 <div id="deletePopup" class="delete-popup">
 
     <div class="delete-box">
@@ -1598,6 +1542,14 @@ let callSeconds = 0;
 let ringTimeout = null;
 let timerInterval = null;
 let currentCaller = "";
+let localStream = null;
+let peerConnection = null;
+
+const rtcConfig = {
+    iceServers: [
+        { urls: "stun:stun.l.google.com:19302" }
+    ]
+};
 
 const socket = io();
 
@@ -1613,6 +1565,10 @@ socket.on("connect", function(){
 
 
 function startCall(type){
+
+    const ok = await startLocalMedia(type);
+
+    if(!ok) return;
 
     if(type==="video"){
         document.getElementById("callingType").innerHTML="Video Call";
@@ -1753,9 +1709,200 @@ socket.on("call-ended",function(){
 
 });
 
+function toggleCallHistory(){
+
+    document.getElementById("callHistoryBox")
+        .classList.toggle("show");
+
+}
+
+async function startLocalMedia(type){
+
+    try{
+
+        localStream = await navigator.mediaDevices.getUserMedia({
+
+            audio:true,
+            video:(type==="video")
+
+        });
+
+        return true;
+
+    }catch(err){
+
+        alert("Camera/Microphone permission denied");
+
+        return false;
+
+    }
+
+}
 
 
 </script>
+
+
+
+<div id="callHistoryBox">
+
+    <div class="history-header">
+         Call History
+    </div>
+
+    <div class="history-body">
+
+{% for c in calls %}
+
+<div class="call-history {% if c[0]==session['username'] %}outgoing{% else %}incoming{% endif %}">
+
+{% if c[0] == session["username"] %}
+
+    {% if c[2] == "voice" %}
+
+    <div class="call-card">
+
+        <svg xmlns="http://www.w3.org/2000/svg"
+             width="20"
+             height="20"
+             viewBox="0 0 24 24"
+             fill="#111111">
+            <path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.3 21 3 13.7 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.24.2 2.45.57 3.57a1 1 0 0 1-.24 1.02l-2.21 2.2z"/>
+        </svg>
+
+        &nbsp;Voice call ended
+
+        <br>
+
+        <small>{{ c[4] }}</small>
+
+    </div>
+
+    {% else %}
+
+    <div class="call-card">
+
+        <svg xmlns="http://www.w3.org/2000/svg"
+             width="20"
+             height="20"
+             viewBox="0 0 24 24">
+            <path fill="#111111"
+                  d="M3 7a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v2.2l5-3v9.6l-5-3V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+        </svg>
+
+        &nbsp;Video call ended
+
+        <br>
+
+        <small>{{ c[4] }}</small>
+
+    </div>
+
+    {% endif %}
+
+{% else %}
+
+    {% if c[3] == "missed" %}
+
+        {% if c[2] == "voice" %}
+
+        <div class="call-card">
+
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 width="20"
+                 height="20"
+                 viewBox="0 0 24 24"
+                 fill="#E53935">
+                <path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.3 21 3 13.7 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.24.2 2.45.57 3.57a1 1 0 0 1-.24 1.02l-2.21 2.2z"/>
+            </svg>
+
+            &nbsp;Missed voice call
+
+            <br>
+
+            <small>{{ c[4] }}</small>
+
+        </div>
+
+        {% else %}
+
+        <div class="call-card">
+
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 width="20"
+                 height="20"
+                 viewBox="0 0 24 24">
+  <path fill="#E53935"
+        d="M3 7a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v2.2l5-3v9.6l-5-3V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+
+  <!-- Center Black Arrow -->
+  <path fill="#111111"
+        d="M10.2 9.2h3v1.3h-0.9l1.9 1.9-.9.9-1.9-1.9v0.9h-1.2z"/>
+
+            </svg>
+
+            &nbsp;Missed video call
+
+            <br>
+
+            <small>{{ c[4] }}</small>
+
+        </div>
+
+        {% endif %}
+
+    {% else %}
+
+        {% if c[2] == "voice" %}
+
+        <div class="call-card">
+
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 width="20"
+                 height="20"
+                 viewBox="0 0 24 24"
+                 fill="#111111">
+                <path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.3 21 3 13.7 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.24.2 2.45.57 3.57a1 1 0 0 1-.24 1.02l-2.21 2.2z"/>
+            </svg>
+
+            &nbsp;Voice call ended
+
+            <br>
+
+            <small>{{ c[4] }}</small>
+
+        </div>
+
+        {% else %}
+
+        <div class="call-card">
+
+            <svg xmlns="http://www.w3.org/2000/svg"
+                 width="20"
+                 height="20"
+                 viewBox="0 0 24 24">
+                <path fill="#111111"
+                      d="M3 7a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v2.2l5-3v9.6l-5-3V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            </svg>
+
+            &nbsp;Video call ended
+
+            <br>
+
+            <small>{{ c[4] }}</small>
+
+        </div>
+
+        {% endif %}
+
+    {% endif %}
+
+{% endif %}
+
+</div>
+
+{% endfor %}
+
 
 
 

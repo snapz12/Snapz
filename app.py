@@ -709,8 +709,8 @@ def chat(username):
 	ORDER BY id ASC
     """,(
         session["username"],
-        chat_with,
-        chat_with,
+	username,
+	username,
         session["username"]
     ))
 
@@ -3288,6 +3288,46 @@ def end_call(data):
     """)
 
     conn.commit()
+    cur.execute("""
+    SELECT caller,receiver,call_type,status
+	FROM calls
+	ORDER BY id DESC
+	LIMIT 1
+    """)
+
+    call = cur.fetchone()
+
+    if call and call[3] == "answered":
+
+        if call[2] == "voice":
+
+            save_system_message(
+                call[0],
+                call[1],
+                "📞 Voice call ended"
+            )
+
+            save_system_message(
+                call[1],
+                call[0],
+                "📞 Voice call ended"
+            )
+
+    else:
+
+            save_system_message(
+                call[0],
+                call[1],
+                "📹 Video call ended"
+            )
+
+
+            save_system_message(
+                call[1],
+                call[0],
+                "📹 Video call ended"
+            )
+
     conn.close()
 
     emit(
@@ -3347,6 +3387,34 @@ def missed_call(data):
     ))
 
     conn.commit()
+    if data["type"] == "voice":
+
+        save_system_message(
+            data["from"],
+            data["to"],
+            "📞 Voice call ended"
+        )
+
+        save_system_message(
+            data["to"],
+            data["from"],
+            "📞 Missed voice call"
+        )
+
+    else:
+
+        save_system_message(
+            data["from"],
+            data["to"],
+            "📹 Video call ended"
+        )
+
+        save_system_message(
+            data["to"],
+            data["from"],
+            "📹 Missed video call"
+        )
+
     conn.close()
 
     emit(

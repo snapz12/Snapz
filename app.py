@@ -694,7 +694,27 @@ def chat(username):
 
     conn = sqlite3.connect("snapz.db")
     cur = conn.cursor()
+    cur.execute("""
+	SELECT
+	caller,
+	receiver,
+	call_type,
+	status,
+	strftime('%I:%M %p', ended_at)
+	FROM calls
+	WHERE
+	(caller=? AND receiver=?)
+	OR
+	(caller=? AND receiver=?)
+	ORDER BY id ASC
+    """,(
+        session["username"],
+        chat_with,
+        chat_with,
+        session["username"]
+    ))
 
+    calls = cur.fetchall()
     # Send message
     if request.method == "POST":
 
@@ -811,6 +831,7 @@ def chat(username):
         profile_url=profile_url,
         is_online=is_online,
         last_seen=last_seen
+	calls=calls
     )
 
 

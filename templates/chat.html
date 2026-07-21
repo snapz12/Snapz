@@ -1756,7 +1756,7 @@ socket.emit("answer-call",{
     to: "{{ session['username'] }}"
 });
 
-    startTimer();
+
 
 const answer = await peerConnection.createAnswer();
 
@@ -1778,6 +1778,7 @@ socket.on("call-answered",function(){
     startTimer();
 
 });
+
 
 socket.on("call-ended",function(){
 
@@ -1821,6 +1822,15 @@ async function startLocalMedia(type){
 
 function createPeer(){
 
+    peerConnection = new RTCPeerConnection({
+        iceServers: [
+            {
+                urls: "stun:stun.l.google.com:19302"
+            }
+        ]
+    });
+
+
     peerConnection.onconnectionstatechange = () => {
         console.log("Connection:", peerConnection.connectionState);
     };
@@ -1831,13 +1841,6 @@ function createPeer(){
     };
 
 
-    peerConnection = new RTCPeerConnection({
-        iceServers: [
-            {
-                urls: "stun:stun.l.google.com:19302"
-            }
-        ]
-    });
 
     // Local Audio/Video Track Add
     localStream.getTracks().forEach(track => {
@@ -1879,27 +1882,6 @@ function createPeer(){
 
 }
 
-
-// Receive ICE Candidate
-socket.on("ice-candidate", async function(data){
-
-    if(!peerConnection || !data.candidate){
-        return;
-    }
-
-    try{
-
-        await peerConnection.addIceCandidate(
-            new RTCIceCandidate(data.candidate)
-        );
-
-    }catch(err){
-
-        console.log("ICE Error:", err);
-
-    }
-
-});
 
 
 

@@ -1638,6 +1638,8 @@ socket.on("incoming-call", async function(data){
 
 socket.on("offer", async(data)=>{
 
+    console.log("Offer received", data);
+
     currentCaller = data.from;
 
     await startLocalMedia(data.type);
@@ -1656,6 +1658,8 @@ socket.on("offer", async(data)=>{
 
 socket.on("answer", async(data)=>{
 
+    console.log("Answer received", data);
+
     await peerConnection.setRemoteDescription(
         new RTCSessionDescription(data.answer)
     );
@@ -1663,6 +1667,9 @@ socket.on("answer", async(data)=>{
 });
 
 socket.on("ice-candidate", async(data)=>{
+
+console.log("ICE received", data);
+
 
     if(peerConnection){
 
@@ -1813,6 +1820,16 @@ async function startLocalMedia(type){
 
 
 function createPeer(){
+
+    peerConnection.onconnectionstatechange = () => {
+        console.log("Connection:", peerConnection.connectionState);
+    };
+
+
+    peerConnection.oniceconnectionstatechange = () => {
+        console.log("ICE State:", peerConnection.iceConnectionState);
+    };
+
 
     peerConnection = new RTCPeerConnection({
         iceServers: [

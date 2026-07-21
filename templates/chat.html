@@ -1620,11 +1620,9 @@ ringTimeout = setTimeout(function(){
 
 }  
 
-socket.on("incoming-call",function(data){
+socket.on("incoming-call", async function(data){
 
     await startLocalMedia(data.type);
-
-    createPeer();
 
     currentCaller = data.from;
 
@@ -1635,8 +1633,8 @@ socket.on("incoming-call",function(data){
     }
 
     document.getElementById("incomingCallPopup").style.display="flex";
-
 });
+
 
 socket.on("offer", async(data)=>{
 
@@ -1644,7 +1642,9 @@ socket.on("offer", async(data)=>{
 
     await startLocalMedia(data.type);
 
-    createPeer();
+    if(!peerConnection){
+        createPeer();
+    }
 
     await peerConnection.setRemoteDescription(
         new RTCSessionDescription(data.offer)
@@ -1815,18 +1815,21 @@ async function startLocalMedia(type){
 function createPeer(){
 
     peerConnection = new RTCPeerConnection({
-        iceServers:[
+        iceServers: [
             {
-                urls:"stun:stun.l.google.com:19302"
+                urls: "stun:stun.l.google.com:19302"
             }
         ]
     });
 
-    localStream.getTracks().forEach(track=>{
+    // Local Audio/Video Track Add
+    localStream.getTracks().forEach(track => {
         peerConnection.addTrack(track, localStream);
     });
 
-    peerConnection.onicecandidate = (event)=>{
+    // ICE Candidate Send
+    peerConnection.onicecandidate = function(event){
+
         if(event.candidate){
 
             socket.emit("ice-candidate",{
@@ -1836,9 +1839,11 @@ function createPeer(){
             });
 
         }
+
     };
 
-    peerConnection.ontrack = (event)=>{
+    // Remote Audio/Video Receive
+    peerConnection.ontrack = function(event){
 
         let audio = document.getElementById("remoteAudio");
 
@@ -1855,18 +1860,25 @@ function createPeer(){
 
     };
 
-
-
 }
 
 
+// Receive ICE Candidate
 socket.on("ice-candidate", async function(data){
 
-    if(data.candidate && peerConnection){
+    if(!peerConnection || !data.candidate){
+        return;
+    }
+
+    try{
 
         await peerConnection.addIceCandidate(
             new RTCIceCandidate(data.candidate)
         );
+
+    }catch(err){
+
+        console.log("ICE Error:", err);
 
     }
 

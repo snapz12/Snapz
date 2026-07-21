@@ -1552,7 +1552,7 @@ const rtcConfig = {
 };
 
 const socket = io();
-
+	
 socket.on("connect", function(){
 
     console.log("Socket Connected:", socket.id);
@@ -1622,9 +1622,9 @@ ringTimeout = setTimeout(function(){
 
 socket.on("incoming-call",function(data){
 
-await startLocalMedia(data.type);
+    await startLocalMedia(data.type);
 
-createPeer();
+    createPeer();
 
     currentCaller = data.from;
 
@@ -1642,7 +1642,7 @@ socket.on("offer", async(data)=>{
 
     currentCaller = data.from;
 
-    await startLocalMedia("voice");
+    await startLocalMedia(data.type);
 
     createPeer();
 
@@ -1858,32 +1858,6 @@ function createPeer(){
 
 
 }
-
-socket.on("offer", async function(data){
-
-    await peerConnection.setRemoteDescription(
-        new RTCSessionDescription(data.offer)
-    );
-
-    const answer = await peerConnection.createAnswer();
-
-    await peerConnection.setLocalDescription(answer);
-
-    socket.emit("answer",{
-        to: data.from,
-        from: "{{ session['username'] }}",
-        answer: answer
-    });
-
-});
-
-socket.on("answer", async function(data){
-
-    await peerConnection.setRemoteDescription(
-        new RTCSessionDescription(data.answer)
-    );
-
-});
 
 
 socket.on("ice-candidate", async function(data){

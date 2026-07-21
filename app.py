@@ -3247,13 +3247,6 @@ def answer_call(data):
     )
 
 
-@socketio.on("ice-candidate")
-def ice(data):
-    emit(
-        "ice-candidate",
-        data,
-        room=data["to"]
-    )
 
 def save_system_message(sender, receiver, text):
 
@@ -3422,6 +3415,21 @@ def missed_call(data):
         {},
         room=data["to"]
     )
+
+
+@socketio.on("offer")
+def offer(data):
+    emit("offer", data, room=data["to"])
+
+
+@socketio.on("answer")
+def answer(data):
+    emit("answer", data, room=data["to"])
+
+
+@socketio.on("ice-candidate")
+def ice_candidate(data):
+    emit("ice-candidate", data, room=data["to"])
 
 
 init_db()

@@ -1582,6 +1582,24 @@ if(!ok) return;
         from:"{{ session['username'] }}",
         type:type
     });
+createPeer();
+
+const offer = await peerConnection.createOffer();
+
+await peerConnection.setLocalDescription(offer);
+
+socket.emit("offer",{
+    to:"{{ chat_with }}",
+    from:"{{ session['username'] }}",
+    offer:offer
+
+
+});
+
+
+
+
+
 
 
 ringTimeout = setTimeout(function(){  
@@ -1604,6 +1622,10 @@ ringTimeout = setTimeout(function(){
 
 socket.on("incoming-call",function(data){
 
+await startLocalMedia(data.type);
+
+createPeer();
+
     currentCaller = data.from;
 
     if(data.type==="video"){
@@ -1616,6 +1638,41 @@ socket.on("incoming-call",function(data){
 
 });
 
+socket.on("offer", async(data)=>{
+
+    currentCaller = data.from;
+
+    await startLocalMedia("voice");
+
+    createPeer();
+
+    await peerConnection.setRemoteDescription(
+        new RTCSessionDescription(data.offer)
+    );
+
+    document.getElementById("incomingCallPopup").style.display="flex";
+
+});
+
+socket.on("answer", async(data)=>{
+
+    await peerConnection.setRemoteDescription(
+        new RTCSessionDescription(data.answer)
+    );
+
+});
+
+socket.on("ice-candidate", async(data)=>{
+
+    if(peerConnection){
+
+        await peerConnection.addIceCandidate(
+            new RTCIceCandidate(data.candidate)
+        );
+
+    }
+
+});
 
 function startTimer(){
 
@@ -1675,7 +1732,7 @@ socket.emit("end-call",{
 }
 
 
-function acceptCall(){
+async function acceptCall(){
 
 clearTimeout(ringTimeout);
 
@@ -1683,12 +1740,27 @@ clearTimeout(ringTimeout);
 
     document.getElementById("callPopup").style.display="flex";
 
+if(!peerConnection){
+    createPeer();
+}
+
 socket.emit("answer-call",{
     from: currentCaller,
     to: "{{ session['username'] }}"
 });
 
     startTimer();
+
+const answer = await peerConnection.createAnswer();
+
+await peerConnection.setLocalDescription(answer);
+
+socket.emit("answer",{
+    to: currentCaller,
+    from:"{{ session['username'] }}",
+    answer:answer
+});
+
 
 }
 
@@ -1738,6 +1810,95 @@ async function startLocalMedia(type){
     }
 
 }
+
+
+function createPeer(){
+
+    peerConnection = new RTCPeerConnection({
+        iceServers:[
+            {
+                urls:"stun:stun.l.google.com:19302"
+            }
+        ]
+    });
+
+    localStream.getTracks().forEach(track=>{
+        peerConnection.addTrack(track, localStream);
+    });
+
+    peerConnection.onicecandidate = (event)=>{
+        if(event.candidate){
+
+            socket.emit("ice-candidate",{
+                to: currentCaller || "{{ chat_with }}",
+                from: "{{ session['username'] }}",
+                candidate: event.candidate
+            });
+
+        }
+    };
+
+    peerConnection.ontrack = (event)=>{
+
+        let audio = document.getElementById("remoteAudio");
+
+        if(!audio){
+
+            audio = document.createElement("audio");
+            audio.id = "remoteAudio";
+            audio.autoplay = true;
+            document.body.appendChild(audio);
+
+        }
+
+        audio.srcObject = event.streams[0];
+
+    };
+
+
+
+}
+
+socket.on("offer", async function(data){
+
+    await peerConnection.setRemoteDescription(
+        new RTCSessionDescription(data.offer)
+    );
+
+    const answer = await peerConnection.createAnswer();
+
+    await peerConnection.setLocalDescription(answer);
+
+    socket.emit("answer",{
+        to: data.from,
+        from: "{{ session['username'] }}",
+        answer: answer
+    });
+
+});
+
+socket.on("answer", async function(data){
+
+    await peerConnection.setRemoteDescription(
+        new RTCSessionDescription(data.answer)
+    );
+
+});
+
+
+socket.on("ice-candidate", async function(data){
+
+    if(data.candidate && peerConnection){
+
+        await peerConnection.addIceCandidate(
+            new RTCIceCandidate(data.candidate)
+        );
+
+    }
+
+});
+
+
 
 
 </script>

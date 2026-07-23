@@ -364,6 +364,42 @@ def home():
 
     following_users = [row[0].strip() for row in cur.fetchall()]
 
+
+    conn = sqlite3.connect("snapz.db")
+    conn.row_factory = sqlite3.Row
+    cur = conn.cursor()
+    cur.execute("""
+    SELECT DISTINCT
+    CASE
+    WHEN sender=? THEN receiver
+    ELSE sender
+    END AS username
+    FROM messages
+    WHERE sender=? OR receiver=?
+    ORDER BY id DESC
+    """,(
+        session["username"],
+        session["username"],
+        session["username"]
+    ))
+
+    recent_users=[]
+
+    for row in cur.fetchall():
+
+        cur.execute("""
+        SELECT profile_pic
+        FROM users
+        WHERE username=?
+        """,(row["username"],))
+
+        u=cur.fetchone()
+
+        recent_users.append({
+            "username":row["username"],
+            "profile_pic":u["profile_pic"] if u else "default.jpg"
+        })
+
     conn.close()
 
 
@@ -389,7 +425,8 @@ def home():
         friends_stories=friends_stories,
         story_circles=story_circles,
         all_stories=all_stories,
-        current_user=current_user
+        current_user=current_user,
+	recent_users=recent_users
     )
 
 @app.route("/send_otp", methods=["POST"])
@@ -695,22 +732,22 @@ def chat(username):
     conn = sqlite3.connect("snapz.db")
     cur = conn.cursor()
     cur.execute("""
-	SELECT
-	caller,
-	receiver,
-	call_type,
-	status,
-	strftime('%I:%M %p', ended_at)
-	FROM calls
-	WHERE
-	(caller=? AND receiver=?)
-	OR
-	(caller=? AND receiver=?)
-	ORDER BY id ASC
+    SELECT
+    caller,
+    receiver,
+    call_type,
+    status,
+    strftime('%I:%M %p', ended_at)
+    FROM calls
+    WHERE
+    (caller=? AND receiver=?)
+    OR
+    (caller=? AND receiver=?)
+    ORDER BY id ASC
     """,(
         session["username"],
-	username,
-	username,
+    username,
+    username,
         session["username"]
     ))
 
@@ -788,7 +825,7 @@ def chat(username):
             reel_id,
             image,
             audio,
-	    video,
+        video,
             deleted
         FROM messages
         WHERE
@@ -831,7 +868,7 @@ def chat(username):
         profile_url=profile_url,
         is_online=is_online,
         last_seen=last_seen,
-	calls=calls
+    calls=calls
     )
 
 
@@ -847,19 +884,20 @@ def chat_messages(username):
     cur = conn.cursor()
 
     cur.execute("""
-	SELECT
-	    id,
-	    sender,
-	    receiver,
-	    message,
-	    reel_id,
-	    is_seen,
-	    timestamp,
-	    image,
-	    audio,
-	    deleted,
-	    video
-	FROM messages
+    SELECT
+        id,
+        sender,
+        receiver,
+        message,
+        reel_id,
+	reel_thumbnail,
+        is_seen,
+        timestamp,
+        image,
+        audio,
+        deleted,
+        video
+    FROM messages
         WHERE
             (sender=? AND receiver=?)
             OR
@@ -886,6 +924,7 @@ def chat_messages(username):
             "receive": row[2],
             "message": row[3],
             "reel_id": row[4],
+	    "reel_thumbnail": row[5],
             "is_seen": row[5],
             "time": time_ago(row[6]),
             "image": row[7],
@@ -936,6 +975,9 @@ def upload():
     print("UPLOAD START")
     print(request.files)
     print(request.form)
+    print("HEADERS =", dict(request.headers))
+    print("METHOD =", request.method)
+
 
     # Login check
     if "username" not in session:
@@ -962,25 +1004,44 @@ def upload():
     upload_type = request.form.get("type", "post")
 
     print("LOGGED USER =", username)
-    print("TYPE =", upload_type)
+    print("UPLOAD TYPE =", upload_type)
+    print("BEFORE CLOUDINARY")
 
-    # Cloudinary upload
     try:
-        result = cloudinary.uploader.upload(file)
+
+        if upload_type == "reel":
+
+            result = cloudinary.uploader.upload(
+                file,
+                resource_type="video",
+                chunk_size=6000000
+            )
+
+        else:
+
+            result = cloudinary.uploader.upload(file)
+
+        print("AFTER CLOUDINARY")
+
         file_url = result["secure_url"]
         print("Cloudinary Upload Success =", file_url)
 
     except Exception as e:
+
         print("Cloudinary Error =", e)
+
         return jsonify({
             "status": "error",
             "message": str(e)
         }), 500
 
+
     conn = sqlite3.connect("snapz.db")
     cur = conn.cursor()
 
     try:
+
+        print("TRY BLOCK START")
 
         # REEL
         if upload_type == "reel":
@@ -989,6 +1050,8 @@ def upload():
                 "INSERT INTO reels(username, video, caption) VALUES(?,?,?)",
                 (username, file_url, caption)
             )
+            print("REEL INSERT DONE")
+
 
         # STORY
         elif upload_type == "story":
@@ -1027,7 +1090,6 @@ def upload():
 
     except Exception as e:
 
-        conn.rollback()
         print("DB Error =", e)
 
         return jsonify({
@@ -1177,36 +1239,38 @@ def reels():
         reel_id = r[0]
 
         # Like count
-        cur.execute(
-            "SELECT COUNT(*) FROM reel_likes WHERE reel_id=?",
-            (reel_id,)
-        )
+        cur.execute("""
+            SELECT COUNT(*)
+            FROM reel_likes
+            WHERE reel_id=?
+        """, (reel_id,))
         like_count = cur.fetchone()[0]
 
         # Current user liked?
-        cur.execute(
-            """
+        cur.execute("""
             SELECT id
             FROM reel_likes
             WHERE reel_id=?
             AND username=?
-            """,
-            (reel_id, current_user)
-        )
-
+        """, (reel_id, current_user))
         liked = cur.fetchone() is not None
 
         # Comment count
-        cur.execute(
-            """
+        cur.execute("""
             SELECT COUNT(*)
             FROM reel_comments
             WHERE reel_id=?
-            """,
-            (reel_id,)
-        )
-
+        """, (reel_id,))
         comment_count = cur.fetchone()[0]
+
+        # Comment list
+        cur.execute("""
+            SELECT username, comment
+            FROM reel_comments
+            WHERE reel_id=?
+            ORDER BY id DESC
+        """, (reel_id,))
+        comment_list = cur.fetchall()
 
         reels.append({
             "id": reel_id,
@@ -1216,7 +1280,8 @@ def reels():
             "profile_pic": r[4] if r[4] else "/static/default.png",
             "likes": like_count,
             "comments": comment_count,
-            "liked": liked
+            "liked": liked,
+            "comment_list": comment_list
         })
 
     conn.close()
@@ -1733,7 +1798,7 @@ def search():
         })
 
     conn.close()
-
+    print(users)
     return jsonify(users)
 
 
@@ -2498,9 +2563,10 @@ def comment_post(post_id):
         INSERT INTO comments(
             post_id,
             username,
-            comment
+            comment,
+            timestamp
         )
-        VALUES(?,?,?)
+        VALUES(?,?,?,datetime('now','localtime'))
     """,(post_id,username,comment))
 
     # Notification
@@ -2539,10 +2605,10 @@ def comment_post(post_id):
 
 
 @app.route("/like_reel/<int:reel_id>", methods=["POST"])
-def like_reel():
+def like_reel(reel_id):
 
     if "username" not in session:
-        return jsonify({"status":"error"}),401
+        return jsonify({"status":"error"}), 401
 
     liker = session["username"]
 
@@ -2564,63 +2630,70 @@ def like_reel():
     owner = row[0]
 
     # Already liked?
-    cur.execute(
-        """
+    cur.execute("""
         SELECT 1
         FROM reel_likes
         WHERE username=? AND reel_id=?
-        """,
-        (liker,reel_id)
-    )
+    """, (liker, reel_id))
 
     if cur.fetchone():
-        conn.close()
-        return jsonify({"status":"already_liked"})
 
-    # Save like
-    cur.execute(
-        """
-        INSERT INTO reel_likes(username,reel_id)
-        VALUES(?,?)
-        """,
-        (liker,reel_id)
-    )
+        cur.execute("""
+            DELETE FROM reel_likes
+            WHERE username=? AND reel_id=?
+        """, (liker, reel_id))
+
+        conn.commit()
+
+        cur.execute("""
+            SELECT COUNT(*)
+            FROM reel_likes
+            WHERE reel_id=?
+        """, (reel_id,))
+
+        like_count = cur.fetchone()[0]
+
+        conn.close()
+
+        return jsonify({
+            "status": "unliked",
+            "likes": like_count
+        })
+
+    # Like Save
+    cur.execute("""
+        INSERT INTO reel_likes(username, reel_id)
+        VALUES(?, ?)
+    """, (liker, reel_id))
 
     # Notification
     if owner != liker:
 
-        cur.execute(
-            """
+        cur.execute("""
             INSERT INTO notifications
-            (user_to,user_from,action)
+            (user_to, user_from, action)
             VALUES(?,?,?)
-            """,
-            (
-                owner,
-                liker,
-                "liked your reel ❤️"
-            )
-        )
+        """, (
+            owner,
+            liker,
+            "liked your reel ❤️"
+        ))
 
     conn.commit()
 
-    # Like count
-    cur.execute(
-        """
+    cur.execute("""
         SELECT COUNT(*)
         FROM reel_likes
         WHERE reel_id=?
-        """,
-        (reel_id,)
-    )
+    """, (reel_id,))
 
     like_count = cur.fetchone()[0]
 
     conn.close()
 
     return jsonify({
-        "status":"liked",
-        "likes":like_count
+        "status": "liked",
+        "likes": like_count
     })
 
 
@@ -2712,7 +2785,8 @@ def comment_reel(reel_id):
     conn.commit()
     conn.close()
 
-    return {"status":"success"}
+    return redirect("/reels")
+
 
 @app.route("/reel/<int:reel_id>")
 def single_reel(reel_id):
@@ -2773,7 +2847,8 @@ def share_reel(reel_id):
     return render_template(
         "share_reel.html",
         users=users,
-        reel_id=reel_id
+        reel_id=reel_id,
+	reel_thumbnail = reel_video
     )
 
 
@@ -2799,19 +2874,17 @@ def send_reel(reel_id, username):
         return "Reel not found"
 
     # Send message
-    cur.execute(
-        """
+    cur.execute("""
         INSERT INTO messages
-        (sender,receiver,message,reel_id,timestamp)
-        VALUES(?,?,?,?,datetime('now','localtime'))
-        """,
-        (
+        (sender, receiver, message, reel_id, reel_thumbnail)
+        VALUES (?, ?, ?, ?, ?)
+        """, (
             sender,
-            username,
-            "🎬 Shared a Reel",
-            reel_id
-        )
-    )
+            receiver,
+            "",
+            reel_id,
+            thumbnail
+    ))
 
     # Notification
     if sender != username:
@@ -3225,14 +3298,15 @@ def answer_call(data):
 
     cur.execute("""
         UPDATE calls
-        SET status='answered'
+        SET status='answered',
+            started_at=datetime('now','localtime')
         WHERE id=(
             SELECT id FROM calls
             WHERE caller=? AND receiver=?
             ORDER BY id DESC
             LIMIT 1
         )
-    """,(
+    """, (
         data["from"],
         data["to"]
     ))
@@ -3281,11 +3355,32 @@ def end_call(data):
     """)
 
     conn.commit()
+
+    cur.execute("""
+    SELECT
+    CAST(
+    (strftime('%s',ended_at)-strftime('%s',started_at))
+    AS INTEGER)
+    FROM calls
+    WHERE status='ended'
+    ORDER BY id DESC
+    LIMIT 1
+    """)
+
+    seconds = cur.fetchone()[0] or 0
+
+    minutes = seconds // 60
+    sec = seconds % 60
+
+    duration = f"{minutes} min {sec} sec"
+
+
+
     cur.execute("""
     SELECT caller,receiver,call_type,status
-	FROM calls
-	ORDER BY id DESC
-	LIMIT 1
+    FROM calls
+    ORDER BY id DESC
+    LIMIT 1
     """)
 
     call = cur.fetchone()
@@ -3297,13 +3392,13 @@ def end_call(data):
             save_system_message(
                 call[0],
                 call[1],
-                "📞 Voice call ended"
+                f"📞 Voice Call\n{duration}"
             )
 
             save_system_message(
                 call[1],
                 call[0],
-                "📞 Voice call ended"
+                f"📞 Voice Call\n{duration}"
             )
 
     else:
@@ -3311,14 +3406,14 @@ def end_call(data):
             save_system_message(
                 call[0],
                 call[1],
-                "📹 Video call ended"
+                f"📹 Video Call\n{duration}"
             )
 
 
             save_system_message(
                 call[1],
                 call[0],
-                "📹 Video call ended"
+                f"📹 Video Call\n{duration}"
             )
 
     conn.close()

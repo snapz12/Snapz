@@ -1170,6 +1170,11 @@ function startRecording() {
 
 // Server par final fetch request post data send karne ke liye
 function finalUpload() {
+
+print("HEADERS =", dict(request.headers))
+print("PATH =", request.path)
+print("METHOD =", request.method)
+
     if (!selectedFile) {
         alert("Koi file select nahi hui hai.");
         return;
@@ -1178,25 +1183,37 @@ function finalUpload() {
     let formData = new FormData();
     formData.append("file", selectedFile);
     formData.append("caption", document.getElementById("caption").value.trim());
-    formData.append("type", mode); 
+    formData.append("type", mode);
 
+    fetch("/upload", {
+        method: "POST",
+        body: formData
+    })
 
-.then(data => {
-    console.log(data);
+    .then(response => response.json())
 
-    if (data.status === "ok") {
-        window.location.href = "/";
-        // ya
-        // location.reload();
-    } else {
-        alert(data.message || "Upload Failed");
-    }
-})
+    .then(data => {
 
-.catch(err => { console.log(err); alert("Network Error");
-});
+        console.log(data);
+
+        if (data.status === "ok") {
+            window.location.href = "/";
+            // ya location.reload();
+        } else {
+            alert(data.message || "Upload Failed");
+        }
+
+    })
+
+    .catch(err => {
+        console.log(err);
+        alert("Network Error");
+    });
 
 }
+
+
+
 </script>
 
 <script>
@@ -1665,7 +1682,7 @@ border-top-right-radius:20px;
 // Like Logic (With Count)
 function toggleLike(btn, postId) {
 
-fetch("/like/" + postId,{
+fetch("/like_post/" + postId,{
     method:"POST"
 })
 .then(res => res.json())
@@ -1845,7 +1862,7 @@ z-index:999999;">
 position:absolute;
 bottom:0;
 left:0;
-width:100%;
+width:92%;
 height:65%;
 background:#111;
 border-radius:20px 20px 0 0;
@@ -1859,16 +1876,19 @@ Share Post
 <input
 id="shareSearch"
 placeholder="Search user..."
+onkeyup="searchShareUser(this.value)"
 style="
-width:100%;
+width:95%;
 padding:10px;
 border:none;
 border-radius:8px;
 margin-bottom:15px;">
 
+<div id="shareSearchResults"></div>
+
 <div id="shareUsers">
 
-{% for f in friends %}
+{% for f in recent_users %}
 
 <div
 style="
@@ -1879,18 +1899,23 @@ margin-bottom:12px;">
 
 <div style="display:flex;align-items:center;">
 
-<img
 {% if f.profile_pic and f.profile_pic.startswith('http') %}
-<img src="{{ f.profile_pic }}">
-{% else %}
-<img src="/static/images/{{ f.profile_pic or 'default.jpg' }}">
-{% endif %}
-
+<img
+src="{{ f.profile_pic }}"
 style="
 width:45px;
 height:45px;
 border-radius:50%;
 margin-right:10px;">
+{% else %}
+<img
+src="/static/images/{{ f.profile_pic or 'default.jpg' }}"
+style="
+width:45px;
+height:45px;
+border-radius:50%;
+margin-right:10px;">
+{% endif %}
 
 <span style="color:white;">
 {{ f.username }}
@@ -1902,13 +1927,19 @@ margin-right:10px;">
 onclick="sharePost('{{ f.username }}')"
 style="
 background:#0095f6;
-color:white;
+color:#fff;
 border:none;
-padding:8px 15px;
-border-radius:8px;">
-
+border-radius:8px;
+width:70px;
+height:36px;
+font-size:14px;
+font-weight:bold;
+display:flex;
+align-items:center;
+justify-content:center;
+cursor:pointer;
+flex-shrink:0;">
 Send
-
 </button>
 
 </div>
@@ -1953,6 +1984,55 @@ function closeShare(){
     document.getElementById("shareBox").style.display="none";
 
 }
+
+function searchShareUser(q){
+
+    if(q.trim()==""){
+        document.getElementById("shareSearchResults").innerHTML="";
+        return;
+    }
+
+    fetch("/search?q="+encodeURIComponent(q))
+    .then(r=>r.json())
+    .then(users=>{
+
+        let html="";
+
+        users.forEach(function(user){
+
+	     let pic = user.profile_pic || "default.jpg";
+
+            html += `
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:10px;border-bottom:1px solid #333;">
+
+                <div style="display:flex;align-items:center;">
+
+                    <img src="/static/images/${pic}"
+                    style="width:45px;height:45px;border-radius:50%;margin-right:10px;">
+
+                    <span style="color:white;">${user.username}</span>
+
+                </div>
+
+                <button
+                onclick="sharePost('${user.username}')"
+                style="background:#0095f6;color:white;border:none;padding:8px 15px;border-radius:8px;">
+
+                Send
+
+                </button>
+
+            </div>
+            `;
+        });
+
+        document.getElementById("shareSearchResults").innerHTML=html;
+
+    });
+
+}
+
+
 
 function sharePost(username){
 

@@ -1844,6 +1844,23 @@ socket.on("call-ended",function(){
     document.getElementById("callPopup").style.display="none";
     document.getElementById("incomingCallPopup").style.display="none";
 
+if (peerConnection) {
+    peerConnection.close();
+    peerConnection = null;
+}
+
+if (localStream) {
+    localStream.getTracks().forEach(track => track.stop());
+    localStream = null;
+}
+
+let audio = document.getElementById("remoteAudio");
+if (audio) {
+    audio.srcObject = null;
+}
+
+
+
 });
 
 function toggleCallHistory(){

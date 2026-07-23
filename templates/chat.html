@@ -20,6 +20,28 @@
             min-height: 100vh;
         }
 
+
+.shared-reel{
+    width:180px;
+    border-radius:15px;
+    overflow:hidden;
+    cursor:pointer;
+    background:#111;
+}
+
+.reel-thumb{
+    width:100%;
+    height:220px;
+    object-fit:cover;
+}
+
+.reel-label{
+    padding:8px;
+    color:#fff;
+    text-align:center;
+    font-weight:bold;
+}
+
 .history-toggle{
     text-align: content;
     position: fixed;
@@ -288,12 +310,14 @@
 
 .chat-image,
 .chat-video{
+    max-width:260px;
+    max-height:350px;
+    width:auto;
+    height:auto;
     display:block;
-    width:100%;
-    max-width:280px;
-    border-radius:15px;
-    cursor:pointer;
+    border-radius:18px;
     object-fit:cover;
+    cursor:pointer;
 }
 
 
@@ -1031,30 +1055,63 @@ async function loadMessages(){
 
 if(chat.image){
 
-    content = `
-    <img
-        class="chat-image"
-        src="/static/uploads/${chat.image}"
-        onclick="openImage('/static/uploads/${chat.image}')">
-    `;
+let imageSrc = chat.image.startsWith("http")
+    ? chat.image
+    : "/static/uploads/" + chat.image;
+
+content = `
+<img
+    class="chat-image"
+    src="${imageSrc}"
+    onclick="openImage('${imageSrc}')">
+`;
 
 }
 
 
 else if(chat.video){
 
+let videoSrc = chat.video.startsWith("http")
+    ? chat.video
+    : "/static/uploads/" + chat.video;
+
 content = `
 <video
     class="chat-video"
-    onclick="openVideo('/static/uploads/${chat.video}')">
+    onclick="openVideo('${videoSrc}')">
 
-    <source src="/static/uploads/${chat.video}" type="video/mp4">
+    <source src="${videoSrc}" type="video/mp4">
 
 </video>
 `;
 
+}
+
+
+else if(chat.reel_id){
+
+let thumb = chat.reel_thumbnail.startsWith("http")
+    ? chat.reel_thumbnail
+    : "/static/uploads/" + chat.reel_thumbnail;
+
+content = `
+<div class="shared-reel"
+     onclick="window.location='/reels?play=${chat.reel_id}'">
+
+    <img
+        class="reel-thumb"
+        src="${thumb}">
+
+    <div class="reel-label">
+        🎬 Shared a Reel
+    </div>
+
+</div>
+`;
 
 }
+
+
 else if(chat.audio){
 
     content = `

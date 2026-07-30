@@ -634,11 +634,23 @@ def users():
                 sender,
                 message,
                 timestamp
-            FROM messages
-            WHERE
-                (sender=? AND receiver=?)
-            OR
-                (sender=? AND receiver=?)
+		FROM messages
+		WHERE
+		(
+		    (sender=? AND receiver=?)
+		    OR
+		    (sender=? AND receiver=?)
+		)
+		AND (
+		    message IS NULL
+		    OR (
+		        message NOT LIKE '📹 Video call%'
+		        AND message NOT LIKE '📹 Missed video call%'
+		        AND message NOT LIKE '📞 Voice call%'
+		        AND message NOT LIKE '📞 Missed voice call%'
+		    )
+		)
+
             ORDER BY id DESC
             LIMIT 1
         """, (
@@ -899,10 +911,22 @@ def chat_messages(username):
             deleted,
             video
         FROM messages
-        WHERE
-            (sender = ? AND receiver = ?)
-            OR
-            (sender = ? AND receiver = ?)
+	WHERE
+	(
+	    (sender=? AND receiver=?)
+	    OR
+	    (sender=? AND receiver=?)
+	)
+	AND (
+	    message IS NULL
+	    OR (
+        	message NOT LIKE '📹 Video call%'
+	        AND message NOT LIKE '📹 Missed video call%'
+	        AND message NOT LIKE '📞 Voice call%'
+        	AND message NOT LIKE '📞 Missed voice call%'
+	    )
+	)
+
         ORDER BY id ASC
     """, (
         my_username,

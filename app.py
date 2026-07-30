@@ -21,7 +21,7 @@ import cloudinary.uploader
 from flask import redirect
 from flask import send_from_directory
 from flask import request, jsonify
-
+import tempfile
 REELS = []
 
 app = Flask(__name__, static_folder="static")
@@ -881,27 +881,28 @@ def chat_messages(username):
     my_username = session["username"]
 
     conn = sqlite3.connect("snapz.db")
+    conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
     cur.execute("""
-    SELECT
-        id,
-        sender,
-        receiver,
-        message,
-        reel_id,
-	reel_thumbnail,
-        is_seen,
-        timestamp,
-        image,
-        audio,
-        deleted,
-        video
-    FROM messages
+        SELECT
+            id,
+            sender,
+            receiver,
+            message,
+            reel_id,
+            reel_thumbnail,
+            is_seen,
+            timestamp,
+            image,
+            audio,
+            deleted,
+            video
+        FROM messages
         WHERE
-            (sender=? AND receiver=?)
+            (sender = ? AND receiver = ?)
             OR
-            (sender=? AND receiver=?)
+            (sender = ? AND receiver = ?)
         ORDER BY id ASC
     """, (
         my_username,
@@ -911,30 +912,28 @@ def chat_messages(username):
     ))
 
     rows = cur.fetchall()
-    conn.close()
 
     data = []
 
     for row in rows:
-
-
         data.append({
-            "id": row[0],
-            "sender": row[1],
-            "receive": row[2],
-            "message": row[3],
-            "reel_id": row[4],
-	    "reel_thumbnail": row[5],
-            "is_seen": row[5],
-            "time": time_ago(row[6]),
-            "image": row[7],
-            "audio": row[8],
-            "deleted": row[9],
-            "video": row[10]
+            "id": row["id"],
+            "sender": row["sender"],
+            "receiver": row["receiver"],
+            "message": row["message"] or "",
+            "reel_id": row["reel_id"],
+            "reel_thumbnail": row["reel_thumbnail"],
+            "is_seen": row["is_seen"] or 0,
+            "time": time_ago(row["timestamp"]) if row["timestamp"] else "",
+            "image": row["image"],
+            "audio": row["audio"],
+            "deleted": row["deleted"] or 0,
+            "video": row["video"]
         })
 
-    return jsonify(data)
+    conn.close()
 
+    return jsonify(data)
 
 
 
@@ -968,92 +967,72 @@ def send_message(username):
     return jsonify({"status":"ok"})
 
 
-
-@app.route("/upload", methods=["POST"])
+@app.route("/upload", methods=["GET", "POST"])
 def upload():
 
-    print("UPLOAD START")
-    print(request.files)
-    print(request.form)
-    print("HEADERS =", dict(request.headers))
-    print("METHOD =", request.method)
+    if request.method == "GET":
+        return render_template("upload.html")
 
-
-    # Login check
     if "username" not in session:
-        return jsonify({
-            "status": "error",
-            "message": "User not logged in"
-        }), 401
+        return "User not logged in"
 
-    # File get
     file = request.files.get("file") or request.files.get("image")
 
-    print("FILE OBJECT =", file)
-    print("FILENAME =", file.filename if file else None)
-
-
     if not file or file.filename == "":
-        return jsonify({
-            "status": "error",
-            "message": "No file uploaded"
-        }), 400
+        return "No file uploaded"
 
     username = session["username"]
     caption = request.form.get("caption", "")
     upload_type = request.form.get("type", "post")
 
-    print("LOGGED USER =", username)
     print("UPLOAD TYPE =", upload_type)
-    print("BEFORE CLOUDINARY")
 
     try:
 
         if upload_type == "reel":
 
-            result = cloudinary.uploader.upload(
-                file,
-                resource_type="video",
-                chunk_size=6000000
+            import tempfile
+
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".mp4") as tmp:
+                file.save(tmp.name)
+                temp_path = tmp.name
+
+            print("TEMP FILE =", temp_path)
+
+            result = cloudinary.uploader.upload_large(
+                temp_path,
+                resource_type="video"
             )
 
         else:
 
             result = cloudinary.uploader.upload(file)
 
-        print("AFTER CLOUDINARY")
-
         file_url = result["secure_url"]
-        print("Cloudinary Upload Success =", file_url)
+
+        print("UPLOAD SUCCESS =", file_url)
 
     except Exception as e:
 
-        print("Cloudinary Error =", e)
+        print("CLOUDINARY ERROR =", e)
 
         return jsonify({
             "status": "error",
             "message": str(e)
-        }), 500
-
+        })
 
     conn = sqlite3.connect("snapz.db")
     cur = conn.cursor()
 
     try:
 
-        print("TRY BLOCK START")
-
-        # REEL
         if upload_type == "reel":
 
             cur.execute(
                 "INSERT INTO reels(username, video, caption) VALUES(?,?,?)",
                 (username, file_url, caption)
             )
-            print("REEL INSERT DONE")
 
-
-        # STORY
         elif upload_type == "story":
 
             cur.execute(
@@ -1061,7 +1040,6 @@ def upload():
                 (username, file_url)
             )
 
-        # POST
         else:
 
             cur.execute(
@@ -1073,32 +1051,26 @@ def upload():
             profile_pic = row[0] if row else "default.jpg"
 
             cur.execute(
-                "INSERT INTO posts(username, image, caption, profile_pic) VALUES(?,?,?,?)",
+                "INSERT INTO posts(username,image,caption,profile_pic) VALUES(?,?,?,?)",
                 (username, file_url, caption, profile_pic)
             )
 
         conn.commit()
 
-        print("UPLOAD SAVED SUCCESSFULLY")
-        print("FILE =", file_url)
-        print("CAPTION =", caption)
-
-        return jsonify({
-            "status": "ok",
-            "url": file_url
-        })
+        return jsonify({"status": "ok"})
 
     except Exception as e:
 
-        print("DB Error =", e)
+        conn.rollback()
 
         return jsonify({
             "status": "error",
             "message": str(e)
-        }), 500
+        })
 
     finally:
         conn.close()
+
 
 
 @app.route("/profile")
@@ -1417,10 +1389,12 @@ def logout():
 @app.route("/story", methods=["POST"])
 def story():
 
+    print("Story route called")
+
     if "username" not in session:
         return redirect("/login")
 
-    image = request.files.get("image")
+    image = request.files.get("file") or request.files.get("image")
 
     if not image or image.filename == "":
         return redirect("/")
@@ -2820,25 +2794,28 @@ def share_reel(reel_id):
     conn = sqlite3.connect("snapz.db")
     cur = conn.cursor()
 
-    # Check reel exists
-    cur.execute(
-        "SELECT id FROM reels WHERE id=?",
-        (reel_id,)
-    )
+    # Reel exists + get video filename
+    cur.execute("""
+        SELECT video
+        FROM reels
+        WHERE id=?
+    """, (reel_id,))
 
-    if not cur.fetchone():
+    row = cur.fetchone()
+
+    if not row:
         conn.close()
         return "Reel not found"
 
-    cur.execute(
-        """
+    reel_thumbnail = row[0]
+
+    # Users list
+    cur.execute("""
         SELECT username, profile_pic
         FROM users
         WHERE username!=?
         ORDER BY username
-        """,
-        (my_username,)
-    )
+    """, (my_username,))
 
     users = cur.fetchall()
 
@@ -2848,9 +2825,8 @@ def share_reel(reel_id):
         "share_reel.html",
         users=users,
         reel_id=reel_id,
-	reel_thumbnail = reel_video
+	reel_thumbnail=reel_thumbnail
     )
-
 
 @app.route("/send_reel/<int:reel_id>/<username>")
 def send_reel(reel_id, username):
@@ -2859,6 +2835,7 @@ def send_reel(reel_id, username):
         return redirect("/login")
 
     sender = session["username"]
+    receiver = username
 
     conn = sqlite3.connect("snapz.db")
     cur = conn.cursor()
@@ -2872,6 +2849,20 @@ def send_reel(reel_id, username):
     if not cur.fetchone():
         conn.close()
         return "Reel not found"
+
+    cur.execute("""
+        SELECT video
+        FROM reels
+        WHERE id=?
+    """, (reel_id,))
+
+    row = cur.fetchone()
+
+    if row:
+        thumbnail = row[0]
+    else:
+        thumbnail = ""
+
 
     # Send message
     cur.execute("""
@@ -2905,8 +2896,7 @@ def send_reel(reel_id, username):
     conn.commit()
     conn.close()
 
-    return redirect(f"/chat/{username}")
-
+    return redirect(f"/reels?play={reel_id}")
 
 
 

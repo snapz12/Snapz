@@ -1036,111 +1036,123 @@ async function loadMessages(){
 
     chatBox.innerHTML = "";
 
-    chats.forEach(chat=>{
 
-        let wrapper = document.createElement("div");
+chats.forEach(chat => {
 
-        wrapper.className =
-            chat.sender=="{{ session['username'] }}"
-            ? "message-wrapper outgoing"
-            : "message-wrapper incoming";
+    let wrapper = document.createElement("div");
 
-        let tick = "✓ Sent";
+    wrapper.className =
+        chat.sender === "{{ session['username'] }}"
+        ? "message-wrapper outgoing"
+        : "message-wrapper incoming";
 
-        if(chat.is_seen==1){
-            tick = "<span style='color:#00ff55;'>✓ Seen</span>";
+    let tick = "";
+
+    if (chat.sender === "{{ session['username'] }}") {
+        tick = chat.is_seen == 1
+            ? '<span style="color:#00ff55;">✓ Seen</span>'
+            : '✓ Sent';
+    }
+
+    let content = "";
+
+    if (chat.deleted == 1) {
+
+        content = `
+            <div class="bubble deleted-message">
+                Message deleted
+            </div>
+        `;
+
+    } else if (chat.image) {
+
+        let imageSrc = chat.image.startsWith("http")
+            ? chat.image
+            : "/static/uploads/" + chat.image;
+
+        content = `
+            <img
+                class="chat-image"
+                src="${imageSrc}"
+                onclick="openImage('${imageSrc}')">
+        `;
+
+    } else if (chat.video) {
+
+        let videoSrc = chat.video.startsWith("http")
+            ? chat.video
+            : "/static/uploads/" + chat.video;
+
+        content = `
+            <video
+                class="chat-video"
+                controls
+                playsinline>
+
+                <source src="${videoSrc}" type="video/mp4">
+
+            </video>
+        `;
+
+    } else if (chat.audio) {
+
+        content = `
+            <audio controls>
+                <source
+                    src="/static/uploads/${chat.audio}"
+                    type="audio/webm">
+            </audio>
+        `;
+
+    } else if (chat.reel_id) {
+
+        let reelSrc = chat.reel_thumbnail || "";
+
+        if (reelSrc && !reelSrc.startsWith("http")) {
+            reelSrc = "/static/uploads/" + reelSrc;
         }
 
-        let content = "";
+        content = `
+            <div class="shared-reel"
+                 onclick="window.location='/reels?play=${chat.reel_id}'">
 
-if(chat.image){
+                ${
+                    reelSrc
+                    ? `<img class="reel-preview" src="${reelSrc}">`
+                    : ""
+                }
 
-let imageSrc = chat.image.startsWith("http")
-    ? chat.image
-    : "/static/uploads/" + chat.image;
+                <div class="reel-label">
+                    🎬 Shared a Reel
+                </div>
 
-content = `
-<img
-    class="chat-image"
-    src="${imageSrc}"
-    onclick="openImage('${imageSrc}')">
-`;
+            </div>
+        `;
 
-}
+    } else {
 
+        content = `
+            <div class="bubble">
+                ${chat.message || ""}
+            </div>
+        `;
+    }
 
-else if(chat.video){
+    wrapper.innerHTML = `
+        <div class="message-box" data-id="${chat.id}">
 
-let videoSrc = chat.video.startsWith("http")
-    ? chat.video
-    : "/static/uploads/" + chat.video;
+            ${content}
 
-content = `
-<video
-    class="chat-video"
-    onclick="openVideo('${videoSrc}')">
+            <div class="meta-info">
+                ${chat.time || ""}
+                ${tick}
+            </div>
 
-    <source src="${videoSrc}" type="video/mp4">
-
-</video>
-`;
-
-}
-
-
-else if(chat.reel_id){
-
-let thumb = chat.reel_thumbnail.startsWith("http")
-    ? chat.reel_thumbnail
-    : "/static/uploads/" + chat.reel_thumbnail;
-
-content = `
-<div class="shared-reel"
-     onclick="window.location='/reels?play=${chat.reel_id}'">
-
-    <img
-        class="reel-thumb"
-        src="${thumb}">
-
-    <div class="reel-label">
-        🎬 Shared a Reel
-    </div>
-
-</div>
-`;
-
-}
-
-
-else if(chat.audio){
-
-    content = `
-    <audio controls>
-        <source src="/static/uploads/${chat.audio}" type="audio/webm">
-    </audio>
+        </div>
     `;
 
-}
-else{
 
-    content = `
-    <div class="bubble">
-        ${chat.message}
-    </div>
-    `;
 
-}
-
-wrapper.innerHTML = `
-<div class="message-box" data-id="${chat.id}">
-    ${content}
-
-    <div class="meta-info">
-        ${chat.time}
-        ${tick}
-    </div>
-</div>
-`;
 
 chatBox.appendChild(wrapper);
 

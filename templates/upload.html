@@ -19,6 +19,80 @@
         <button type="submit" style="padding: 10px; background: #0095f6; color: white; border: none; font-weight: bold; border-radius: 4px; cursor: pointer;">Post to Feed</button>
     </form>
 
+<hr style="margin:30px 0;border-color:#333;">
+
+<h2>📖 Upload Story</h2>
+
+<form action="/story"
+      method="POST"
+      enctype="multipart/form-data"
+      style="display:flex;flex-direction:column;gap:15px;max-width:300px;">
+
+    <label>Select Story (Photo/Video):</label>
+
+    <input type="file"
+           name="image"
+           accept="image/*,video/*"
+           required
+           style="color:#fff;">
+
+    <button type="submit"
+            style="padding:10px;
+                   background:#00c853;
+                   color:white;
+                   border:none;
+                   border-radius:4px;
+                   font-weight:bold;
+                   cursor:pointer;">
+        Upload Story
+    </button>
+
+</form>
+<hr style="margin:30px 0;border-color:#333;">
+
+<h2>🎬 Upload Reel</h2>
+
+<form action="/upload"
+      method="POST"
+      enctype="multipart/form-data"
+      style="display:flex;flex-direction:column;gap:15px;max-width:300px;">
+
+    <input type="hidden" name="type" value="reel">
+
+    <label>Select Reel (Video):</label>
+
+    <input type="file"
+           name="file"
+           accept="video/*"
+           required
+           style="color:#fff;">
+
+    <input type="text"
+           name="caption"
+           placeholder="Write Caption..."
+           style="
+               padding:10px;
+               background:#262626;
+               border:1px solid #555;
+               color:#fff;
+               border-radius:4px;">
+
+    <button type="submit"
+            style="
+                padding:10px;
+                background:#ff006e;
+                color:white;
+                border:none;
+                border-radius:4px;
+                font-weight:bold;
+                cursor:pointer;">
+        Upload Reel
+    </button>
+
+</form>
+
+
+
 </body>
 </html>
 

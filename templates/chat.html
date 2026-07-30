@@ -1979,162 +1979,104 @@ function createPeer(){
 <div id="callHistoryBox">
 
     <div class="history-header">
-         Call History
+        Call History
     </div>
 
     <div class="history-body">
 
-{% for c in calls %}
+        {% for c in calls %}
 
-<div class="call-history {% if c[0]==session['username'] %}outgoing{% else %}incoming{% endif %}">
+        <div class="call-history
+            {% if c.caller == session['username'] %}
+                outgoing
+            {% else %}
+                incoming
+            {% endif %}
+        ">
 
-{% if c[0] == session["username"] %}
+            <div class="call-card">
 
-    {% if c[2] == "voice" %}
+                <!-- ICON -->
+                {% if c.call_type == "voice" %}
 
-    <div class="call-card">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         width="20"
+                         height="20"
+                         viewBox="0 0 24 24"
+                         fill="{% if c.status == 'missed' %}#E53935{% else %}#111111{% endif %}">
+                        <path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.3 21 3 13.7 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.24.2 2.45.57 3.57a1 1 0 0 1-.24 1.02l-2.21 2.2z"/>
+                    </svg>
 
-        <svg xmlns="http://www.w3.org/2000/svg"
-             width="20"
-             height="20"
-             viewBox="0 0 24 24"
-             fill="#111111">
-            <path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.3 21 3 13.7 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.24.2 2.45.57 3.57a1 1 0 0 1-.24 1.02l-2.21 2.2z"/>
-        </svg>
+                {% else %}
 
-        &nbsp;Voice call ended
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         width="20"
+                         height="20"
+                         viewBox="0 0 24 24">
 
-        <br>
+                        <path
+                            fill="{% if c.status == 'missed' %}#E53935{% else %}#111111{% endif %}"
+                            d="M3 7a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v2.2l5-3v9.6l-5-3V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
 
-        <small>{{ c[4] }}</small>
+                    </svg>
+
+                {% endif %}
+
+
+                <!-- CALL TEXT -->
+
+                {% if not c.started_at or not c.ended_at %}
+
+                    {% if c.status == "missed" %}
+
+                        {% if c.call_type == "voice" %}
+                            Missed voice call
+                        {% else %}
+                            Missed video call
+                        {% endif %}
+
+                    {% else %}
+
+                        {% if c.call_type == "voice" %}
+                            Voice call
+                        {% else %}
+                            Video call
+                        {% endif %}
+
+                    {% endif %}
+
+                    <br>
+
+                    <small>
+                        {{ c.call_time }}
+                    </small>
+
+
+                {% else %}
+
+                    {% if c.call_type == "voice" %}
+                        Voice call ended
+                    {% else %}
+                        Video call ended
+                    {% endif %}
+
+                    <br>
+
+                    <small>
+                        {{ c.duration }}
+                    </small>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+        {% endfor %}
 
     </div>
-
-    {% else %}
-
-    <div class="call-card">
-
-        <svg xmlns="http://www.w3.org/2000/svg"
-             width="20"
-             height="20"
-             viewBox="0 0 24 24">
-            <path fill="#111111"
-                  d="M3 7a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v2.2l5-3v9.6l-5-3V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-        </svg>
-
-        &nbsp;Video call ended
-
-        <br>
-
-        <small>{{ c[4] }}</small>
-
-    </div>
-
-    {% endif %}
-
-{% else %}
-
-    {% if c[3] == "missed" %}
-
-        {% if c[2] == "voice" %}
-
-        <div class="call-card">
-
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 width="20"
-                 height="20"
-                 viewBox="0 0 24 24"
-                 fill="#E53935">
-                <path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.3 21 3 13.7 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.24.2 2.45.57 3.57a1 1 0 0 1-.24 1.02l-2.21 2.2z"/>
-            </svg>
-
-            &nbsp;Missed voice call
-
-            <br>
-
-            <small>{{ c[4] }}</small>
-
-        </div>
-
-        {% else %}
-
-        <div class="call-card">
-
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 width="20"
-                 height="20"
-                 viewBox="0 0 24 24">
-  <path fill="#E53935"
-        d="M3 7a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v2.2l5-3v9.6l-5-3V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-
-  <!-- Center Black Arrow -->
-  <path fill="#111111"
-        d="M10.2 9.2h3v1.3h-0.9l1.9 1.9-.9.9-1.9-1.9v0.9h-1.2z"/>
-
-            </svg>
-
-            &nbsp;Missed video call
-
-            <br>
-
-            <small>{{ c[4] }}</small>
-
-        </div>
-
-        {% endif %}
-
-    {% else %}
-
-        {% if c[2] == "voice" %}
-
-        <div class="call-card">
-
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 width="20"
-                 height="20"
-                 viewBox="0 0 24 24"
-                 fill="#111111">
-                <path d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.3 21 3 13.7 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.24.2 2.45.57 3.57a1 1 0 0 1-.24 1.02l-2.21 2.2z"/>
-            </svg>
-
-            &nbsp;Voice call ended
-
-            <br>
-
-            <small>{{ c[4] }}</small>
-
-        </div>
-
-        {% else %}
-
-        <div class="call-card">
-
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 width="20"
-                 height="20"
-                 viewBox="0 0 24 24">
-                <path fill="#111111"
-                      d="M3 7a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v2.2l5-3v9.6l-5-3V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-            </svg>
-
-            &nbsp;Video call ended
-
-            <br>
-
-            <small>{{ c[4] }}</small>
-
-        </div>
-
-        {% endif %}
-
-    {% endif %}
-
-{% endif %}
 
 </div>
-
-{% endfor %}
-
 
 
 

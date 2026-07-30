@@ -743,28 +743,109 @@ def chat(username):
 
     conn = sqlite3.connect("snapz.db")
     cur = conn.cursor()
+
+# =========================
+# CALL HISTORY
+# =========================
+
     cur.execute("""
-    SELECT
-    caller,
-    receiver,
-    call_type,
-    status,
-    strftime('%I:%M %p', ended_at)
-    FROM calls
-    WHERE
-    (caller=? AND receiver=?)
-    OR
-    (caller=? AND receiver=?)
-    ORDER BY id ASC
-    """,(
-        session["username"],
-    username,
-    username,
-        session["username"]
+        SELECT
+            id,
+            caller,
+            receiver,
+            call_type,
+            status,
+            created_at,
+            started_at,
+            ended_at
+        FROM calls
+        WHERE
+            (caller=? AND receiver=?)
+            OR
+            (caller=? AND receiver=?)
+        ORDER BY id ASC
+    """, (
+        my_username,
+        username,
+        username,
+        my_username
     ))
 
-    calls = cur.fetchall()
-    # Send message
+    call_rows = cur.fetchall()
+
+    calls = []
+
+    from datetime import datetime
+
+    for row in call_rows:
+
+        call_id = row[0]
+        caller = row[1]
+        receiver = row[2]
+        call_type = row[3]
+        status = row[4]
+        created_at = row[5]
+        started_at = row[6]
+        ended_at = row[7]
+
+        duration = None
+        call_time = None
+
+    # =========================
+    # CALL RECEIVED
+    # =========================
+        if started_at and ended_at:
+
+            try:
+                start = datetime.fromisoformat(started_at)
+                end = datetime.fromisoformat(ended_at)
+
+                seconds = int((end - start).total_seconds())
+
+                if seconds < 0:
+                    seconds = 0
+
+                minutes = seconds // 60
+                secs = seconds % 60
+
+                duration = f"{minutes} min {secs} sec"
+
+            except Exception as e:
+
+                print("DURATION ERROR =", e)
+
+                duration = "0 min 0 sec"
+
+    # =========================
+    # CALL NOT RECEIVED
+    # =========================
+        else:
+
+            try:
+                dt = datetime.fromisoformat(created_at)
+
+                call_time = dt.strftime("%I:%M %p").lstrip("0")
+
+            except Exception:
+
+                call_time = created_at or ""
+
+        calls.append({
+            "id": call_id,
+            "caller": caller,
+            "receiver": receiver,
+            "call_type": call_type,
+            "status": status,
+            "created_at": created_at,
+            "started_at": started_at,
+            "ended_at": ended_at,
+            "duration": duration,
+            "call_time": call_time
+        })
+
+    print("CALLS FINAL =", calls)
+
+
     if request.method == "POST":
 
         msg = request.form.get("message", "").strip()
@@ -872,7 +953,7 @@ def chat(username):
         })
 
     conn.close()
-
+    print("CALLS FINAL =", calls)
     return render_template(
         "chat.html",
         chats=chats,

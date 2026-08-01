@@ -1816,6 +1816,9 @@ clearTimeout(ringTimeout);
 
     document.getElementById("callPopup").style.display="flex";
 
+callSeconds = 0;
+startTimer();
+
 if(!peerConnection){
     createPeer();
 }
@@ -2033,75 +2036,55 @@ function createPeer(){
                 <!-- CALL TEXT -->
                 <!-- ========================= -->
 
-                {% if c.status == "missed" or c.status == "ringing" %}
-
-                    <!-- MISSED CALL -->
-
-                    {% if c.call_type == "voice" %}
-
-                        <span class="missed-call-text">
-                            Missed voice call
-                        </span>
-
-                    {% else %}
-
-                        <span class="missed-call-text">
-                            Missed video call
-                        </span>
-
-                    {% endif %}
-
-                    <br>
-
-                    <small>
-                        {{ c.call_time }}
-                    </small>
 
 
-                {% elif c.status == "answered" and c.ended_at %}
+{% if c.status == "missed" %}
 
-                    <!-- ANSWERED + ENDED -->
+    {% if c.call_type == "voice" %}
+        <span class="missed-call-text">Missed voice call</span>
+    {% else %}
+        <span class="missed-call-text">Missed video call</span>
+    {% endif %}
 
-                    {% if c.call_type == "voice" %}
+    <br>
+    <small>{{ c.call_time }}</small>
 
-                        Voice call ended
+{% elif c.status == "ended" %}
 
-                    {% else %}
+    {% if c.call_type == "voice" %}
+        Voice call ended
+    {% else %}
+        Video call ended
+    {% endif %}
 
-                        Video call ended
+    <br>
+    <small>{{ c.duration }}</small>
 
-                    {% endif %}
+{% elif c.status == "answered" %}
 
-                    <br>
+    {% if c.call_type == "voice" %}
+        Voice call
+    {% else %}
+        Video call
+    {% endif %}
 
-                    <small>
-                        {{ c.duration }}
-                    </small>
+    <br>
+    <small>{{ c.duration }}</small>
 
+{% else %}
 
-                {% else %}
+    {% if c.call_type == "voice" %}
+        Calling...
+    {% else %}
+        Video calling...
+    {% endif %}
 
-                    <!-- OTHER / CURRENT CALL -->
+    <br>
+    <small>{{ c.call_time }}</small>
 
-                    {% if c.call_type == "voice" %}
+{% endif %}
 
-                        Voice call
-
-                    {% else %}
-
-                        Video call
-
-                    {% endif %}
-
-                    <br>
-
-                    <small>
-                        {{ c.call_time }}
-                    </small>
-
-                {% endif %}
-
-            </div>
+</div>
 
         </div>
 

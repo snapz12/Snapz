@@ -3445,11 +3445,21 @@ def end_call(data):
     cur = conn.cursor()
 
     cur.execute("""
-        UPDATE calls
-        SET status='ended',
-            ended_at=datetime('now','localtime')
-        WHERE status='answered'
-    """)
+    UPDATE calls
+    SET
+        status='ended',
+        ended_at=datetime('now','localtime')
+    WHERE id=(
+        SELECT id
+        FROM calls
+        WHERE caller=? AND receiver=? AND status='answered'
+        ORDER BY id DESC
+        LIMIT 1
+    )
+    """,(
+        data["from"],
+        data["to"]
+    ))
 
     conn.commit()
 
@@ -3474,7 +3484,10 @@ def end_call(data):
 
 
     cur.execute("""
-    SELECT caller,receiver,call_type,status
+    SELECT
+    caller,
+    receiver,
+    call_type
     FROM calls
     ORDER BY id DESC
     LIMIT 1
@@ -3482,7 +3495,7 @@ def end_call(data):
 
     call = cur.fetchone()
 
-    if call and call[3] == "answered":
+    if call:
 
         if call[2] == "voice":
 
@@ -3498,14 +3511,13 @@ def end_call(data):
                 f"📞 Voice Call\n{duration}"
             )
 
-    else:
+        else:
 
             save_system_message(
                 call[0],
                 call[1],
                 f"📹 Video Call\n{duration}"
             )
-
 
             save_system_message(
                 call[1],

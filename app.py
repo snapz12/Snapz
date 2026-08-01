@@ -3414,7 +3414,7 @@ def answer_call(data):
     emit(
         "call-answered",
         data,
-        room=data["to"]
+        room=data["from"]
     )
 
 

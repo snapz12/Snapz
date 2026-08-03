@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<title>Email Change</title>
+<style>
+
+body{
+    background:#000;
+    color:#fff;
+    font-family:sans-serif;
+}
+
+
+
+.header{
+    font-size:30px;
+    margin-bottom:35px;
+}
+
+.label{
+    font-size:18px;
+    margin:18px 0 8px;
+    display:block;
+}
+
+input{
+    width: 100%;
+    height: 50px;
+    background: #1b1b1b;
+    color: white;
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 0 15px;
+    font-size: 16px;
+    box-sizing: border-box;
+    margin-top: 8px;
+}
+
+.otp-row{
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.otp-row input{
+    flex: 1;
+}
+
+.otp-row button{
+    width:110px;
+    height:50px;
+    border:none;
+    border-radius:12px;
+    background:red;
+    color:white;
+    font-size:15px;
+    font-weight:bold;
+    transition:0.2s;
+}
+
+.otp-row button:active,
+.otp-row button:focus{
+    background:orange;
+}
+
+.save-btn{
+    width:100%;
+    height:52px;
+    margin-top:20px;
+    border:none;
+    border-radius:15px;
+    background:red;
+    color:white;
+    font-size:18px;
+    font-weight:bold;
+    transition:0.2s;
+}
+
+.save-btn:active,
+.save-btn:focus{
+    background:orange;
+}
+
+
+button.clicked{
+    background:orange !important;
+}
+
+
+</style>
+</head>
+<body>
+
+
+<div class="container">
+
+
+
+<div class="header">
+    <a href="/settings" class="back">←</a>
+    <span>Change Email</span>
+</div>
+
+
+<form action="/save_new_email" method="POST">
+
+<label class="label">Current Email</label>
+<input class="input" value="{{ email }}" readonly>
+
+<label class="label">Verification Code</label>
+
+<div class="otp-row">
+    <input class="input" name="otp" placeholder="Enter OTP">
+
+    <button
+        type="button"
+        onclick="sendOTP()"
+        class="otp-btn">
+        Send OTP
+    </button>
+</div>
+
+<label class="label">New Email</label>
+<input class="input" type="email" name="new_email" placeholder="Enter New Email">
+
+<label class="label">Confirm Email</label>
+<input class="input" type="email" name="confirm_email" placeholder="Confirm New Email">
+
+<button class="save-btn" type="submit">
+    Save Changes
+</button>
+
+</form>
+
+<script>
+
+
+function sendOTP(){
+
+    fetch("/send_change_email_otp",{
+        method:"POST"
+    })
+
+    .then(res=>res.text())
+
+    .then(msg=>{
+        alert(msg);
+    });
+
+}
+
+
+
+</script>
+  
+</body>
+</html>

@@ -1,7 +1,8 @@
+import os
+os.environ["EVENTLET_NO_GREENDNS"] = "yes"
 import eventlet
 eventlet.monkey_patch()
 import sqlite3
-import os
 import base64
 from flask import Flask, request, session, redirect, url_for
 import time
@@ -24,6 +25,8 @@ from flask import redirect
 from flask import send_from_directory
 from flask import request, jsonify
 import tempfile
+import json
+from flask import send_file
 REELS = []
 
 app = Flask(__name__, static_folder="static")
@@ -167,7 +170,9 @@ def init_db():
     conn.commit()
     conn.close()
 
-
+@app.route("/splash")
+def splash():
+    return render_template("splash.html")
 
 @app.route("/")
 def home():
@@ -573,7 +578,7 @@ def login():
 
             conn.close()
 
-            return redirect("/")
+            return redirect("/splash")
 
         conn.close()
 
@@ -818,19 +823,23 @@ def chat(username):
 
                 duration = "0 min 0 sec"
 
-    # =========================
-    # CALL NOT RECEIVED
-    # =========================
+        # =========================
+        # CALL NOT RECEIVED
+        # =========================
         else:
 
             try:
-                dt = datetime.fromisoformat(created_at)
+
+                if status == "missed" and ended_at:
+                    dt = datetime.fromisoformat(ended_at)
+                else:
+                    dt = datetime.fromisoformat(created_at)
 
                 call_time = dt.strftime("%I:%M %p").lstrip("0")
 
             except Exception:
+                call_time = ""
 
-                call_time = created_at or ""
 
         calls.append({
             "id": call_id,
@@ -3444,6 +3453,26 @@ def end_call(data):
     conn = sqlite3.connect("snapz.db")
     cur = conn.cursor()
 
+
+    cur.execute("""
+    SELECT status
+    FROM calls
+    WHERE caller=? AND receiver=?
+    ORDER BY id DESC
+    LIMIT 1
+    """, (
+        data["from"],
+        data["to"]
+    ))
+
+    row = cur.fetchone()
+
+    if row and row[0] == "missed":
+        conn.close()
+        return
+
+
+
     cur.execute("""
     UPDATE calls
     SET
@@ -3634,6 +3663,428 @@ def answer(data):
 @socketio.on("ice-candidate")
 def ice_candidate(data):
     emit("ice-candidate", data, room=data["to"])
+
+
+@socketio.on("reject-call")
+def reject_call(data):
+
+    conn = sqlite3.connect("snapz.db")
+    cur = conn.cursor()
+
+    cur.execute("""
+        UPDATE calls
+        SET status='missed',
+            ended_at=datetime('now','localtime')
+        WHERE id=(
+            SELECT id
+            FROM calls
+            WHERE caller=? AND receiver=?
+            ORDER BY id DESC
+            LIMIT 1
+        )
+    """,(
+        data["from"],
+        data["to"]
+    ))
+
+    conn.commit()
+    conn.close()
+
+    emit(
+        "call-rejected",
+        data,
+        room=data["from"]
+    )
+
+@app.route("/menu")
+def menu():
+
+    if "username" not in session:
+        return redirect("/login")
+
+    return render_template("menu.html")
+
+
+@app.route("/settings")
+def settings():
+
+    if "username" not in session:
+        return redirect("/login")
+
+    return render_template("settings.html")
+
+
+@app.route("/settings/sound")
+def sound_settings():
+
+    if "username" not in session:
+        return redirect("/login")
+
+    return render_template("sound_settings.html")
+
+@app.route("/account")
+def account():
+
+    if "username" not in session:
+        return redirect("/login")
+
+    return render_template("account.html")
+
+
+
+@app.route("/change_email")
+def change_email():
+    if "username" not in session:
+        return redirect("/login")
+
+    conn = sqlite3.connect("snapz.db")
+    c = conn.cursor()
+
+    c.execute(
+        "SELECT email FROM users WHERE username=?",
+        (session["username"],)
+    )
+
+    email = c.fetchone()[0]
+
+    conn.close()
+
+    return render_template("change_email.html", email=email)
+
+
+@app.route("/send_change_email_otp", methods=["POST"])
+def send_change_email_otp():
+
+    if "username" not in session:
+        return "Login First"
+
+    conn = sqlite3.connect("snapz.db")
+    cur = conn.cursor()
+
+    cur.execute(
+        "SELECT email FROM users WHERE username=?",
+        (session["username"],)
+    )
+
+    email = cur.fetchone()[0]
+    conn.close()
+
+    otp = str(random.randint(100000,999999))
+
+    session["change_email_otp"] = otp
+
+    msg = Message(
+        "Snapz Email Change OTP",
+        sender=app.config["MAIL_USERNAME"],
+        recipients=[email]
+    )
+
+    msg.body = f"Your OTP is: {otp}"
+
+    mail.send(msg)
+
+    return "OTP Sent Successfully"
+
+
+@app.route("/verify_change_email_otp", methods=["POST"])
+def verify_change_email_otp():
+
+    otp = request.form.get("otp")
+
+    if otp == session.get("signup_otp"):
+
+        session["email_verified"] = True
+
+        return redirect("/new_email")
+
+    otp = request.form.get("otp")
+
+    print("Entered OTP:", otp)
+    print("Session OTP:", session.get("change_email_otp"))
+
+
+    if otp != session.get("change_email_otp"):
+        return "Invalid OTP"
+
+
+@app.route("/save_new_email", methods=["POST"])
+def save_new_email():
+
+    otp = request.form["otp"]
+
+    if otp != session.get("change_email_otp"):
+        return "Invalid OTP"
+
+    new_email = request.form["new_email"]
+    confirm = request.form["confirm_email"]
+
+    if new_email != confirm:
+        return "Emails do not match"
+
+    conn = sqlite3.connect("snapz.db")
+    cur = conn.cursor()
+
+    cur.execute(
+        "SELECT id FROM users WHERE email=?",
+        (new_email,)
+    )
+
+    if cur.fetchone():
+        conn.close()
+        return "Email already exists"
+
+    cur.execute(
+        "UPDATE users SET email=? WHERE username=?",
+        (new_email, session["username"])
+    )
+
+    conn.commit()
+    conn.close()
+
+    session.pop("change_email_otp", None)
+
+    return redirect("/account")
+
+@app.route("/change_mobile")
+def change_mobile():
+
+    if "username" not in session:
+        return redirect("/login")
+
+    conn = sqlite3.connect("snapz.db")
+    cur = conn.cursor()
+
+    cur.execute(
+        "SELECT mobile FROM users WHERE username=?",
+        (session["username"],)
+    )
+
+    row = cur.fetchone()
+    conn.close()
+
+    mobile = row[0] if row and row[0] else ""
+
+    return render_template(
+        "change_mobile.html",
+        mobile=mobile
+    )
+@app.route("/save_new_mobile", methods=["POST"])
+def save_new_mobile():
+
+    if "username" not in session:
+        return redirect("/login")
+
+    new_mobile = request.form.get("new_mobile")
+    confirm_mobile = request.form.get("confirm_mobile")
+
+    if new_mobile != confirm_mobile:
+        return "Mobile numbers do not match"
+
+    conn = sqlite3.connect("snapz.db")
+    cur = conn.cursor()
+
+    cur.execute(
+        "SELECT id FROM users WHERE mobile=?",
+        (new_mobile,)
+    )
+
+    if cur.fetchone():
+        conn.close()
+        return "Mobile number already exists"
+
+    cur.execute(
+        "UPDATE users SET mobile=? WHERE username=?",
+        (new_mobile, session["username"])
+    )
+
+    conn.commit()
+    conn.close()
+
+    return redirect("/account")
+
+@app.route("/privacy")
+def privacy():
+
+    if "username" not in session:
+        return redirect("/login")
+
+    conn = sqlite3.connect("snapz.db")
+    cur = conn.cursor()
+
+    cur.execute("""
+        SELECT private_account, activity_status
+        FROM users
+        WHERE username=?
+    """,(session["username"],))
+
+    row = cur.fetchone()
+    conn.close()
+
+    return render_template(
+        "privacy.html",
+        private_account=row[0],
+        activity_status=row[1]
+    )
+
+
+@app.route("/update_privacy", methods=["POST"])
+def update_privacy():
+
+    if "username" not in session:
+        return "Login"
+
+    setting = request.form.get("setting")
+    value = request.form.get("value")
+
+    conn = sqlite3.connect("snapz.db")
+    cur = conn.cursor()
+
+    if setting == "private":
+
+        cur.execute("""
+        UPDATE users
+        SET private_account=?
+        WHERE username=?
+        """,(value,session["username"]))
+
+    elif setting == "activity":
+
+        cur.execute("""
+        UPDATE users
+        SET activity_status=?
+        WHERE username=?
+        """,(value,session["username"]))
+
+    conn.commit()
+    conn.close()
+
+    return "OK"
+
+
+
+
+
+@app.route("/message_privacy")
+def message_privacy():
+    return "Message Privacy"
+
+@app.route("/comment_privacy")
+def comment_privacy():
+    return "Comment Privacy"
+
+@app.route("/story_privacy")
+def story_privacy():
+    return "Story Privacy"
+
+
+@app.route("/restricted_accounts")
+def restricted_accounts():
+    return "Restricted Accounts"
+
+
+
+@app.route("/account_info")
+def account_info():
+
+    if "username" not in session:
+        return redirect("/login")
+
+    conn = sqlite3.connect("snapz.db")
+    cur = conn.cursor()
+
+    cur.execute("""
+    SELECT username,name,bio,email,mobile,profile_pic
+    FROM users
+    WHERE username=?
+    """,(session["username"],))
+
+    user = cur.fetchone()
+
+    conn.close()
+
+    return render_template(
+        "account_info.html",
+        user=user
+    )
+
+@app.route("/download_account_data")
+def download_account_data():
+
+    if "username" not in session:
+        return redirect("/login")
+
+    username = session["username"]
+
+    conn = sqlite3.connect("snapz.db")
+    cur = conn.cursor()
+
+    # User
+    cur.execute("""
+        SELECT username,name,bio,email,mobile,profile_pic
+        FROM users
+        WHERE username=?
+    """,(username,))
+    user = cur.fetchone()
+
+    # Posts
+    cur.execute("""
+        SELECT caption,image
+        FROM posts
+        WHERE username=?
+    """,(username,))
+    posts = cur.fetchall()
+
+    # Reels
+    cur.execute("""
+        SELECT caption,video
+        FROM reels
+        WHERE username=?
+    """,(username,))
+    reels = cur.fetchall()
+
+    conn.close()
+
+    data = {
+
+        "Username": user[0],
+        "Name": user[1],
+        "Bio": user[2],
+        "Email": user[3],
+        "Mobile": user[4],
+        "Profile Photo": user[5],
+        "Posts": posts,
+        "Reels": reels
+
+    }
+
+    file = tempfile.NamedTemporaryFile(
+        delete=False,
+        suffix=".json",
+        mode="w",
+        encoding="utf-8"
+    )
+
+    json.dump(data,file,indent=4)
+
+    file.close()
+
+    return send_file(
+        file.name,
+        as_attachment=True,
+        download_name=f"{username}_Account_Info.json"
+    )
+
+
+@app.route("/blocked_accounts")
+def blocked_accounts():
+
+    if "username" not in session:
+        return redirect("/login")
+
+    return render_template("blocked_accounts.html")
+
+
+
 
 
 init_db()

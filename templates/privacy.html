@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Privacy</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:sans-serif;
+}
+
+body{
+background:#000;
+color:#fff;
+}
+
+.container{
+max-width:500px;
+margin:auto;
+}
+
+.header{
+display:flex;
+align-items:center;
+gap:15px;
+padding:18px;
+font-size:22px;
+font-weight:bold;
+border-bottom:1px solid #222;
+}
+
+.header a{
+text-decoration:none;
+color:white;
+font-size:26px;
+}
+
+.item{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:18px;
+border-bottom:1px solid #222;
+font-size:18px;
+text-decoration:none;
+color:white;
+}
+
+.left{
+display:flex;
+align-items:center;
+gap:12px;
+}
+
+.right{
+display:flex;
+align-items:center;
+gap:10px;
+color:#888;
+}
+
+.switch{
+position:relative;
+display:inline-block;
+width:50px;
+height:28px;
+}
+
+.switch input{
+display:none;
+}
+
+.slider{
+position:absolute;
+cursor:pointer;
+top:0;
+left:0;
+right:0;
+bottom:0;
+background:#555;
+border-radius:34px;
+transition:.3s;
+}
+
+.slider:before{
+position:absolute;
+content:"";
+height:22px;
+width:22px;
+left:3px;
+bottom:3px;
+background:white;
+border-radius:50%;
+transition:.3s;
+}
+
+input:checked + .slider{
+background:red;
+}
+
+input:checked + .slider:before{
+transform:translateX(22px);
+}
+
+.arrow{
+font-size:22px;
+color:#888;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+<a href="/settings">←</a>
+<span>Privacy</span>
+</div>
+
+<div class="item">
+
+<div class="left">
+ Private Account
+</div>
+
+<div class="right">
+
+<label class="switch">
+<input
+type="checkbox"
+{% if private_account %}checked{% endif %}
+onchange="updatePrivacy('private',this.checked)">
+<span class="slider"></span>
+</label>
+
+<span class="arrow">›</span>
+
+</div>
+
+</div>
+
+<div class="item">
+
+<div class="left">
+ Show Activity Status
+</div>
+
+<div class="right">
+
+<label class="switch">
+<input
+type="checkbox"
+{% if activity_status %}checked{% endif %}
+onchange="updatePrivacy('activity',this.checked)">
+<span class="slider"></span>
+</label>
+
+<span class="arrow">›</span>
+
+</div>
+
+</div>
+
+<a class="item" href="/message_privacy">
+
+<div class="left">
+ Who Can Message Me
+</div>
+
+<div class="right">
+<span>Everyone</span>
+<span class="arrow">›</span>
+</div>
+
+</a>
+
+<a class="item" href="/comment_privacy">
+
+<div class="left">
+ Comment Privacy
+</div>
+
+<div class="right">
+<span>Everyone</span>
+<span class="arrow">›</span>
+</div>
+
+</a>
+
+<a class="item" href="/story_privacy">
+
+<div class="left">
+ Story Privacy
+</div>
+
+<div class="right">
+<span>Everyone</span>
+<span class="arrow">›</span>
+</div>
+
+</a>
+
+<a class="item" href="/blocked_accounts">
+    <span> Blocked Accounts</span>
+    <span class="arrow">›</span>
+</a>
+
+
+</div>
+
+
+
+<script>
+
+function updatePrivacy(setting,state){
+
+    let form = new FormData();
+
+    form.append("setting",setting);
+    form.append("value",state ? 1 : 0);
+
+    fetch("/update_privacy",{
+
+        method:"POST",
+
+        body:form
+
+    });
+
+}
+
+</script>
+
+
+
+
+</body>
+</html>

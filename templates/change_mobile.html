@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Change Mobile Number</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:sans-serif;
+}
+
+body{
+    background:#000;
+    color:white;
+}
+
+.container{
+    width:100%;
+    max-width:500px;
+    margin:auto;
+    padding:20px;
+}
+
+.header{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    font-size:22px;
+    font-weight:bold;
+    margin-bottom:30px;
+}
+
+.back{
+    text-decoration:none;
+    color:white;
+    font-size:26px;
+}
+
+.label{
+    display:block;
+    margin-top:18px;
+    margin-bottom:8px;
+    font-size:16px;
+    font-weight:bold;
+}
+
+.input{
+    width:100%;
+    height:55px;
+    border:none;
+    outline:none;
+    border-radius:15px;
+    background:#1b1b1b;
+    color:white;
+    padding:0 15px;
+    font-size:17px;
+}
+
+.input::placeholder{
+    color:#888;
+}
+
+.save-btn{
+    width:100%;
+    height:55px;
+    margin-top:30px;
+    border:none;
+    border-radius:15px;
+    background:red;
+    color:white;
+    font-size:18px;
+    font-weight:bold;
+    transition:.2s;
+}
+
+.save-btn.clicked{
+    background:orange;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+    <a href="/account" class="back">←</a>
+    <span>Change Mobile Number</span>
+</div>
+
+<form action="/save_new_mobile" method="POST">
+
+<label class="label">Current Mobile Number</label>
+
+<input
+class="input"
+value="{{ mobile }}"
+readonly>
+
+<label class="label">New Mobile Number</label>
+
+<input
+class="input"
+type="text"
+name="new_mobile"
+placeholder="Enter New Mobile Number"
+required>
+
+<label class="label">Confirm Mobile Number</label>
+
+<input
+class="input"
+type="text"
+name="confirm_mobile"
+placeholder="Confirm Mobile Number"
+required>
+
+<button
+type="submit"
+class="save-btn"
+onclick="this.classList.add('clicked')">
+
+Save Changes
+
+</button>
+
+</form>
+
+</div>
+
+</body>
+</html>

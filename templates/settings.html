@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings</title>
+
+<style>
+
+body{
+    margin:0;
+    background:#000;
+    color:white;
+    font-family:Arial,sans-serif;
+}
+
+.header{
+    padding:18px;
+    font-size:22px;
+    font-weight:bold;
+    border-bottom:1px solid #222;
+}
+
+.item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:18px;
+    border-bottom:1px solid #1b1b1b;
+    color:white;
+    text-decoration:none;
+    font-size:17px;
+}
+
+.item:hover{
+    background:#111;
+}
+
+.arrow{
+    color:#777;
+}
+
+</style>
+
+</head>
+<body>
+
+<div class="header">
+Settings
+</div>
+
+<a class="item" href="/account">
+    <span>Account</span>
+    <span class="arrow">›</span>
+</a>
+
+<a class="item" href="/settings/sound">
+    <span> Sound</span>
+    <span class="arrow">›</span>
+</a>
+
+<a class="item" href="/appearance">
+<span>Appearance</span>
+<span class="arrow">›</span>
+</a>
+
+<a class="item" href="/notifications">
+<span> Notifications</span>
+<span class="arrow">›</span>
+</a>
+
+<a class="item" href="/about">
+<span>About Snapz</span>
+<span class="arrow">›</span>
+</a>
+
+
+
+
+
+<script>
+
+function toggleSoundSettings(){
+
+    let box = document.getElementById("soundSettings");
+
+    if(box.style.display=="block"){
+        box.style.display="none";
+    }else{
+        box.style.display="block";
+    }
+
+}
+
+const slider = document.getElementById("startupVolume");
+const value = document.getElementById("volumeValue");
+
+// Saved volume load
+let savedVolume = localStorage.getItem("startup_volume") || 0.6;
+
+slider.value = savedVolume;
+value.innerHTML = Math.round(savedVolume * 100) + "%";
+
+// Slider change
+slider.oninput = function(){
+
+    localStorage.setItem("startup_volume", this.value);
+
+    value.innerHTML = Math.round(this.value * 100) + "%";
+
+}
+
+
+
+
+
+</script>
+
+
+
+</body>
+</html>

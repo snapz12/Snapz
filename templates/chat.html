@@ -1823,6 +1823,19 @@ if(!peerConnection){
     createPeer();
 }
 
+
+socket.on("call-rejected",function(){
+
+    stopTimer();
+
+    document.getElementById("callPopup").style.display="none";
+
+    alert("Call declined");
+
+});
+
+
+
 socket.emit("answer-call",{
     from: currentCaller,
     to: "{{ session['username'] }}"
@@ -1973,9 +1986,24 @@ function createPeer(){
 
 
 
+function rejectCall(){
+
+    clearTimeout(ringTimeout);
+
+    document.getElementById("incomingCallPopup").style.display="none";
+
+    socket.emit("reject-call",{
+        from: currentCaller,
+        to: "{{ session['username'] }}"
+    });
+
+}
 
 
 </script>
+
+
+
 
 
 
@@ -1987,108 +2015,132 @@ function createPeer(){
 
     <div class="history-body">
 
-        {% for c in calls %}
-
-        <div class="call-history
-            {% if c.caller == session['username'] %}
-                outgoing
-            {% else %}
-                incoming
-            {% endif %}
-        ">
-
-            <div class="call-card">
-
-                <!-- ========================= -->
-                <!-- ICON -->
-                <!-- ========================= -->
-
-                {% if c.call_type == "voice" %}
-
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         width="20"
-                         height="20"
-                         viewBox="0 0 24 24">
-
-                        <path
-                            fill="{% if c.status == 'missed' or c.status == 'ringing' %}#E53935{% else %}#111111{% endif %}"
-                            d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.3 21 3 13.7 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.24.2 2.45.57 3.57a1 1 0 0 1-.24 1.02l-2.21 2.2z"/>
-
-                    </svg>
-
-                {% else %}
-
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         width="20"
-                         height="20"
-                         viewBox="0 0 24 24">
-
-                        <path
-                            fill="{% if c.status == 'missed' or c.status == 'ringing' %}#E53935{% else %}#111111{% endif %}"
-                            d="M3 7a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v2.2l5-3v9.6l-5-3V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-
-                    </svg>
-
-                {% endif %}
+    {% for c in calls %}
 
 
-                <!-- ========================= -->
-                <!-- CALL TEXT -->
-                <!-- ========================= -->
+    <div class="call-history {% if c.caller==session['username'] %}outgoing{% else %}incoming{% endif %}">
 
+    {% if c.caller==session["username"] %}
 
+    <!-- ================= OUTGOING ================= -->
 
-{% if c.status == "missed" %}
+    <div class="call-card">
 
-    {% if c.call_type == "voice" %}
-        <span class="missed-call-text">Missed voice call</span>
+        {% if c.call_type=="voice" %}
+
+        <svg xmlns="http://www.w3.org/2000/svg"
+             width="20"
+             height="20"
+             viewBox="0 0 24 24">
+
+            <path fill="#111111"
+            d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.3 21 3 13.7 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.24.2 2.45.57 3.57a1 1 0 0 1-.24 1.02l-2.21 2.2z"/>
+
+        </svg>
+
+        {% else %}
+
+        <svg xmlns="http://www.w3.org/2000/svg"
+             width="20"
+             height="20"
+             viewBox="0 0 24 24">
+
+            <path fill="#111111"
+            d="M3 7a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v2.2l5-3v9.6l-5-3V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+
+        </svg>
+
+        {% endif %}
+
+        &nbsp;
+
+        <b>
+        {{ "Ended Voice Call" if c.call_type=="voice" else "Ended Video Call" }}
+        </b>
+
+        <br>
+
+        <small>
+        {% if c.duration %}
+            {{ c.duration }}
+        {% else %}
+            {{ c.call_time }}
+        {% endif %}
+        </small>
+
+    </div>
+
     {% else %}
-        <span class="missed-call-text">Missed video call</span>
-    {% endif %}
 
-    <br>
-    <small>{{ c.call_time }}</small>
+    <!-- ================= INCOMING ================= -->
 
-{% elif c.status == "ended" %}
+    <div class="call-card">
 
-    {% if c.call_type == "voice" %}
-        Voice call ended
-    {% else %}
-        Video call ended
-    {% endif %}
+        {% if c.call_type=="voice" %}
 
-    <br>
-    <small>{{ c.duration }}</small>
+        <svg xmlns="http://www.w3.org/2000/svg"
+             width="20"
+             height="20"
+             viewBox="0 0 24 24">
 
-{% elif c.status == "answered" %}
+            <path fill="{% if c.status=='missed' %}#E53935{% else %}#111111{% endif %}"
+            d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.3 21 3 13.7 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.24.2 2.45.57 3.57a1 1 0 0 1-.24 1.02l-2.21 2.2z"/>
 
-    {% if c.call_type == "voice" %}
-        Voice call
-    {% else %}
-        Video call
-    {% endif %}
+        </svg>
 
-    <br>
-    <small>{{ c.duration }}</small>
+        {% else %}
 
-{% else %}
+        <svg xmlns="http://www.w3.org/2000/svg"
+             width="20"
+             height="20"
+             viewBox="0 0 24 24">
 
-    {% if c.call_type == "voice" %}
-        Calling...
-    {% else %}
-        Video calling...
-    {% endif %}
+            <path fill="{% if c.status=='missed' %}#E53935{% else %}#111111{% endif %}"
+            d="M3 7a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v2.2l5-3v9.6l-5-3V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
 
-    <br>
-    <small>{{ c.call_time }}</small>
+        </svg>
+
+        {% endif %}
+
+        &nbsp;
+
+{% if c.status=="missed" %}
+
+<b style="color:#E53935;">
+{{ "Missed Voice Call" if c.call_type=="voice" else "Missed Video Call" }}
+</b>
+
+{% elif c.status=="ended" or c.status=="answered" %}
+
+<b>
+{{ "Ended Voice Call" if c.call_type=="voice" else "Ended Video Call" }}
+</b>
+
+{% elif c.status=="ringing" %}
+
+<b>
+{{ "Incoming Voice Call" if c.call_type=="voice" else "Incoming Video Call" }}
+</b>
 
 {% endif %}
 
-</div>
+        <br>
 
-        </div>
+        <small>
+        {% if c.duration %}
+            {{ c.duration }}
+        {% else %}
+            {{ c.call_time }}
+        {% endif %}
+        </small>
 
-        {% endfor %}
+    </div>
+
+    {% endif %}
+
+    </div>
+
+    {% endfor %}
 
     </div>
 

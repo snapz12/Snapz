@@ -10,88 +10,423 @@ body{
     font-family:sans-serif;
 }
 
+.action-btn{
+    background:none;
+    border:none;
+    cursor:pointer;
+}
 
-.comment-modal{
+
+/* ============================================================
+   SNAPZ REELS 3 HEART DOUBLE TAP BURST
+============================================================ */
+
+.snapz-heart-burst{
     position:fixed;
     left:0;
-    right:0;
-    bottom:0;
-    height:70vh;
-
-    background:#111;
-    z-index:99999;
-
-    display:none;
-    flex-direction:column;
-
-    border-radius:20px 20px 0 0;
+    top:0;
+    width:0;
+    height:0;
+    pointer-events:none;
+    z-index:999999;
 }
 
-.comment-header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:15px;
-    font-size:18px;
-    font-weight:bold;
-    color:white;
-    border-bottom:1px solid #333;
-}
-
-.comment-list{
-    height:calc(100% - 120px);
-    overflow-y:auto;
-    padding:15px;
-}
-
-.comment-input{
+.snapz-burst-heart{
     position:absolute;
-    bottom:0;
-    left:0;
+    width:42px;
+    height:42px;
+    pointer-events:none;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    transform:translate(-50%,-50%) scale(.55) rotate(0deg);
+    opacity:0;
+
+animation:snapzHeartFloat 1.15s cubic-bezier(.25,.46,.45,.94) forwards;
+
+    filter:drop-shadow(0 3px 5px rgba(255,64,129,.28));
+
+    will-change:transform,opacity;
+}
+
+.snapz-burst-heart svg{
+    display:block;
+    width:42px;
+    height:42px;
+    flex:none;
+}
+
+.snapz-burst-heart svg path{
+    fill:#FF4081;
+    stroke:none;
+}
+
+.snapz-burst-heart:nth-child(1){
+    animation-delay:0ms;
+}
+
+.snapz-burst-heart:nth-child(2){
+    animation-delay:90ms;
+}
+
+.snapz-burst-heart:nth-child(3){
+    animation-delay:180ms;
+}
+
+@keyframes snapzHeartFloat{
+
+    0%{
+        opacity:0;
+        transform:
+            translate(-50%,-50%)
+            translate(0,8px)
+            scale(.45)
+            rotate(0deg);
+    }
+
+    12%{
+        opacity:1;
+        transform:
+            translate(-50%,-50%)
+            translate(calc(var(--sx) * .35),0px)
+            scale(.82)
+            rotate(calc(var(--sr) * .35));
+    }
+
+    30%{
+        opacity:1;
+        transform:
+            translate(-50%,-50%)
+            translate(calc(var(--sx) * .7),-20px)
+            scale(1.05)
+            rotate(calc(var(--sr) * .7));
+    }
+
+    50%{
+        opacity:1;
+        transform:
+            translate(-50%,-50%)
+            translate(var(--mx),-48px)
+            scale(1)
+            rotate(var(--mr));
+    }
+
+    72%{
+        opacity:.85;
+        transform:
+            translate(-50%,-50%)
+            translate(
+                calc(var(--mx) + (var(--ex) - var(--mx)) * .45),
+                -72px
+            )
+            scale(.88)
+            rotate(
+                calc(var(--mr) + (var(--er) - var(--mr)) * .45)
+            );
+    }
+
+    100%{
+        opacity:0;
+        transform:
+            translate(-50%,-50%)
+            translate(var(--ex),-105px)
+            scale(.72)
+            rotate(var(--er));
+    }
+}
+
+
+.reel-heart{
+transition:0.2s;
+}
+.actions button svg{
+filter:drop-shadow(0 0 3px black);
+}
+
+.action-btn:active .reel-heart{
+    transform:scale(1.2);
+}
+
+.reel-comment-icon{
+    color:white;
+    transition:0.2s;
+}
+
+.action-btn:active .reel-comment-icon{
+    transform:scale(1.15);
+}
+.action-btn{
+    background:none;
+    border:none;
+    cursor:pointer;
+}
+
+.reel-share-icon,
+.download-icon{
+    transition:0.2s;
+}
+
+.action-btn:active svg{
+    transform:scale(1.15);
+}
+
+
+/* =========================================================
+   SNAPZ REEL COMMENTS - NEW SYSTEM
+   Modal is created directly inside BODY by JavaScript.
+   ========================================================= */
+
+.snapz-reel-comment-overlay{
+    position:fixed;
+    inset:0;
+    z-index:2147483000;
+    display:none;
+    align-items:flex-end;
+    justify-content:center;
+    background:rgba(0,0,0,.58);
+}
+
+.snapz-reel-comment-overlay.show{
+    display:flex;
+}
+
+.snapz-reel-comment-modal{
+    width:100%;
+    max-width:560px;
+    height:50vh;
+    background:#111;
+    color:#fff;
+    border-radius:20px 20px 0 0;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    box-shadow:0 -8px 35px rgba(0,0,0,.45);
+}
+
+.snapz-reel-comment-header{
+    flex:0 0 58px;
+    height:58px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 16px;
+    box-sizing:border-box;
+    border-bottom:1px solid #2b2b2b;
+    font-size:18px;
+    font-weight:700;
+}
+
+.snapz-reel-comment-close{
+    width:40px;
+    height:40px;
+    border:0;
+    background:transparent;
+    color:#fff;
+    font-size:25px;
+    line-height:40px;
+    padding:0;
+    cursor:pointer;
+}
+
+.snapz-reel-comment-list{
+    flex:1 1 auto;
+    min-height:0;
+    overflow-y:auto;
+    padding:14px 14px 10px;
+    box-sizing:border-box;
+    -webkit-overflow-scrolling:touch;
+}
+
+.snapz-reel-comment-empty{
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#888;
+    font-size:15px;
+}
+
+.snapz-reel-comment-item{
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+    padding:11px 4px;
+    border-bottom:1px solid #222;
+}
+
+.snapz-reel-comment-user{
+    color:#fff;
+    font-size:14px;
+    font-weight:700;
+}
+
+.snapz-reel-comment-text{
+    color:#e9e9e9;
+    font-size:15px;
+    line-height:1.4;
+    word-break:break-word;
+}
+
+.snapz-reel-comment-inputbar{
+    flex:0 0 auto;
+    min-height:68px;
     width:100%;
     display:flex;
     align-items:center;
-    gap:10px;
-    padding:10px;
+    gap:9px;
+    padding:10px 12px;
     box-sizing:border-box;
     background:#111;
-    border-top:1px solid #333;
+    border-top:1px solid #2b2b2b;
 }
 
-.comment-input input{
+.snapz-reel-comment-input{
     flex:1;
-    height:45px;
-    border:none;
-    border-radius:25px;
-    padding:0 15px;
-    font-size:16px;
+    min-width:0;
+    height:46px;
+    border:1px solid #383838;
+    border-radius:24px;
+    outline:none;
+    padding:0 16px;
+    box-sizing:border-box;
+    background:#1d1d1d;
+    color:#fff;
+    font-size:15px;
 }
 
-.comment-input button{
-    width:90px;
-    height:45px;
+.snapz-reel-comment-input::placeholder{
+    color:#888;
+}
 
-    background:#0095f6 !important;
-    color:#fff !important;
-
-    border:none !important;
-    border-radius:12px;   /* Pehle 25px tha */
-
-    font-size:18px;
-    font-weight:bold;
+.snapz-reel-comment-post{
+    flex:0 0 76px;
+    width:76px;
+    height:46px;
+    border:0;
+    border-radius:24px;
+    background:#0095f6;
+    color:#fff;
+    font-size:15px;
+    font-weight:700;
     cursor:pointer;
-
-    display:flex;
-    justify-content:center;
-    align-items:center;
-
-    flex-shrink:0;
 }
 
-@keyframes slideUp{
-    from{
-        transform:translateY(100%);
-    }
+.snapz-reel-comment-post:disabled{
+    opacity:.55;
+}
+
+
+.snapz-reel-comment-row{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    width:100%;
+}
+
+.snapz-reel-comment-profile{
+    width:38px;
+    height:38px;
+    min-width:38px;
+    border-radius:50%;
+    object-fit:cover;
+    background:#222;
+}
+
+.snapz-reel-comment-content{
+    flex:1;
+    min-width:0;
+}
+
+.snapz-reel-comment-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    min-height:22px;
+}
+
+.snapz-reel-comment-user{
+    color:#fff;
+    font-size:14px;
+    font-weight:700;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.snapz-reel-comment-reply-btn{
+    flex:0 0 auto;
+    border:0;
+    background:none;
+    color:#aaa;
+    font-size:13px;
+    font-weight:600;
+    padding:3px 4px;
+    cursor:pointer;
+}
+
+.snapz-reel-comment-reply-btn:active{
+    color:#fff;
+}
+
+.snapz-reel-comment-text{
+    color:#e9e9e9;
+    font-size:15px;
+    line-height:1.4;
+    margin-top:2px;
+    word-break:break-word;
+}
+
+.snapz-reel-replies{
+    margin-left:48px;
+    margin-top:10px;
+    padding-left:10px;
+    border-left:1px solid #333;
+}
+
+.snapz-reel-reply-row{
+    margin-bottom:10px;
+}
+
+.snapz-reel-reply-row:last-child{
+    margin-bottom:0;
+}
+
+.snapz-reel-reply-bar{
+    flex:0 0 auto;
+    min-height:38px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:7px 14px;
+    box-sizing:border-box;
+    background:#181818;
+    border-top:1px solid #292929;
+    color:#aaa;
+    font-size:13px;
+}
+
+.snapz-reel-reply-bar button{
+    width:28px;
+    height:28px;
+    border:0;
+    background:transparent;
+    color:#aaa;
+    font-size:20px;
+    cursor:pointer;
+}
+
+.snapz-reel-comment-count{
+    text-align:center;
+    font-size:12px;
+    font-weight:bold;
+    margin-top:-10px;
+    color:#fff;
+}
+
     to{
         transform:translateY(0);
     }
@@ -139,7 +474,7 @@ body{
     height:45px;
     border:none;
     border-radius:50%;
-    background:rgba(0,0,0,.5);
+    background:transparent;
     color:white;
     font-size:20px;
     cursor:pointer;
@@ -152,6 +487,7 @@ body{
     text-align:center;
     width:100%;
     background:#000;
+    color:#FF4081;
     padding:15px;
     font-size:20px;
     font-weight:bold;
@@ -210,7 +546,7 @@ body{
     height:45px;
     border:none;
     border-radius:50%;
-    background:rgba(0,0,0,.5);
+    background:transparent;
     color:white;
     font-size:20px;
 }
@@ -246,6 +582,16 @@ body{
 
 <div class="reel">
 
+{% if r.audio %}
+<audio
+    class="snapz-reel-music"
+    src="{{ r.audio }}"
+    data-start="{{ r.music_start or 0 }}"
+    data-end="{{ r.music_end or 0 }}"
+    preload="metadata">
+</audio>
+{% endif %}
+
 <video autoplay loop playsinline muted >
     <source src="{{ r.video }}" type="video/mp4">
 </video>
@@ -261,22 +607,52 @@ body{
 
     <div style="display:flex;align-items:center;gap:8px;">
 
-        {% if r.profile_pic %}
-            {% if r.profile_pic.startswith('http') %}
-                <img src="{{ r.profile_pic }}" class="profile-pic">
-            {% else %}
-                <img src="/static/images/{{ r.profile_pic }}" class="profile-pic">
-            {% endif %}
+<a href="{{ url_for('profile_view', username=r.username|trim) }}"
+   style="display:flex;align-items:center;">
+
+    {% if r.profile_pic %}
+        {% if r.profile_pic.startswith('http') %}
+            <img src="{{ r.profile_pic }}"
+                 class="profile-pic">
         {% else %}
-            <img src="/static/images/default.jpg" class="profile-pic">
+            <img src="/static/images/{{ r.profile_pic }}"
+                 class="profile-pic">
         {% endif %}
+    {% else %}
+        <img src="/static/images/default.jpg"
+             class="profile-pic">
+    {% endif %}
 
-        <span class="username">@{{ r.username }}</span>
+</a>
 
-        <button class="follow-btn"
-        onclick="toggleFollow(this,'{{ r.username }}')">
-            Follow
-        </button>
+<a href="{{ url_for('profile_view', username=r.username|trim) }}"
+   style="color:white;text-decoration:none;">
+
+    <span class="username">@{{ r.username }}</span>
+
+</a>
+
+
+<button
+    class="follow-btn"
+    data-follow-username="{{ r.username }}"
+    onclick="toggleFollow(this, '{{ r.username }}')"
+    style="
+          background:#FF4081;
+          color:white;
+          border:none;
+          border-radius:6px;
+          padding:7px 14px;
+          font-weight:600;
+          cursor:pointer;
+      "
+>
+    {% if r.username in following_users %}
+        Following
+    {% else %}
+        Follow
+    {% endif %}
+</button>
 
     </div>
 
@@ -289,12 +665,24 @@ body{
 
 <div class="actions">
 
-<button onclick="toggleLike(this, {{ r.id }})">
-{% if r.liked %}
-❤️
-{% else %}
-🤍
-{% endif %}
+<button onclick="toggleLike(this, {{ r.id }})" class="action-btn">
+
+<svg class="reel-heart"
+     width="32"
+     height="32"
+     viewBox="0 0 24 24"
+     fill="{% if r.liked %}red{% else %}none{% endif %}"
+     xmlns="http://www.w3.org/2000/svg">
+
+    <path
+        d="M20.84 4.61C20.33 4.1 19.72 3.69 19.05 3.42C18.39 3.14 17.67 3 16.95 3.01C16.23 3.02 15.51 3.17 14.85 3.46C14.19 3.74 13.59 4.16 13.09 4.68L12 5.75L10.91 4.68C10.41 4.16 9.81 3.74 9.15 3.46C8.49 3.17 7.77 3.02 7.05 3.01C6.33 3 5.61 3.14 4.95 3.42C4.28 3.69 3.67 4.1 3.16 4.61C1.04 6.73 1.04 10.17 3.16 12.29L12 21L20.84 12.29C22.96 10.17 22.96 6.73 20.84 4.61Z"
+        stroke="{% if r.liked %}red{% else %}#FF4081{% endif %}"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+
+</svg>
+
 </button>
 
 <div
@@ -309,75 +697,92 @@ class="like-count">
 
 
 
-<button onclick="openCommentModal({{ r.id }})">
-💬
+<button onclick="openCommentModal({{ r.id }})" class="action-btn">
+
+<svg class="reel-comment-icon"
+width="32"
+height="32"
+viewBox="0 0 24 24"
+fill="none"
+xmlns="http://www.w3.org/2000/svg">
+
+<path 
+d="M21 11.5C21 16.194 17.194 20 12.5 20H7L3 22V11.5C3 6.806 6.806 3 11.5 3H12.5C17.194 3 21 6.806 21 11.5Z"
+stroke="#FF4081"
+stroke-width="2"
+stroke-linecap="round"
+stroke-linejoin="round"/>
+
+</svg>
+
 </button>
 
 {% if r.comments > 0 %}
-<div style="
-text-align:center;
-font-size:12px;
-font-weight:bold;
-margin-top:-10px;
-color:white;">
+<div id="reel-comment-count-{{ r.id }}" class="snapz-reel-comment-count">
 {{ r.comments }}
 </div>
 {% endif %}
+<button onclick="openShare({{ r.id }})" class="action-btn">
 
-<div id="commentModal{{ r.id }}" class="comment-modal">
+<svg class="reel-share-icon"
+width="32"
+height="32"
+viewBox="0 0 24 24"
+fill="none"
+xmlns="http://www.w3.org/2000/svg">
 
-    <div class="comment-header">
-        <span>Comments</span>
-        <button onclick="closeCommentModal({{ r.id }})">✕</button>
-    </div>
+<path 
+d="M22 2L11 13"
+stroke="#FF4081"
+stroke-width="2"
+stroke-linecap="round"/>
 
-<div class="comment-list">
+<path 
+d="M22 2L15 22L11 13L2 9L22 2Z"
+stroke="#FF4081"
+stroke-width="2"
+stroke-linecap="round"
+stroke-linejoin="round"/>
 
-{% if r.comment_list %}
+</svg>
 
-    {% for c in r.comment_list %}
-
-    <div class="comment-item">
-        <b>@{{ c[0] }}</b><br>
-        {{ c[1] }}
-    </div>
-
-    {% endfor %}
-
-{% else %}
-
-    <div style="text-align:center;color:gray;padding:20px;">
-        No comments yet
-    </div>
-
-{% endif %}
-
-</div>
-
-    <form method="POST" action="/comment_reel/{{ r.id }}" class="comment-input">
-
-        <input
-        type="text"
-        name="comment"
-        placeholder="Add comment..."
-        required>
-
-        <button type="submit">
-            Post
-        </button>
-
-    </form>
-
-</div>
-
-
-<button onclick="openShare({{ r.id }})">
-📤
 </button>
 
 <!-- Download -->
 <a href="/download_reel/{{ r.id }}">
-    <button>📥</button>
+
+<button class="action-btn">
+
+<svg class="download-icon"
+width="32"
+height="32"
+viewBox="0 0 24 24"
+fill="none"
+xmlns="http://www.w3.org/2000/svg">
+
+<path 
+d="M12 3V15"
+stroke="#FF4081"
+stroke-width="2"
+stroke-linecap="round"/>
+
+<path 
+d="M7 10L12 15L17 10"
+stroke="#FF4081"
+stroke-width="2"
+stroke-linecap="round"
+stroke-linejoin="round"/>
+
+<path 
+d="M5 21H19"
+stroke="#FF4081"
+stroke-width="2"
+stroke-linecap="round"/>
+
+</svg>
+
+</button>
+
 </a>
 
 </div>
@@ -396,85 +801,7 @@ color:white;">
 {% endfor %}
 
 
-<div class="navbar"><a href="/">
-<svg xmlns="http://www.w3.org/2000/svg"
-     width="28" height="28"
-     viewBox="0 0 24 24"
-     fill="none"
-     stroke="currentColor"
-     stroke-width="2.8"
-     stroke-linecap="round"
-     stroke-linejoin="round">
-
-  <path d="M3 10.5L12 3l9 7.5"/>
-  <path d="M5 9.8V20h14V9.8"/>
-</svg>
-</a><a href="/reels">
-<svg xmlns="http://www.w3.org/2000/svg"
-     width="28" height="28"
-     viewBox="0 0 24 24"
-     fill="none"
-     stroke="currentColor"
-     stroke-width="2.8"
-     stroke-linecap="round"
-     stroke-linejoin="round">
-
-  <rect x="3" y="3" width="18" height="18" rx="3"/>
-  <path d="M3 8h18"/>
-  <path d="M8 3l3 5"/>
-  <path d="M13 3l3 5"/>
-  <path d="M10 10l5 3-5 3z"/>
-</svg>
-</a><a href="/upload">
-<svg xmlns="http://www.w3.org/2000/svg"
-     width="28" height="28"
-     viewBox="0 0 24 24"
-     fill="none"
-     stroke="currentColor"
-     stroke-width="2.8"
-     stroke-linecap="round"
-     stroke-linejoin="round">
-
-  <rect x="3" y="3" width="18" height="18" rx="5"/>
-  <path d="M12 8v8"/>
-  <path d="M8 12h8"/>
-
-</svg>
-</a><a href="/users">
-<svg xmlns="http://www.w3.org/2000/svg"
-     width="28"
-     height="28"
-     viewBox="0 0 24 24"
-     fill="none"
-     stroke="currentColor"
-     stroke-width="2.8"
-     stroke-linecap="round"
-     stroke-linejoin="round">
-
-  <path d="M22 2L11 13"/>
-  <path d="M22 2L15 22L11 13L2 9L22 2Z"/>
-
-</svg>
-</a><a href="/profile">
-<svg xmlns="http://www.w3.org/2000/svg"
-     width="28"
-     height="28"
-     viewBox="0 0 24 24"
-     fill="none"
-     stroke="currentColor"
-     stroke-width="2.8"
-     stroke-linecap="round"
-     stroke-linejoin="round">
-
-  <circle cx="12" cy="8" r="4"/>
-  <path d="M5 20c1.8-3.5 4.5-5 7-5s5.2 1.5 7 5"/>
-
-</svg>
-</a>
-
-</div>
-
-
+{% include 'navbar.html' %}
 
 
 <script>
@@ -490,22 +817,36 @@ fetch("/like_reel/" + reelId,{
 .then(data=>{
 
 let count = document.getElementById("like-count-" + reelId);
+let heart = btn.querySelector(".reel-heart");
+let path = heart.querySelector("path");
+
 
 if(data.status=="liked"){
-    btn.innerHTML="❤️";
-    btn.style.color="red";
+
+    btn.classList.add("active");
+
+    heart.setAttribute("fill","red");
+    path.setAttribute("stroke","red");
+
     count.innerText = data.likes;
+
 }
 
+
 if(data.status=="unliked"){
-    btn.innerHTML="🤍";
-    btn.style.color="white";
+
+    btn.classList.remove("active");
+
+    heart.setAttribute("fill","none");
+    path.setAttribute("stroke","white");
+
 
     if(data.likes == 0){
         count.innerText = "";
     }else{
         count.innerText = data.likes;
     }
+
 }
 
 });
@@ -513,33 +854,1065 @@ if(data.status=="unliked"){
 }
 
 
-function toggleFollow(btn,username){
+function toggleFollow(btn, username) {
 
-if(btn.innerText=="Follow"){
-btn.innerText="Following";
-btn.style.background="#333";
-}else{
-btn.innerText="Follow";
-btn.style.background="#0095f6";
+    const isFollowing =
+        btn.innerText.trim() === "Following";
+
+    const url = isFollowing
+        ? "/unfollow/" + encodeURIComponent(username)
+        : "/follow/" + encodeURIComponent(username);
+
+    fetch(url, {
+        method: "POST"
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if (
+            data.status !== "followed" &&
+            data.status !== "unfollowed"
+        ) {
+            return;
+        }
+
+        const newFollowing =
+            data.status === "followed";
+
+        /*
+         * Current page par jis bhi jagah
+         * same user ka Follow button hai,
+         * sabko ek saath update karo.
+         */
+        document
+            .querySelectorAll(
+                '[data-follow-username="' +
+                CSS.escape(username) +
+                '"]'
+            )
+            .forEach(function(button) {
+
+                button.innerText =
+                    newFollowing
+                        ? "Following"
+                        : "Follow";
+
+                button.style.background = "#FF4081";
+                button.style.color = "#fff";
+            });
+
+        /*
+         * Dusre pages/components ke liye event.
+         */
+        window.dispatchEvent(
+            new CustomEvent("snapzFollowChanged", {
+                detail: {
+                    username: username,
+                    following: newFollowing
+                }
+            })
+        );
+
+    })
+    .catch(function(error) {
+        console.error("Follow error:", error);
+    });
 }
 
+
+let snapzActiveReelCommentId = null;
+let snapzCurrentReelReplyTo = null;
+let snapzCurrentReelReplyUsername = "";
+
+let snapzReelCommentOverlay = null;
+let snapzReelCommentList = null;
+let snapzReelCommentInput = null;
+let snapzReelCommentPost = null;
+
+
+function snapzCreateReelCommentModal(){
+
+    if(document.getElementById("snapzReelCommentOverlay")){
+
+        snapzReelCommentOverlay =
+            document.getElementById("snapzReelCommentOverlay");
+
+        snapzReelCommentList =
+            document.getElementById("snapzReelCommentList");
+
+        snapzReelCommentInput =
+            document.getElementById("snapzReelCommentInput");
+
+        snapzReelCommentPost =
+            document.getElementById("snapzReelCommentPost");
+
+        return;
+    }
+
+    snapzReelCommentOverlay = document.createElement("div");
+
+    snapzReelCommentOverlay.id =
+        "snapzReelCommentOverlay";
+
+    snapzReelCommentOverlay.className =
+        "snapz-reel-comment-overlay";
+
+
+    snapzReelCommentOverlay.innerHTML = `
+
+        <div class="snapz-reel-comment-modal">
+
+            <div class="snapz-reel-comment-header">
+
+                <span>Comments</span>
+
+                <button
+                    type="button"
+                    class="snapz-reel-comment-close"
+                    id="snapzReelCommentClose"
+                >×</button>
+
+            </div>
+
+
+            <div
+                id="snapzReelCommentList"
+                class="snapz-reel-comment-list"
+            ></div>
+
+
+            <div
+                id="snapzReelReplyBar"
+                class="snapz-reel-reply-bar"
+                style="display:none;"
+            >
+                <span id="snapzReelReplyText">
+                    Replying...
+                </span>
+
+                <button
+                    type="button"
+                    id="snapzReelReplyCancel"
+                >×</button>
+            </div>
+
+
+            <form
+                id="snapzReelCommentForm"
+                class="snapz-reel-comment-inputbar"
+            >
+
+                <input
+                    id="snapzReelCommentInput"
+                    class="snapz-reel-comment-input"
+                    type="text"
+                    placeholder="Add comment..."
+                    autocomplete="off"
+                    maxlength="1000"
+                >
+
+                <button
+                    id="snapzReelCommentPost"
+                    class="snapz-reel-comment-post"
+                    type="submit"
+                >Post</button>
+
+            </form>
+
+        </div>
+    `;
+
+
+    document.body.appendChild(
+        snapzReelCommentOverlay
+    );
+
+
+    snapzReelCommentList =
+        document.getElementById(
+            "snapzReelCommentList"
+        );
+
+    snapzReelCommentInput =
+        document.getElementById(
+            "snapzReelCommentInput"
+        );
+
+    snapzReelCommentPost =
+        document.getElementById(
+            "snapzReelCommentPost"
+        );
+
+
+    document
+        .getElementById("snapzReelCommentClose")
+        .addEventListener(
+            "click",
+            closeCommentModal
+        );
+
+
+    document
+        .getElementById("snapzReelReplyCancel")
+        .addEventListener(
+            "click",
+            snapzCancelReelReply
+        );
+
+
+    snapzReelCommentOverlay.addEventListener(
+        "click",
+        function(e){
+
+            if(e.target === snapzReelCommentOverlay){
+
+                closeCommentModal();
+
+            }
+
+        }
+    );
+
+
+    document
+        .getElementById("snapzReelCommentForm")
+        .addEventListener(
+            "submit",
+            function(e){
+
+                e.preventDefault();
+
+                snapzSubmitReelComment();
+
+            }
+        );
+
+
+    snapzReelCommentInput.addEventListener(
+        "keydown",
+        function(e){
+
+            if(e.key === "Enter"){
+
+                e.preventDefault();
+
+                snapzSubmitReelComment();
+
+            }
+
+        }
+    );
 }
 
-function openCommentModal(id){
 
-    document.getElementById("commentModal"+id).style.display="flex";
 
-    document.body.style.overflow="hidden";
+function openCommentModal(reelId){
+
+    snapzActiveReelCommentId =
+        reelId;
+
+    snapzCurrentReelReplyTo =
+        null;
+
+    snapzCurrentReelReplyUsername =
+        "";
+
+    snapzCreateReelCommentModal();
+
+    snapzReelCommentOverlay.classList.add(
+        "show"
+    );
+
+    document.body.style.overflow =
+        "hidden";
+
+
+    snapzReelCommentList.innerHTML = `
+        <div class="snapz-reel-comment-empty">
+            Loading comments...
+        </div>
+    `;
+
+
+    snapzReelCommentInput.value = "";
+
+    snapzCancelReelReply();
+
+    snapzLoadReelComments(
+        reelId
+    );
+
+
+    setTimeout(function(){
+
+        if(snapzReelCommentInput){
+
+            snapzReelCommentInput.focus();
+
+        }
+
+    },100);
+}
+
+
+
+function closeCommentModal(){
+
+    if(!snapzReelCommentOverlay){
+
+        return;
+
+    }
+
+    snapzCancelReelReply();
+
+    snapzReelCommentOverlay.classList.remove(
+        "show"
+    );
+
+    document.body.style.overflow = "";
+
+    snapzActiveReelCommentId = null;
+}
+
+
+
+function snapzLoadReelComments(reelId){
+
+    fetch(
+        "/reel_comments/" + reelId,
+        {
+            method:"GET",
+            headers:{
+                "X-Requested-With":
+                    "XMLHttpRequest"
+            }
+        }
+    )
+    .then(function(response){
+
+        if(!response.ok){
+
+            throw new Error(
+                "Failed to load comments"
+            );
+
+        }
+
+        return response.json();
+
+    })
+    .then(function(data){
+
+        if(data.status !== "ok"){
+
+            throw new Error(
+                data.message ||
+                "Comment loading failed"
+            );
+
+        }
+
+        snapzRenderReelComments(
+            data.comments || []
+        );
+
+
+        snapzUpdateReelCommentCount(
+            reelId,
+            data.count || 0
+        );
+
+    })
+    .catch(function(error){
+
+        console.error(
+            "Reel comments load error:",
+            error
+        );
+
+
+        snapzReelCommentList.innerHTML = `
+            <div class="snapz-reel-comment-empty">
+                Unable to load comments.
+            </div>
+        `;
+
+    });
+}
+
+
+
+function snapzReelProfilePic(url){
+
+    if(url && String(url).trim()){
+
+        return String(url);
+
+    }
+
+    return "/static/images/default_profile.png";
+}
+
+
+
+function snapzRenderReelComments(comments){
+
+    snapzReelCommentList.innerHTML = "";
+
+
+    const topComments =
+        comments.filter(function(c){
+
+            return (
+                c.reply_to === null ||
+                c.reply_to === undefined
+            );
+
+        });
+
+
+    if(!topComments.length){
+
+        snapzReelCommentList.innerHTML = `
+            <div class="snapz-reel-comment-empty">
+                No comments yet
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    topComments.forEach(function(comment){
+
+        snapzAddReelComment(
+            comment,
+            comments
+        );
+
+    });
+
+
+    snapzReelCommentList.scrollTop =
+        snapzReelCommentList.scrollHeight;
+}
+
+
+
+function snapzAddReelComment(
+    comment,
+    allComments
+){
+
+    const item =
+        document.createElement("div");
+
+    item.className =
+        "snapz-reel-comment-item";
+
+
+    const row =
+        document.createElement("div");
+
+    row.className =
+        "snapz-reel-comment-row";
+
+
+    const pic =
+        document.createElement("img");
+
+    pic.className =
+        "snapz-reel-comment-profile";
+
+    pic.src =
+        snapzReelProfilePic(
+            comment.profile_pic
+        );
+
+    pic.alt = "";
+
+
+    pic.onerror = function(){
+
+        this.src =
+            "/static/images/default_profile.png";
+
+    };
+
+
+    const content =
+        document.createElement("div");
+
+    content.className =
+        "snapz-reel-comment-content";
+
+
+    const top =
+        document.createElement("div");
+
+    top.className =
+        "snapz-reel-comment-top";
+
+
+    const username =
+        document.createElement("span");
+
+    username.className =
+        "snapz-reel-comment-user";
+
+    username.textContent =
+        "@" + comment.username;
+
+
+    const reply =
+        document.createElement("button");
+
+    reply.type =
+        "button";
+
+    reply.className =
+        "snapz-reel-comment-reply-btn";
+
+    reply.textContent =
+        "Reply";
+
+
+    reply.dataset.commentId =
+        comment.id;
+
+    reply.dataset.commentUsername =
+        comment.username;
+
+
+    reply.addEventListener(
+        "click",
+        function(){
+
+            snapzSetReelReplyMode(
+                Number(comment.id),
+                comment.username
+            );
+
+        }
+    );
+
+
+    top.appendChild(username);
+
+    top.appendChild(reply);
+
+
+    const text =
+        document.createElement("div");
+
+    text.className =
+        "snapz-reel-comment-text";
+
+    text.textContent =
+        comment.comment;
+
+
+    content.appendChild(top);
+
+    content.appendChild(text);
+
+
+    row.appendChild(pic);
+
+    row.appendChild(content);
+
+    item.appendChild(row);
+
+
+    const replies =
+        allComments.filter(function(c){
+
+            return Number(c.reply_to) ===
+                   Number(comment.id);
+
+        });
+
+
+    if(replies.length){
+
+        const replyList =
+            document.createElement("div");
+
+        replyList.className =
+            "snapz-reel-replies";
+
+
+        replies.forEach(function(replyComment){
+
+            snapzAddReelReply(
+                replyList,
+                replyComment,
+                allComments
+            );
+
+        });
+
+
+        item.appendChild(
+            replyList
+        );
+
+    }
+
+
+    snapzReelCommentList.appendChild(
+        item
+    );
+}
+
+
+
+function snapzAddReelReply(
+    container,
+    comment,
+    allComments
+){
+
+    const row =
+        document.createElement("div");
+
+    row.className =
+        "snapz-reel-comment-row snapz-reel-reply-row";
+
+
+    const pic =
+        document.createElement("img");
+
+    pic.className =
+        "snapz-reel-comment-profile";
+
+    pic.src =
+        snapzReelProfilePic(
+            comment.profile_pic
+        );
+
+    pic.alt = "";
+
+
+    pic.onerror = function(){
+
+        this.src =
+            "/static/images/default_profile.png";
+
+    };
+
+
+    const content =
+        document.createElement("div");
+
+    content.className =
+        "snapz-reel-comment-content";
+
+
+    const top =
+        document.createElement("div");
+
+    top.className =
+        "snapz-reel-comment-top";
+
+
+    const username =
+        document.createElement("span");
+
+    username.className =
+        "snapz-reel-comment-user";
+
+    username.textContent =
+        "@" + comment.username;
+
+
+    const reply =
+        document.createElement("button");
+
+    reply.type =
+        "button";
+
+    reply.className =
+        "snapz-reel-comment-reply-btn";
+
+    reply.textContent =
+        "Reply";
+
+
+    reply.dataset.commentId =
+        comment.id;
+
+    reply.dataset.commentUsername =
+        comment.username;
+
+
+    reply.addEventListener(
+        "click",
+        function(){
+
+            snapzSetReelReplyMode(
+                Number(comment.id),
+                comment.username
+            );
+
+        }
+    );
+
+
+    top.appendChild(username);
+
+    top.appendChild(reply);
+
+
+    const text =
+        document.createElement("div");
+
+    text.className =
+        "snapz-reel-comment-text";
+
+    text.textContent =
+        comment.comment;
+
+
+    content.appendChild(top);
+
+    content.appendChild(text);
+
+
+    row.appendChild(pic);
+
+    row.appendChild(content);
+
+
+    container.appendChild(
+        row
+    );
+}
+
+
+
+function snapzSetReelReplyMode(
+    commentId,
+    username
+){
+
+    snapzCurrentReelReplyTo =
+        Number(commentId);
+
+    snapzCurrentReelReplyUsername =
+        username || "";
+
+
+    const bar =
+        document.getElementById(
+            "snapzReelReplyBar"
+        );
+
+    const text =
+        document.getElementById(
+            "snapzReelReplyText"
+        );
+
+
+    if(bar){
+
+        bar.style.display =
+            "flex";
+
+    }
+
+
+    if(text){
+
+        text.textContent =
+            "Reply to @" +
+            snapzCurrentReelReplyUsername;
+
+    }
+
+
+    if(snapzReelCommentInput){
+
+        snapzReelCommentInput.placeholder =
+            "Reply...";
+
+        snapzReelCommentInput.focus();
+
+    }
 
 }
 
-function closeCommentModal(id){
 
-    document.getElementById("commentModal"+id).style.display="none";
 
-    document.body.style.overflow="auto";
+function snapzCancelReelReply(){
+
+    snapzCurrentReelReplyTo =
+        null;
+
+    snapzCurrentReelReplyUsername =
+        "";
+
+
+    const bar =
+        document.getElementById(
+            "snapzReelReplyBar"
+        );
+
+
+    if(bar){
+
+        bar.style.display =
+            "none";
+
+    }
+
+
+    if(snapzReelCommentInput){
+
+        snapzReelCommentInput.placeholder =
+            "Add comment...";
+
+    }
 
 }
+
+
+
+function snapzSubmitReelComment(){
+
+    if(!snapzActiveReelCommentId){
+
+        return;
+
+    }
+
+
+    const text =
+        (
+            snapzReelCommentInput.value ||
+            ""
+        ).trim();
+
+
+    if(!text){
+
+        snapzReelCommentInput.focus();
+
+        return;
+
+    }
+
+
+    snapzReelCommentPost.disabled =
+        true;
+
+    snapzReelCommentPost.textContent =
+        "Posting...";
+
+
+    const formData =
+        new URLSearchParams();
+
+
+    formData.append(
+        "comment",
+        text
+    );
+
+
+    if(
+        snapzCurrentReelReplyTo !==
+        null
+    ){
+
+        formData.append(
+            "reply_to",
+            snapzCurrentReelReplyTo
+        );
+
+    }
+
+
+    fetch(
+        "/comment_reel/" +
+        snapzActiveReelCommentId,
+        {
+            method:"POST",
+
+            headers:{
+                "Content-Type":
+                    "application/x-www-form-urlencoded; charset=UTF-8",
+
+                "X-Requested-With":
+                    "XMLHttpRequest"
+            },
+
+            body:
+                formData.toString()
+        }
+    )
+    .then(function(response){
+
+        return response.json()
+            .then(function(data){
+
+                if(
+                    !response.ok ||
+                    data.status !== "ok"
+                ){
+
+                    throw new Error(
+                        data.message ||
+                        "Comment failed"
+                    );
+
+                }
+
+                return data;
+
+            });
+
+    })
+    .then(function(){
+
+        const reelId =
+            snapzActiveReelCommentId;
+
+
+        snapzReelCommentInput.value =
+            "";
+
+
+        snapzCancelReelReply();
+
+
+        snapzLoadReelComments(
+            reelId
+        );
+
+    })
+    .catch(function(error){
+
+        console.error(
+            "Reel comment post error:",
+            error
+        );
+
+
+        alert(
+            error.message ||
+            "Unable to post comment."
+        );
+
+    })
+    .finally(function(){
+
+        snapzReelCommentPost.disabled =
+            false;
+
+        snapzReelCommentPost.textContent =
+            "Post";
+
+
+        snapzReelCommentInput.focus();
+
+    });
+}
+
+
+
+function snapzRefreshReelCommentCount(
+    reelId
+){
+
+    fetch(
+        "/reel_comments/" +
+        reelId
+    )
+    .then(function(response){
+
+        return response.json();
+
+    })
+    .then(function(data){
+
+        if(data.status === "ok"){
+
+            snapzUpdateReelCommentCount(
+                reelId,
+                data.count || 0
+            );
+
+        }
+
+    })
+    .catch(function(error){
+
+        console.error(
+            "Reel comment count error:",
+            error
+        );
+
+    });
+}
+
+
+
+function snapzUpdateReelCommentCount(
+    reelId,
+    count
+){
+
+    const countElement =
+        document.getElementById(
+            "reel-comment-count-" +
+            reelId
+        );
+
+
+    if(!countElement){
+
+        return;
+
+    }
+
+
+    if(count > 0){
+
+        countElement.textContent =
+            count;
+
+        countElement.style.display =
+            "block";
+
+    }else{
+
+        countElement.textContent =
+            "";
+
+        countElement.style.display =
+            "none";
+
+    }
+
+}
+
+
+
+document.addEventListener(
+    "keydown",
+    function(e){
+
+        if(e.key === "Escape"){
+
+            closeCommentModal();
+
+        }
+
+    }
+);
 
 
 function openShareModal(){
@@ -612,6 +1985,247 @@ const observer = new IntersectionObserver((entries) => {
 
 videos.forEach(video=>{
     observer.observe(video);
+});
+
+</script>
+
+
+<script>
+/* =====================================================
+   SNAPZ REEL MUSIC PLAYER
+   Syncs saved reel music with active reel.
+===================================================== */
+(function(){
+
+    let activeMusic = null;
+
+    function stopMusic(audio){
+        if(!audio) return;
+
+        try{
+            audio.pause();
+            audio.currentTime = 0;
+        }catch(e){}
+    }
+
+    function playReelMusic(reel){
+
+        const music =
+            reel.querySelector(".snapz-reel-music");
+
+        if(!music){
+
+            if(activeMusic){
+                stopMusic(activeMusic);
+                activeMusic = null;
+            }
+
+            return;
+        }
+
+        if(activeMusic && activeMusic !== music){
+            stopMusic(activeMusic);
+        }
+
+        activeMusic = music;
+
+        const start =
+            Number(music.dataset.start || 0);
+
+        const end =
+            Number(music.dataset.end || 0);
+
+        function startPlayback(){
+
+            try{
+
+                if(
+                    Number.isFinite(start) &&
+                    start >= 0 &&
+                    start < music.duration
+                ){
+                    music.currentTime = start;
+                }
+
+                music.play().catch(function(){});
+
+            }catch(e){}
+
+        }
+
+        if(music.readyState >= 1){
+            startPlayback();
+        }else{
+
+            music.addEventListener(
+                "loadedmetadata",
+                startPlayback,
+                {once:true}
+            );
+
+        }
+
+        music.ontimeupdate = function(){
+
+            if(
+                end > start &&
+                music.currentTime >= end
+            ){
+
+                music.currentTime = start;
+
+                music.play().catch(function(){});
+
+            }
+
+        };
+
+    }
+
+    window.snapzPlayReelMusic = playReelMusic;
+
+    const reels =
+        document.querySelectorAll(".reel");
+
+    reels.forEach(function(reel){
+
+        const video =
+            reel.querySelector("video");
+
+        if(!video) return;
+
+        video.addEventListener(
+            "play",
+            function(){
+
+                playReelMusic(reel);
+
+            }
+        );
+
+        video.addEventListener(
+            "pause",
+            function(){
+
+                const music =
+                    reel.querySelector(
+                        ".snapz-reel-music"
+                    );
+
+                if(music){
+                    stopMusic(music);
+                }
+
+            }
+        );
+
+    });
+
+})();
+</script>
+
+
+<script>
+/* ============================================================
+   SNAPZ REELS 3 HEART DOUBLE TAP BURST
+============================================================ */
+
+function snapzShowThreeHeartBurst(clientX, clientY){
+
+    const burst = document.createElement("div");
+    burst.className = "snapz-heart-burst";
+
+    burst.style.left = clientX + "px";
+    burst.style.top = clientY + "px";
+
+    const routes = [
+        {
+            sx:"-10px",
+            mx:"-20px",
+            ex:"-42px",
+            sr:"-8deg",
+            mr:"-14deg",
+            er:"-22deg"
+        },
+        {
+            sx:"10px",
+            mx:"22px",
+            ex:"38px",
+            sr:"8deg",
+            mr:"14deg",
+            er:"22deg"
+        },
+        {
+            sx:"-2px",
+            mx:"-10px",
+            ex:"8px",
+            sr:"-3deg",
+            mr:"8deg",
+            er:"-8deg"
+        }
+    ];
+
+    routes.forEach(function(route){
+
+        const heart = document.createElement("span");
+
+        heart.className = "snapz-burst-heart";
+
+        heart.innerHTML = `
+            <svg
+                width="42"
+                height="42"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <path
+                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78Z"
+                    fill="#FF4081"
+                />
+            </svg>
+        `;
+
+        heart.style.setProperty("--sx", route.sx);
+        heart.style.setProperty("--mx", route.mx);
+        heart.style.setProperty("--ex", route.ex);
+
+        heart.style.setProperty("--sr", route.sr);
+        heart.style.setProperty("--mr", route.mr);
+        heart.style.setProperty("--er", route.er);
+
+        burst.appendChild(heart);
+    });
+
+    document.body.appendChild(burst);
+
+    setTimeout(function(){
+        burst.remove();
+    }, 1250);
+}
+
+
+/* ============================================================
+   REEL VIDEO DOUBLE TAP
+============================================================ */
+
+document.addEventListener("dblclick", function(e){
+
+    if (!e.target) return;
+
+    const video = e.target.closest(".reel video");
+
+    if (!video) return;
+
+    /* Buttons / action area par animation nahi */
+    if (
+        e.target.closest("button") ||
+        e.target.closest("a") ||
+        e.target.closest(".actions")
+    ){
+        return;
+    }
+
+    snapzShowThreeHeartBurst(e.clientX, e.clientY);
 });
 
 </script>

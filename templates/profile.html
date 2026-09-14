@@ -194,6 +194,11 @@ body{
     display: none;
     background: #000;
 }
+.cropper-view-box,
+.cropper-face{
+    border-radius:50%;
+}
+
 .crop-container img {
     max-width: 100%;
     display: block;
@@ -223,6 +228,15 @@ body{
 .profile-img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 2px solid #dbdbdb; cursor: pointer; }
  #crop-box-wrapper { display: none; width: 300px; margin-top: 10px; }
 #image-to-crop { max-width: 100%; }
+
+#crop-box-wrapper{
+    display:none;
+    width:100%;
+    max-height:300px;
+    overflow:hidden;
+    margin-top:10px;
+}
+
 
 /* Grid Layout for Posts/Reels */
 .grid-container {
@@ -302,32 +316,49 @@ body{
 {% endif %}
 </div>
 
+
+
 <!-- Buttons -->
 <div class="profile-buttons">
 
 {% if user and user[1] != session["username"] %}
 
-<button onclick="window.location.href='/chat/{{ user[1] }}'">
-Message
-</button>
+    <!-- OTHER USER PROFILE -->
 
-<button onclick="shareProfileLink()">
-Share Profile
+    <button onclick="window.location.href='/chat/{{ user[1] }}'">
+        Message
+    </button>
+
+<button
+    id="profile-follow-btn"
+    data-follow-username="{{ user[1]|trim }}"
+    onclick="toggleFollow(this, '{{ user[1]|trim }}')">
+
+    {% if is_following %}
+        Following
+    {% else %}
+        Follow
+    {% endif %}
+
 </button>
 
 {% else %}
 
-<button onclick="openEditModal()">
-Edit Profile
-</button>
+    <!-- MY OWN PROFILE -->
 
-<button onclick="shareProfileLink()">
-Share Profile
-</button>
+    <button onclick="openEditModal()">
+        Edit Profile
+    </button>
+
+    <button onclick="shareProfileLink()">
+        Share Profile
+    </button>
 
 {% endif %}
 
 </div>
+
+
 
     <!-- Tabs -->
     <div class="profile-tabs">
@@ -368,6 +399,23 @@ Share Profile
 </svg>
 
 </button>
+          <button onclick="showTab('tagged')">
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="28"
+     height="28"
+     viewBox="0 0 24 24"
+     fill="none"
+     stroke="currentColor"
+     stroke-width="2.8"
+     stroke-linecap="round"
+     stroke-linejoin="round">
+
+  <path d="M20 21a8 8 0 0 0-16 0"/>
+  <circle cx="12" cy="7" r="4"/>
+
+</svg>
+
+          </button>
     </div>
 
 </div>
@@ -378,9 +426,28 @@ Share Profile
         
         <h3 style="text-align: center;">Edit Profile</h3>
         
-        <form action="/update_profile" method="POST" enctype="multipart/form-data">
-            <label>Change Profile Photo:</label>
-            <input type="file" name="profile_pic" style="width: 100%; margin-bottom: 15px;">
+<form id="edit-profile-form" action="/update_profile" method="POST" enctype="multipart/form-data">
+<label>Change Profile Photo:</label>
+
+<input 
+type="file"
+id="profile-pic-input"
+name="profile_pic"
+accept="image/*"
+style="width:100%;margin-bottom:15px;">
+
+
+<div id="crop-box-wrapper">
+
+<img id="image-to-crop"
+style="max-width:100%;">
+</div>
+
+
+<input 
+type="hidden"
+name="cropped_image"
+id="cropped-image-data">
 
             <label>Name:</label>
             <input type="text" name="name" value="{{ session.get('name') }}" style="width: 100%; padding: 10px; margin-bottom: 15px; background: #222; color: white; border: 1px solid #444; border-radius: 5px;">
@@ -402,32 +469,110 @@ Share Profile
 
 
 
-<div style="position: absolute; top: 15px; right: 20px; z-index: 1000;">      
-<a href="/menu" style="text-decoration:none;color:white;font-size:24px;">
-☰
-</a>
-<a href="/settings"      
-style="color:white;text-decoration:none;font-size:14px;display:block;margin-bottom:10px;">      
-   
-</a>      <div id="logout-menu" style="display: none; background: #222; padding: 10px; border-radius: 5px; position: absolute; right: 0; margin-top: 5px;">      
-    <a href="/logout" style="color: white; text-decoration: none; font-size: 14px;"></a>      
+<div style="position: absolute; top: 15px; right: 20px; z-index: 10000;">
+
+{% if user and user[1] != session["username"] %}
+
+<!-- OTHER USER PROFILE MENU -->
+<button
+    type="button"
+    onclick="var m=document.getElementById('profile-user-menu'); if(m){m.style.display='block';m.style.visibility='visible';m.style.opacity='1';} return false;"
+    aria-label="Profile menu"
+    style="
+        background:none;
+        border:none;
+        color:white;
+        font-size:28px;
+        line-height:28px;
+        padding:0;
+        margin:0;
+        cursor:pointer;
+    "
+>☰</button>
+
+<div id="profile-user-menu"
+     style="
+        display:none;
+        position:absolute;
+        top:42px;
+        right:0;
+        width:150px;
+        min-height:90px;
+        background:#1b1b1b;
+        border:1px solid rgba(255,255,255,.20);
+        border-radius:10px;
+        padding:6px;
+        box-shadow:0 10px 30px rgba(0,0,0,.70);
+        z-index:999999;
+        visibility:visible;
+        opacity:1;
+     ">
+
+    <button
+        type="button"
+        onclick="blockProfileUser()"
+        style="
+            width:100%;
+            background:none;
+            border:none;
+            color:white;
+            text-align:left;
+            padding:11px 12px;
+            font-size:14px;
+            border-radius:7px;
+        "
+    >Block</button>
+
+    <button
+        type="button"
+        onclick="reportProfileUser()"
+        style="
+            width:100%;
+            background:none;
+            border:none;
+            color:#ff4d7d;
+            text-align:left;
+            padding:11px 12px;
+            font-size:14px;
+            border-radius:7px;
+        "
+    >Report</button>
+
 </div>
 
-</div>      
+{% else %}
+
+<!-- MY OWN PROFILE MENU -->
+<a href="/menu"
+   style="text-decoration:none;color:white;font-size:24px;">
+☰
+</a>
+
+<a href="/settings"
+   style="color:white;text-decoration:none;font-size:14px;display:block;margin-bottom:10px;">
+</a>
+
+<div id="logout-menu"
+     style="display: none; background: #222; padding: 10px; border-radius: 5px; position: absolute; right: 0; margin-top: 5px;">
+    <a href="/logout"
+       style="color: white; text-decoration: none; font-size: 14px;"></a>
+</div>
+
+{% endif %}
+
+</div>
 
 
 <div id="posts-tab" class="grid-container">
 {% for post in posts %}
 
 <img
-src="{{ post[2] }}"
-class="grid-item"
+    src="{{ post[2] }}"
+    class="grid-item"
+    alt="Post"
+    onclick="openPost('{{ post[0] }}'); return false;"
+>
 
-onclick="openPost(
-'{{post[0]}}',
-'{{post[2]}}',
-`{{post[3]}}`
-)">
 {% endfor %}
 </div>
 
@@ -452,6 +597,24 @@ onclick="openReel(
 
 
 
+
+<!-- ACCEPTED TAGGED POSTS -->
+<div id="tagged-tab" class="grid-container" style="display:none;">
+
+{% for post in tagged_posts %}
+
+<img
+    src="{{ post[2] }}"
+    class="grid-item"
+    alt="Tagged post"
+    onclick="openTaggedPost('{{ post[0] }}'); return false;"
+>
+
+{% endfor %}
+
+</div>
+
+
 <div id="popup"
 style="
 display:none;
@@ -461,30 +624,134 @@ left:0;
 width:100%;
 height:100%;
 background:black;
-z-index:99999;">
+z-index:99999;
+overflow:hidden;">
 
-<div style="
+<div id="profilePopupTopBar" style="
 position:absolute;
-top:15px;
-right:15px;">
+top:12px;
+left:0;
+right:0;
+height:44px;
+z-index:100000;
+padding:0;
+box-sizing:border-box;">
 
-<button onclick="togglePostMenu()">☰</button>
+<button
+id="profilePopupCloseBtn"
+onclick="document.getElementById('popup').style.display='none';"
+style="position:absolute;
+  left:0;
+  top:0;
+  width:44px;
+  height:44px;
+  background:rgba(0,0,0,.6);
+  border:none;
+  color:white;
+  font-size:32px;
+  border-radius:50%;
+  cursor:pointer;
+  line-height:40px;">
+×
+</button>
+
+<button
+id="profilePopupMenuBtn"
+onclick="togglePostMenu(event)"
+style="position:absolute;
+  right:12px;
+  top:0;
+  width:44px;
+  height:44px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(0,0,0,.6);
+  border:none;
+  color:white;
+  font-size:24px;
+  border-radius:50%;
+  cursor:pointer;">
+☰
+</button>
 
 <div id="menu"
 style="
 display:none;
-background:#222;
-padding:10px;">
+position:absolute;
+top:52px;
+right:12px;
+background:transparent;
+padding:0;
+border-radius:0;
+min-width:0;
+z-index:100001;">
 
-<button onclick="editCurrent()">Edit</button>
-<br><br>
-<button onclick="deleteCurrent()">Delete</button>
+<button
+onclick="editCurrent()"
+style="
+display:block;
+width:100%;
+background:none;
+border:none;
+color:white;
+padding:10px;
+text-align:left;
+font-size:16px;">
+Edit
+</button>
+
+<button
+onclick="hideCurrent()"
+style="
+display:block;
+width:100%;
+background:none;
+border:none;
+color:white;
+padding:10px;
+text-align:left;
+font-size:16px;">
+Hide
+</button>
+
+<button
+onclick="deleteCurrent()"
+style="
+display:block;
+width:100%;
+background:none;
+border:none;
+color:#ff4d6d;
+padding:10px;
+text-align:left;
+font-size:16px;">
+Delete
+</button>
 
 </div>
 
+
 </div>
 
-<div id="popup-content"></div>
+
+<div id="popup-content"
+style="
+width:100%;
+height:100%;
+display:flex;
+align-items:center;
+justify-content:center;
+flex-direction:column;
+box-sizing:border-box;
+padding:20px 0;
+overflow-y:auto;
+scroll-behavior:smooth;
+-webkit-overflow-scrolling:touch;
+scroll-snap-type:y mandatory;
+overscroll-behavior-y:contain;
+">
+</div>
 
 </div>
 
@@ -542,30 +809,37 @@ document.getElementById('edit-profile-form').addEventListener('submit', function
 
 function menuOpen(event){
     if(event) event.stopPropagation();
-    let m = document.getElementById("menu");
-    m.style.display = (m.style.display == "block") ? "none" : "block";
+    togglePostMenu(event);
 }
 
-document.addEventListener('click', function() {
-    document.getElementById("menu").style.display = "none";
+document.addEventListener("click", function(event){
+
+    const menu = document.getElementById("menu");
+    const button = event.target.closest(
+        'button[onclick^="togglePostMenu"]'
+    );
+
+    if(!menu){
+        return;
+    }
+
+    if(menu.contains(event.target)){
+        return;
+    }
+
+    if(button){
+        return;
+    }
+
+menu.style.display = "none";
+
+const menuButton = document.getElementById("profilePopupMenuBtn");
+if(menuButton){
+    menuButton.style.display = "flex";
+}
+
 });
 
-function showTab(tab) {
-    const pS = document.getElementById('posts-section');
-    const rS = document.getElementById('reels-section');
-    const pT = document.getElementById('post-tab');
-    const rT = document.getElementById('reel-tab');
-    
-    if(tab === 'posts') {
-        pS.style.display = 'grid'; rS.style.display = 'none';
-        pT.style.borderBottom = '2px solid white'; pT.style.color = 'white';
-        rT.style.borderBottom = 'none'; rT.style.color = '#8e8e8e';
-    } else {
-        pS.style.display = 'none'; rS.style.display = 'grid';
-        rT.style.borderBottom = '2px solid white'; rT.style.color = 'white';
-        pT.style.borderBottom = 'none'; pT.style.color = '#8e8e8e';
-    }
-}
 
 function openEditModal() {
         document.getElementById('edit-modal').style.display = 'block';
@@ -606,6 +880,149 @@ function previewImage(event) {
         // Yahan Cropper.js initialize karna padega
     };
     reader.readAsDataURL(event.target.files[0]);
+cropper = new Cropper(imageToCrop, {
+    aspectRatio: 1,
+    viewMode: 1,
+    background:false,
+    autoCropArea:1,
+    responsive:true
+});
+
+}
+
+function toggleProfileUserMenu(event) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
+    const menu = document.getElementById("profile-user-menu");
+
+    if (!menu) {
+        alert("Profile menu element not found");
+        return false;
+    }
+
+    menu.style.display = "block";
+    menu.style.visibility = "visible";
+    menu.style.opacity = "1";
+    menu.style.zIndex = "999999";
+
+    return false;
+}
+
+const snapzProfileTargetUsername =
+    {{ user[1]|tojson if user else '""' }};
+
+function blockProfileUser() {
+    if (!snapzProfileTargetUsername) return;
+
+    const oldPopup = document.getElementById("snapzBlockConfirmPopup");
+    if (oldPopup) oldPopup.remove();
+
+    const popup = document.createElement("div");
+    popup.id = "snapzBlockConfirmPopup";
+
+    popup.innerHTML = `
+        <div style="
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,.72);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            z-index:999999;
+            padding:20px;
+        ">
+            <div style="
+                width:min(360px,100%);
+                background:#181818;
+                border-radius:18px;
+                padding:24px 20px 18px;
+                box-sizing:border-box;
+                text-align:center;
+                box-shadow:0 12px 40px rgba(0,0,0,.5);
+            ">
+                <div style="
+                    font-size:20px;
+                    font-weight:700;
+                    color:#fff;
+                    margin-bottom:10px;
+                ">
+                    Confirm Block
+                </div>
+
+                <div style="
+                    font-size:15px;
+                    line-height:1.5;
+                    color:#bdbdbd;
+                    margin-bottom:22px;
+                ">
+                    Are you sure you want to block
+                    <strong style="color:#fff;">
+                        @${snapzProfileTargetUsername}
+                    </strong>?
+                </div>
+
+                <div style="
+                    display:flex;
+                    gap:10px;
+                ">
+                    <button
+                        type="button"
+                        id="snapzBlockCancelButton"
+                        style="
+                            flex:1;
+                            border:none;
+                            border-radius:12px;
+                            padding:12px;
+                            background:#303030;
+                            color:#fff;
+                            font-size:15px;
+                            font-weight:600;
+                        ">
+                        Cancel
+                    </button>
+
+                    <button
+                        type="button"
+                        id="snapzBlockConfirmButton"
+                        style="
+                            flex:1;
+                            border:none;
+                            border-radius:12px;
+                            padding:12px;
+                            background:#ff3d81;
+                            color:#fff;
+                            font-size:15px;
+                            font-weight:700;
+                        ">
+                        OK
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(popup);
+
+    document.getElementById("snapzBlockCancelButton").onclick = function() {
+        popup.remove();
+    };
+
+    document.getElementById("snapzBlockConfirmButton").onclick = function() {
+        window.location.href =
+            "/block/" + encodeURIComponent(snapzProfileTargetUsername);
+    };
+}
+
+
+function reportProfileUser() {
+    if (!snapzProfileTargetUsername) return;
+
+    window.location.href =
+        "/report_user/" +
+        encodeURIComponent(snapzProfileTargetUsername);
 }
 
 function toggleMenu() {
@@ -643,84 +1060,1782 @@ function shareProfileLink(){
 <script>
 function showTab(tab){
 
-    document.getElementById("posts-tab").style.display = "none";
-    document.getElementById("reels-tab").style.display = "none";
+    console.log("SNAPZ TAB CLICK:", tab);
 
-    document.getElementById(tab + "-tab").style.display = "grid";
-}
+    const tabs = ["posts", "reels", "tagged"];
 
+    tabs.forEach(function(name){
+        const element = document.getElementById(name + "-tab");
 
+        if(element){
+            element.style.display = "none";
+        }
+    });
 
-let currentId="";
+    const selected = document.getElementById(tab + "-tab");
 
-function openPost(id,file,caption){
+    if(selected){
 
-    currentId=id;
+        selected.style.display = "grid";
 
-    document.getElementById("popup-content").innerHTML=
-    `
-    <img src="/static/uploads/${file}"
-    style="width:100%;max-height:90vh;object-fit:contain;">
-    <p>${caption}</p>
-    `;
+        console.log("SNAPZ ACTIVE TAB:", selected.id);
+        console.log("SNAPZ DISPLAY:", selected.style.display);
+        console.log("SNAPZ HTML LENGTH:", selected.innerHTML.length);
+        console.log("SNAPZ CHILDREN:", selected.children.length);
 
-    document.getElementById("popup").style.display="block";
-}
+        if(tab === "tagged"){
+        }
 
-function openReel(id,file,caption){
+    } else {
 
-    currentId=id;
+        console.error("SNAPZ TAB NOT FOUND:", tab + "-tab");
 
-    document.getElementById("popup-content").innerHTML=
-    `
-    <video src="/static/uploads/${file}"
-    autoplay controls
-    style="width:100%;max-height:90vh;">
-    </video>
-    <p>${caption}</p>
-    `;
-
-    document.getElementById("popup").style.display="block";
-}
-
-function togglePostMenu(){
-
-    let m=document.getElementById("menu");
-
-    m.style.display=
-    m.style.display=="block" ? "none":"block";
-}
-
-document.getElementById("editBtn").onclick=function(){
-
-    let caption=prompt("New Caption");
-
-    if(caption){
-
-        fetch("/edit_post",{
-            method:"POST",
-            headers:{
-                "Content-Type":"application/json"
-            },
-            body:JSON.stringify({
-                id:currentId,
-                caption:caption
-            })
-        }).then(()=>location.reload());
+        alert("ERROR: " + tab + "-tab NOT FOUND");
     }
 }
 
-document.getElementById("deleteBtn").onclick=function(){
 
-    if(confirm("Delete this post?")){
 
-        fetch("/delete_post/"+currentId,{
-            method:"POST"
-        }).then(()=>location.reload());
+let currentId = "";
+
+
+/* ============================================================
+   SNAPZ PROFILE FEED
+   POST -> ONLY PROFILE POSTS
+   REEL -> ONLY PROFILE REELS
+============================================================ */
+
+let profileFeedType = "";
+let profileFeedIndex = 0;
+
+/* Profile data directly from Flask */
+const PROFILE_POSTS = {{ posts | map(attribute=0) | list | tojson }};
+const PROFILE_POST_DATA = [
+{% for post in posts %}
+    {
+        id: {{ post[0] | tojson }},
+        username: {{ post[1] | tojson }},
+        image: {{ post[2] | tojson }},
+        caption: {{ post[3] | tojson }}
+    },
+{% endfor %}
+];
+
+const PROFILE_REELS = [
+{% for reel in reels %}
+    {
+        id: {{ reel[0] | tojson }},
+        username: {{ reel[1] | tojson }},
+        video: {{ reel[2] | tojson }},
+        caption: {{ reel[3] | tojson }}
+    },
+{% endfor %}
+];
+
+
+/* ============================================================
+   URL HELPER
+============================================================ */
+
+function profileMediaUrl(file){
+
+    if(!file){
+        return "";
     }
+
+    if(
+        file.startsWith("http://") ||
+        file.startsWith("https://") ||
+        file.startsWith("/")
+    ){
+        return file;
+    }
+
+    return "/static/uploads/" + file;
+}
+
+
+/* ============================================================
+   RENDER POST
+============================================================ */
+
+function renderProfilePost(index){
+
+    if(index < 0 || index >= PROFILE_POST_DATA.length){
+        return;
+    }
+
+    profileFeedIndex = index;
+
+    const post = PROFILE_POST_DATA[index];
+
+    currentId = post.id;
+
+    const imageUrl = profileMediaUrl(post.image);
+
+    document.getElementById("popup-content").innerHTML = `
+
+        <div class="snapz-profile-feed-item"
+             data-feed-index="${index}"
+             style="
+                width:100%;
+                min-height:100%;
+                display:flex;
+                flex-direction:column;
+                justify-content:flex-start;
+                align-items:center;
+                box-sizing:border-box;
+                padding-top:25px;
+                padding-bottom:40px;
+                scroll-snap-align:start;
+                scroll-snap-stop:always;
+             ">
+
+            <div style="
+                width:100%;
+                display:flex;
+                justify-content:center;
+                align-items:center;
+                flex-shrink:0;
+            ">
+
+                <img
+                    src="${imageUrl}"
+                    style="
+                        display:block;
+                        max-width:100%;
+                        max-height:75vh;
+                        width:auto;
+                        height:auto;
+                        object-fit:contain;
+                        margin:auto;
+                    "
+                >
+
+            </div>
+
+
+            <div style="
+                width:100%;
+                box-sizing:border-box;
+                padding:12px 15px 20px;
+                color:white;
+            ">
+
+                <div style="
+                    display:flex;
+                    align-items:center;
+                    gap:28px;
+                    margin-bottom:10px;
+                ">
+
+                    <!-- LIKE -->
+                    <button
+                        onclick="profileLike(this, '${post.id}')"
+                        style="
+                            background:none;
+                            border:none;
+                            color:white;
+                            display:flex;
+                            align-items:center;
+                            gap:6px;
+                            font-size:16px;
+                            padding:0;
+                            cursor:pointer;
+                        "
+                    >
+
+                        <svg
+                            width="28"
+                            height="28"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+
+                            <path
+                                d="M20.84 4.61C20.33 4.1 19.72 3.69 19.05 3.42
+                                   C18.39 3.14 17.67 3 16.95 3.01
+                                   C16.23 3.02 15.51 3.17 14.85 3.46
+                                   C14.19 3.74 13.59 4.16 13.09 4.68
+                                   L12 5.75L10.91 4.68
+                                   C10.41 4.16 9.81 3.74 9.15 3.46
+                                   C8.49 3.17 7.77 3.02 7.05 3.01
+                                   C6.33 3 5.61 3.14 4.95 3.42
+                                   C4.28 3.69 3.67 4.1 3.16 4.61
+                                   C1.04 6.73 1.04 10.17 3.16 12.29
+                                   L12 21L20.84 12.29
+                                   C22.96 10.17 22.96 6.73 20.84 4.61Z"
+                                stroke="#FF4081"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
+
+                        </svg>
+
+                        <span class="profile-like-count">0</span>
+
+                    </button>
+
+
+                    <!-- COMMENT -->
+                    <button
+                        onclick="profileComment('${post.id}')"
+                        style="
+                            background:none;
+                            border:none;
+                            color:white;
+                            display:flex;
+                            align-items:center;
+                            justify-content:center;
+                            gap:6px;
+                            padding:0;
+                            cursor:pointer;
+                        "
+                    >
+
+                        <svg
+                            width="28"
+                            height="28"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+
+                            <path
+                                d="M21 11.5C21 16.194 17.194 20 12.5 20H7L3 22V11.5C3 6.806 6.806 3 11.5 3H12.5C17.194 3 21 6.806 21 11.5Z"
+                                stroke="#FF4081"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
+
+                        </svg>
+
+                        <span class="profile-comment-count">0</span>
+
+                    </button>
+
+
+                    <!-- SHARE -->
+                    <button
+                        onclick="profileShare('${post.id}')"
+                        style="
+                            background:none;
+                            border:none;
+                            color:white;
+                            display:flex;
+                            align-items:center;
+                            justify-content:center;
+                            gap:6px;
+                            padding:0;
+                            cursor:pointer;
+                        "
+                    >
+
+                        <svg
+                            width="28"
+                            height="28"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+
+                            <path
+                                d="M22 2L11 13"
+                                stroke="#FF4081"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
+
+                            <path
+                                d="M22 2L15 22L11 13L2 9L22 2Z"
+                                stroke="#FF4081"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
+
+                        </svg>
+
+                        <span class="profile-share-count">0</span>
+
+                    </button>
+
+                </div>
+
+
+                <div style="
+                    font-size:17px;
+                    line-height:1.4;
+                    word-break:break-word;
+                ">
+                    ${post.caption || ""}
+                </div>
+
+            </div>
+
+        </div>
+    `;
+
+    loadProfilePostCounts(post.id);
+}
+
+
+/* ============================================================
+   RENDER REEL
+============================================================ */
+
+function renderProfileReel(index){
+
+    if(index < 0 || index >= PROFILE_REELS.length){
+        return;
+    }
+
+    profileFeedIndex = index;
+
+    const reel = PROFILE_REELS[index];
+
+    currentId = reel.id;
+
+    const videoUrl = profileMediaUrl(reel.video);
+
+    document.getElementById("popup-content").innerHTML = `
+
+        <div class="snapz-profile-feed-item"
+             data-feed-index="${index}"
+             style="
+                width:100%;
+                min-height:100%;
+                display:flex;
+                flex-direction:column;
+                justify-content:flex-start;
+                align-items:center;
+                box-sizing:border-box;
+                padding-top:15px;
+                padding-bottom:40px;
+                scroll-snap-align:start;
+                scroll-snap-stop:always;
+             ">
+
+            <video
+                src="${videoUrl}"
+                autoplay
+                controls
+                playsinline
+                style="
+                    display:block;
+                    width:100%;
+                    max-width:100%;
+                    max-height:78vh;
+                    object-fit:contain;
+                    background:black;
+                "
+            ></video>
+
+
+            <div style="
+                width:100%;
+                box-sizing:border-box;
+                padding:12px 15px 20px;
+                color:white;
+            ">
+
+                <div style="
+                    font-size:17px;
+                    line-height:1.4;
+                    word-break:break-word;
+                ">
+                    ${reel.caption || ""}
+                </div>
+
+            </div>
+
+        </div>
+    `;
+}
+
+
+/* ============================================================
+   OPEN POST
+   ONLY POSTS ARE USED
+============================================================ */
+
+function openPost(id){
+
+    const popup = document.getElementById("popup");
+    const content = document.getElementById("popup-content");
+
+    if(!popup || !content){
+        console.log("SNAPZ: popup not found");
+        return false;
+    }
+
+    const post = PROFILE_POST_DATA.find(
+        p => String(p.id) === String(id)
+    );
+
+    if(!post){
+        console.log("SNAPZ: post not found:", id);
+        return false;
+    }
+
+    profileFeedType = "post";
+    currentId = post.id;
+
+    const imageUrl = profileMediaUrl(post.image);
+
+    content.innerHTML = `
+
+        <div
+            style="
+                width:100%;
+                height:100%;
+                background:#000;
+                display:flex;
+                flex-direction:column;
+                position:relative;
+                box-sizing:border-box;
+            "
+        >
+
+            <!-- PHOTO -->
+            <div
+                style="
+                    flex:1;
+                    width:100%;
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                    overflow:hidden;
+                "
+            >
+
+                <img
+                    src="${imageUrl}"
+                    style="
+                        display:block;
+                        max-width:100%;
+                        max-height:78vh;
+                        width:auto;
+                        height:auto;
+                        object-fit:contain;
+                        user-select:none;
+                        -webkit-user-drag:none;
+                    "
+                >
+
+            </div>
+
+
+            <!-- BOTTOM AREA -->
+            <div
+                style="
+                    width:100%;
+                    padding:12px 15px 25px;
+                    box-sizing:border-box;
+                    color:white;
+                    background:#000;
+                "
+            >
+
+                <!-- ACTION BUTTONS -->
+
+                <div
+                    style="
+                        display:flex;
+                        align-items:center;
+                        gap:28px;
+                        margin-bottom:12px;
+                    "
+                >
+
+                    <!-- LIKE -->
+
+                    <button
+                        onclick="profileLike(this, '${post.id}'); event.stopPropagation();"
+                        style="
+                            background:none;
+                            border:0;
+                            padding:0;
+                            color:white;
+                            display:flex;
+                            align-items:center;
+                            gap:6px;
+                            cursor:pointer;
+                        "
+                    >
+
+                        <svg
+                            width="28"
+                            height="28"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M20.84 4.61C20.33 4.1 19.72 3.69 19.05 3.42
+                                C18.39 3.14 17.67 3 16.95 3.01
+                                C16.23 3.02 15.51 3.17 14.85 3.46
+                                C14.19 3.74 13.59 4.16 13.09 4.68
+                                L12 5.75L10.91 4.68
+                                C10.41 4.16 9.81 3.74 9.15 3.46
+                                C8.49 3.17 7.77 3.02 7.05 3.01
+                                C6.33 3 5.61 3.14 4.95 3.42
+                                C4.28 3.69 3.67 4.1 3.16 4.61
+                                C1.04 6.73 1.04 10.17 3.16 12.29
+                                L12 21L20.84 12.29
+                                C22.96 10.17 22.96 6.73 20.84 4.61Z"
+                                stroke="#FF4081"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
+                        </svg>
+
+                        <span class="profile-like-count">0</span>
+
+                    </button>
+
+
+                    <!-- COMMENT -->
+
+                    <button
+                        onclick="profileComment('${post.id}'); event.stopPropagation();"
+                        style="
+                            background:none;
+                            border:0;
+                            padding:0;
+                            color:white;
+                            display:flex;
+                            align-items:center;
+                            gap:6px;
+                            cursor:pointer;
+                        "
+                    >
+
+                        <svg
+                            width="28"
+                            height="28"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M21 11.5C21 16.194 17.194 20 12.5 20H7L3 22V11.5
+                                C3 6.806 6.806 3 11.5 3H12.5
+                                C17.194 3 21 6.806 21 11.5Z"
+                                stroke="#FF4081"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
+                        </svg>
+
+                        <span class="profile-comment-count">0</span>
+
+                    </button>
+
+
+                    <!-- SHARE -->
+
+                    <button
+                        onclick="profileShare('${post.id}'); event.stopPropagation();"
+                        style="
+                            background:none;
+                            border:0;
+                            padding:0;
+                            color:white;
+                            display:flex;
+                            align-items:center;
+                            gap:6px;
+                            cursor:pointer;
+                        "
+                    >
+
+                        <svg
+                            width="28"
+                            height="28"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+
+                            <path
+                                d="M22 2L11 13"
+                                stroke="#FF4081"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
+
+                            <path
+                                d="M22 2L15 22L11 13L2 9L22 2Z"
+                                stroke="#FF4081"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
+
+                        </svg>
+
+                        <span class="profile-share-count">0</span>
+
+                    </button>
+
+                </div>
+
+
+                <!-- CAPTION -->
+
+                <div
+                    style="
+                        font-size:17px;
+                        line-height:1.4;
+                        word-break:break-word;
+                    "
+                >
+                    ${post.caption || ""}
+                </div>
+
+            </div>
+
+        </div>
+    `;
+
+    popup.style.display = "block";
+
+    return false;
+}
+
+
+/* ============================================================
+   TAGGED POST OPENER
+============================================================ */
+
+function openTaggedPost(id){
+
+    /*
+       Tagged post ko PROFILE_POST_DATA mein find karo.
+       Agar available hai to normal viewer use karo.
+    */
+
+    const tagged = {{ tagged_posts | map(attribute=0) | list | tojson }};
+
+    if(tagged.includes(Number(id)) || tagged.includes(String(id))){
+
+        openPost(id);
+
+        return false;
+    }
+
+    /*
+       Tagged post current profile posts mein na ho
+       to direct database-loaded data se viewer banega.
+    */
+
+    const popup = document.getElementById("popup");
+    const content = document.getElementById("popup-content");
+
+    if(!popup || !content){
+        return false;
+    }
+
+    content.innerHTML = `
+        <div
+            style="
+                width:100%;
+                height:100%;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                background:#000;
+                color:white;
+                font-size:16px;
+            "
+        >
+            Loading post...
+        </div>
+    `;
+
+    popup.style.display = "block";
+
+    fetch("/post/${id}")
+        .then(r => r.json())
+        .then(data => {
+
+            if(data.image){
+
+                const imageUrl = profileMediaUrl(data.image);
+
+                content.innerHTML = `
+                    <div
+                        style="
+                            width:100%;
+                            height:100%;
+                            background:#000;
+                            display:flex;
+                            align-items:center;
+                            justify-content:center;
+                        "
+                    >
+                        <img
+                            src="${imageUrl}"
+                            style="
+                                max-width:100%;
+                                max-height:90vh;
+                                object-fit:contain;
+                            "
+                        >
+                    </div>
+                `;
+
+            }
+
+        })
+        .catch(() => {
+
+            content.innerHTML = `
+                <div
+                    style="
+                        color:white;
+                        display:flex;
+                        align-items:center;
+                        justify-content:center;
+                        height:100%;
+                    "
+                >
+                    Unable to open post
+                </div>
+            `;
+
+        });
+
+    return false;
+}
+
+
+function openReel(id, file, caption){
+
+    profileFeedType = "reel";
+
+    const popup = document.getElementById("popup");
+    const content = document.getElementById("popup-content");
+
+    if(!popup || !content){
+        return;
+    }
+
+    popup.style.display = "block";
+
+    /*
+       IMPORTANT:
+       All profile REELS are loaded vertically.
+       Posts are NOT included.
+    */
+    content.innerHTML = "";
+
+    PROFILE_REELS.forEach(function(reel, index){
+
+        const videoUrl = profileMediaUrl(reel.video);
+
+        content.insertAdjacentHTML("beforeend", `
+
+            <div class="snapz-profile-feed-item"
+                 data-feed-type="reel"
+                 data-feed-index="${index}"
+                 data-reel-id="${reel.id}"
+                 style="
+                    width:100%;
+                    min-height:100%;
+                    box-sizing:border-box;
+                    scroll-snap-align:start;
+                    scroll-snap-stop:always;
+                    display:flex;
+                    flex-direction:column;
+                    justify-content:flex-start;
+                    align-items:center;
+                    padding-top:15px;
+                    padding-bottom:40px;
+                 ">
+
+                <video
+                    src="${videoUrl}"
+                    autoplay
+                    controls
+                    playsinline
+                    loop
+                    style="
+                        display:block;
+                        width:100%;
+                        max-width:100%;
+                        max-height:78vh;
+                        object-fit:contain;
+                        background:black;
+                    "
+                ></video>
+
+                <div style="
+                    width:100%;
+                    box-sizing:border-box;
+                    padding:12px 15px 20px;
+                    color:white;
+                ">
+
+                    <div style="
+                        font-size:17px;
+                        line-height:1.4;
+                        word-break:break-word;
+                    ">
+                        ${reel.caption || ""}
+                    </div>
+
+                </div>
+
+            </div>
+        `);
+
+    });
+
+    const index = PROFILE_REELS.findIndex(
+        r => String(r.id) === String(id)
+    );
+
+    profileFeedIndex = index >= 0 ? index : 0;
+    currentId =
+        PROFILE_REELS[profileFeedIndex]?.id || id;
+
+    requestAnimationFrame(function(){
+
+        const items =
+            content.querySelectorAll(
+                '.snapz-profile-feed-item[data-feed-type="reel"]'
+            );
+
+        if(items[profileFeedIndex]){
+
+            items[profileFeedIndex].scrollIntoView({
+                behavior:"auto",
+                block:"start"
+            });
+
+        }
+
+    });
+
+}
+
+
+/* ============================================================
+   LOAD NEXT PROFILE ITEM
+============================================================ */
+
+function loadNextProfileItem(){
+
+    if(profileFeedType === "post"){
+
+        if(profileFeedIndex + 1 < PROFILE_POST_DATA.length){
+
+            profileFeedIndex++;
+
+            renderProfilePost(profileFeedIndex);
+
+            document.getElementById("popup-content").scrollTop = 0;
+        }
+
+    }
+
+
+    else if(profileFeedType === "reel"){
+
+        if(profileFeedIndex + 1 < PROFILE_REELS.length){
+
+            profileFeedIndex++;
+
+            renderProfileReel(profileFeedIndex);
+
+            document.getElementById("popup-content").scrollTop = 0;
+        }
+
+    }
+
+}
+
+
+/* ============================================================
+   TOUCH SWIPE / DOWN SCROLL
+============================================================ */
+
+let profileTouchStartY = 0;
+let profileTouchEndY = 0;
+
+document.addEventListener("touchstart", function(e){
+
+    const popup = document.getElementById("popup");
+
+    if(!popup || popup.style.display !== "block"){
+        return;
+    }
+
+    if(!e.touches || !e.touches.length){
+        return;
+    }
+
+    profileTouchStartY = e.touches[0].clientY;
+
+}, {passive:true});
+
+
+document.addEventListener("touchend", function(e){
+
+    const popup = document.getElementById("popup");
+
+    if(!popup || popup.style.display !== "block"){
+        return;
+    }
+
+    if(!e.changedTouches || !e.changedTouches.length){
+        return;
+    }
+
+    profileTouchEndY = e.changedTouches[0].clientY;
+
+    const distance =
+        profileTouchStartY - profileTouchEndY;
+
+    /*
+       Swipe UP = user is moving to the next item.
+    */
+if(distance > 50){
+    loadNextProfileItem();
+}
+
+}, {passive:true});
+
+
+/* ============================================================
+   MOUSE WHEEL SUPPORT
+============================================================ */
+
+document.addEventListener("wheel", function(e){
+
+    const popup = document.getElementById("popup");
+
+    if(!popup || popup.style.display !== "block"){
+        return;
+    }
+
+    if(e.deltaY > 50){
+
+        loadNextProfileItem();
+
+    }
+
+}, {passive:true});
+
+
+
+function togglePostMenu(event){
+
+    if(event){
+        event.stopPropagation();
+    }
+
+    const menu = document.getElementById("menu");
+    const menuButton = document.getElementById("profilePopupMenuBtn");
+
+    if(!menu || !menuButton){
+        console.error("PROFILE MENU ELEMENT NOT FOUND");
+        return;
+    }
+
+    if(menu.style.display === "block"){
+
+        menu.style.display = "none";
+        menuButton.style.display = "flex";
+
+    }else{
+
+        menu.style.display = "block";
+        menuButton.style.display = "none";
+
+    }
+}
+
+
+async function toggleProfileFollow(button, username) {
+
+    const oldText = button.innerText;
+
+    button.disabled = true;
+
+    try {
+
+        const response = await fetch(
+            "/follow/" + encodeURIComponent(username),
+            {
+                method: "POST"
+            }
+        );
+
+        const data = await response.json();
+
+        if (data.status === "followed") {
+
+            button.innerText = "Following";
+
+        } else if (data.status === "unfollowed") {
+
+            button.innerText = "Follow";
+
+        } else {
+
+            button.innerText = oldText;
+
+            alert(data.message || "Something went wrong");
+
+        }
+
+    } catch (error) {
+
+        console.error(error);
+
+        button.innerText = oldText;
+
+    }
+
+    button.disabled = false;
+}
+
+
+function toggleFollow(btn, username) {
+
+    const isFollowing =
+        btn.innerText.trim() === "Following";
+
+    const url = isFollowing
+        ? "/unfollow/" + encodeURIComponent(username)
+        : "/follow/" + encodeURIComponent(username);
+
+    btn.disabled = true;
+
+    fetch(url, {
+        method: "POST"
+    })
+    .then(res => res.json())
+    .then(data => {
+
+        if (data.status === "followed") {
+
+            btn.innerText = "Following";
+            btn.style.background = "#333";
+            btn.style.color = "#888";
+
+        } else if (data.status === "unfollowed") {
+
+            btn.innerText = "Follow";
+            btn.style.background = "#0095f6";
+            btn.style.color = "#fff";
+
+        }
+
+    })
+    .catch(error => {
+        console.error("Follow error:", error);
+    })
+    .finally(() => {
+        btn.disabled = false;
+    });
+}
+
+
+async function loadProfilePostCounts(postId){
+
+    try{
+
+        const response =
+            await fetch("/post_counts/" + postId);
+
+        const data =
+            await response.json();
+
+        const popupContent =
+            document.getElementById("popup-content");
+
+        const likeEl =
+            popupContent
+                ? popupContent.querySelector(".profile-like-count")
+                : null;
+
+        const commentEl =
+            popupContent
+                ? popupContent.querySelector(".profile-comment-count")
+                : null;
+
+        const shareEl =
+            popupContent
+                ? popupContent.querySelector(".profile-share-count")
+                : null;
+
+        if(likeEl){
+            likeEl.innerText = data.likes;
+        }
+
+        if(commentEl){
+            commentEl.innerText = data.comments;
+        }
+
+        if(shareEl){
+            shareEl.innerText = data.shares;
+        }
+
+    }catch(error){
+
+        console.error(
+            "PROFILE COUNT ERROR:",
+            error
+        );
+
+    }
+
+}
+
+
+</script>
+
+<script>
+function editCurrent(){
+
+    const id = currentId;
+
+    if(!id){
+        alert("No post or reel selected");
+        return;
+    }
+
+    const type = profileFeedType;
+
+    openEditCaptionModal(id, type);
+    return;
+
+    const url =
+        type === "reel"
+        ? "/edit_reel"
+        : "/edit_post";
+
+    fetch(url, {
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+            id:id,
+            caption:newCaption
+        })
+    })
+    .then(response => response.json().catch(() => ({})))
+    .then(data => {
+
+        if(data.status === "error"){
+            alert(data.message || "Edit failed");
+            return;
+        }
+
+        document.getElementById("menu").style.display="none";
+
+        location.reload();
+
+    })
+    .catch(error => {
+
+        console.error("EDIT ERROR:", error);
+        alert("Something went wrong");
+
+    });
+}
+
+
+function hideCurrent(){
+
+    const id = currentId;
+
+    if(!id){
+        alert("No post or reel selected");
+        return;
+    }
+
+    const type = profileFeedType;
+
+    const mediaName =
+        type === "reel"
+        ? "Reel"
+        : "Post";
+
+    openHideConfirm(id, type, mediaName);
+    return;
+
+    const url =
+        type === "reel"
+        ? "/hide_reel/" + id
+        : "/hide_post/" + id;
+
+    fetch(url, {
+        method:"POST"
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        if(data.status !== "hidden"){
+            alert(data.message || "Unable to hide");
+            return;
+        }
+
+        document.getElementById("menu").style.display="none";
+
+        location.reload();
+
+    })
+    .catch(error => {
+
+        console.error("HIDE ERROR:", error);
+        alert("Something went wrong");
+
+    });
+}
+
+
+function deleteCurrent(){
+
+    const id = currentId;
+
+    if(!id){
+        alert("No post or reel selected");
+        return;
+    }
+
+    const type = profileFeedType;
+
+    const mediaName =
+        type === "reel"
+        ? "Reel"
+        : "Post";
+
+    openDeleteConfirm(id, type, mediaName);
+    return;
+
+    const url =
+        type === "reel"
+        ? "/delete_reel/" + id
+        : "/delete_post/" + id;
+
+    fetch(url, {
+        method:"POST"
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        if(data.status !== "deleted"){
+            alert(data.message || "Delete failed");
+            return;
+        }
+
+        document.getElementById("menu").style.display="none";
+
+        location.reload();
+
+    })
+    .catch(error => {
+
+        console.error("DELETE ERROR:", error);
+        alert("Something went wrong");
+
+    });
 }
 </script>
 
+
+
+<!-- CUSTOM DELETE CONFIRMATION -->
+<div id="deleteConfirmModal"
+     style="
+        display:none;
+        position:fixed;
+        inset:0;
+        z-index:999999999;
+        background:rgba(0,0,0,.65);
+        align-items:center;
+        justify-content:center;
+     ">
+
+    <div style="
+        width:290px;
+        max-width:85%;
+        background:#222;
+        border-radius:14px;
+        padding:20px;
+        box-sizing:border-box;
+        text-align:center;
+        color:white;
+        box-shadow:0 8px 30px rgba(0,0,0,.6);
+    ">
+
+        <div id="deleteConfirmTitle"
+             style="
+                font-size:18px;
+                font-weight:600;
+                margin-bottom:10px;
+             ">
+            Permanently Delete?
+        </div>
+
+        <div style="
+            font-size:14px;
+            color:#aaa;
+            margin-bottom:20px;
+        ">
+            This cannot be undone.
+        </div>
+
+        <div style="
+            display:flex;
+            gap:10px;
+        ">
+
+            <button
+                type="button"
+                onclick="closeDeleteConfirm()"
+                style="
+                    flex:1;
+                    padding:10px;
+                    border:0;
+                    border-radius:8px;
+                    background:#444;
+                    color:white;
+                    font-size:15px;
+                    cursor:pointer;
+                ">
+                Cancel
+            </button>
+
+            <button
+                type="button"
+                onclick="confirmDeleteCurrent()"
+                style="
+                    flex:1;
+                    padding:10px;
+                    border:0;
+                    border-radius:8px;
+                    background:#ff3040;
+                    color:white;
+                    font-size:15px;
+                    font-weight:600;
+                    cursor:pointer;
+                ">
+                OK
+            </button>
+
+        </div>
+    </div>
+</div>
+
+<script>
+
+let pendingDeleteId = null;
+let pendingDeleteType = null;
+
+function openDeleteConfirm(id, type, mediaName){
+
+    pendingDeleteId = id;
+    pendingDeleteType = type;
+
+    const title =
+        document.getElementById("deleteConfirmTitle");
+
+    if(title){
+        title.innerText =
+            "Delete " + mediaName + " permanently?";
+    }
+
+    const modal =
+        document.getElementById("deleteConfirmModal");
+
+    if(modal){
+        modal.style.display = "flex";
+    }
+
+    const menu =
+        document.getElementById("menu");
+
+    if(menu){
+        menu.style.display = "none";
+    }
+
+    const menuButton =
+        document.getElementById("profilePopupMenuBtn");
+
+    if(menuButton){
+        menuButton.style.display = "flex";
+    }
+}
+
+function closeDeleteConfirm(){
+
+    pendingDeleteId = null;
+    pendingDeleteType = null;
+
+    const modal =
+        document.getElementById("deleteConfirmModal");
+
+    if(modal){
+        modal.style.display = "none";
+    }
+}
+
+function confirmDeleteCurrent(){
+
+    const id = pendingDeleteId;
+    const type = pendingDeleteType;
+
+    if(!id){
+        closeDeleteConfirm();
+        return;
+    }
+
+    const url =
+        type === "reel"
+        ? "/delete_reel/" + id
+        : "/delete_post/" + id;
+
+    const modal =
+        document.getElementById("deleteConfirmModal");
+
+    fetch(url, {
+        method:"POST"
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        if(data.status !== "deleted"){
+            alert(data.message || "Delete failed");
+            return;
+        }
+
+        if(modal){
+            modal.style.display = "none";
+        }
+
+        pendingDeleteId = null;
+        pendingDeleteType = null;
+
+        location.reload();
+
+    })
+    .catch(error => {
+
+        console.error("DELETE ERROR:", error);
+        alert("Something went wrong");
+
+    });
+}
+
+</script>
+
+
+<!-- CUSTOM EDIT CAPTION MODAL -->
+<div id="editCaptionModal" style="
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:999999998;
+    background:rgba(0,0,0,.65);
+    align-items:center;
+    justify-content:center;
+">
+    <div style="
+        width:300px;
+        max-width:85%;
+        background:#222;
+        border-radius:14px;
+        padding:20px;
+        box-sizing:border-box;
+        color:white;
+    ">
+
+        <div style="
+            font-size:18px;
+            font-weight:600;
+            margin-bottom:14px;
+            text-align:center;
+        ">
+            Edit Caption
+        </div>
+
+        <textarea id="editCaptionInput"
+            style="
+                width:100%;
+                min-height:90px;
+                box-sizing:border-box;
+                resize:none;
+                border:0;
+                outline:none;
+                border-radius:8px;
+                padding:10px;
+                background:#333;
+                color:white;
+                font-size:15px;
+            "
+            placeholder="Write caption..."></textarea>
+
+        <div style="
+            display:flex;
+            gap:10px;
+            margin-top:14px;
+        ">
+            <button type="button"
+                onclick="closeEditCaptionModal()"
+                style="
+                    flex:1;
+                    padding:10px;
+                    border:0;
+                    border-radius:8px;
+                    background:#444;
+                    color:white;
+                    font-size:15px;
+                ">
+                Cancel
+            </button>
+
+            <button type="button"
+                onclick="saveEditCaption()"
+                style="
+                    flex:1;
+                    padding:10px;
+                    border:0;
+                    border-radius:8px;
+                    background:#0095f6;
+                    color:white;
+                    font-size:15px;
+                    font-weight:600;
+                ">
+                Save
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<!-- CUSTOM HIDE CONFIRMATION -->
+<div id="hideConfirmModal" style="
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:999999997;
+    background:rgba(0,0,0,.65);
+    align-items:center;
+    justify-content:center;
+">
+    <div style="
+        width:280px;
+        max-width:85%;
+        background:#222;
+        border-radius:14px;
+        padding:20px;
+        box-sizing:border-box;
+        text-align:center;
+        color:white;
+    ">
+
+        <div id="hideConfirmTitle" style="
+            font-size:18px;
+            font-weight:600;
+            margin-bottom:8px;
+        ">
+            Hide Post?
+        </div>
+
+        <div style="
+            font-size:14px;
+            color:#aaa;
+            margin-bottom:18px;
+        ">
+            It will be hidden but not deleted.
+        </div>
+
+        <div style="
+            display:flex;
+            gap:10px;
+        ">
+            <button type="button"
+                onclick="closeHideConfirm()"
+                style="
+                    flex:1;
+                    padding:10px;
+                    border:0;
+                    border-radius:8px;
+                    background:#444;
+                    color:white;
+                    font-size:15px;
+                ">
+                Cancel
+            </button>
+
+            <button type="button"
+                onclick="confirmHideCurrent()"
+                style="
+                    flex:1;
+                    padding:10px;
+                    border:0;
+                    border-radius:8px;
+                    background:#0095f6;
+                    color:white;
+                    font-size:15px;
+                ">
+                OK
+            </button>
+        </div>
+
+    </div>
+</div>
+
+<script>
+
+let pendingEditId = null;
+let pendingEditType = null;
+
+function openEditCaptionModal(id, type){
+
+    pendingEditId = id;
+    pendingEditType = type;
+
+    document.getElementById("editCaptionInput").value = "";
+
+    document.getElementById("editCaptionModal").style.display = "flex";
+
+    const menu = document.getElementById("menu");
+    if(menu){
+        menu.style.display = "none";
+    }
+}
+
+function closeEditCaptionModal(){
+
+    pendingEditId = null;
+    pendingEditType = null;
+
+    document.getElementById("editCaptionModal").style.display = "none";
+}
+
+function saveEditCaption(){
+
+    const id = pendingEditId;
+    const type = pendingEditType;
+
+    if(!id){
+        closeEditCaptionModal();
+        return;
+    }
+
+    const newCaption =
+        document.getElementById("editCaptionInput").value;
+
+    const url =
+        type === "reel"
+        ? "/edit_reel"
+        : "/edit_post";
+
+    fetch(url, {
+        method:"POST",
+        headers:{
+            "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+            id:id,
+            caption:newCaption
+        })
+    })
+    .then(response => response.json().catch(() => ({})))
+    .then(data => {
+
+        if(data.status === "error"){
+            alert(data.message || "Edit failed");
+            return;
+        }
+
+        closeEditCaptionModal();
+
+        location.reload();
+
+    })
+    .catch(error => {
+
+        console.error("EDIT ERROR:", error);
+        alert("Something went wrong");
+
+    });
+}
+
+
+let pendingHideId = null;
+let pendingHideType = null;
+
+function openHideConfirm(id, type, mediaName){
+
+    pendingHideId = id;
+    pendingHideType = type;
+
+    document.getElementById("hideConfirmTitle").innerText =
+        "Hide " + mediaName + "?";
+
+    document.getElementById("hideConfirmModal").style.display = "flex";
+}
+
+function closeHideConfirm(){
+
+    pendingHideId = null;
+    pendingHideType = null;
+
+    document.getElementById("hideConfirmModal").style.display = "none";
+}
+
+function confirmHideCurrent(){
+
+    const id = pendingHideId;
+    const type = pendingHideType;
+
+    if(!id){
+        closeHideConfirm();
+        return;
+    }
+
+    const url =
+        type === "reel"
+        ? "/hide_reel/" + id
+        : "/hide_post/" + id;
+
+    fetch(url, {
+        method:"POST"
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        if(data.status !== "hidden"){
+            alert(data.message || "Unable to hide");
+            return;
+        }
+
+        closeHideConfirm();
+
+        location.reload();
+
+    })
+    .catch(error => {
+
+        console.error("HIDE ERROR:", error);
+        alert("Something went wrong");
+
+    });
+}
+
+</script>
 
 
 </body>

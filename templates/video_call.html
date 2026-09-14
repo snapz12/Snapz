@@ -1,203 +1,943 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Video Call</title>
+    <title>Snapz Video Call</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 
+    <style>
+        *{
+            box-sizing:border-box;
+        }
+
+        html,body{
+            margin:0;
+            width:100%;
+            height:100%;
+            overflow:hidden;
+            background:#000;
+            color:#fff;
+            font-family:Arial,sans-serif;
+        }
+
+        .call-screen{
+            position:relative;
+            width:100%;
+            height:100%;
+            background:#000;
+        }
+
+        #remoteVideo{
+            position:absolute;
+            inset:0;
+            width:100%;
+            height:100%;
+            object-fit:cover;
+            background:#111;
+        }
+
+        #localVideo{
+            position:absolute;
+            top:18px;
+            right:18px;
+            width:115px;
+            height:165px;
+            object-fit:cover;
+            background:#222;
+            border-radius:16px;
+            border:2px solid rgba(255,255,255,.25);
+            z-index:5;
+            box-shadow:0 5px 20px rgba(0,0,0,.5);
+        }
+
+        .top-bar{
+            position:absolute;
+            top:0;
+            left:0;
+            right:0;
+            z-index:6;
+            padding:18px;
+            padding-right:150px;
+            background:linear-gradient(
+                rgba(0,0,0,.65),
+                transparent
+            );
+        }
+
+        .username{
+            font-size:18px;
+            font-weight:600;
+        }
+
+        #callStatus{
+            margin-top:4px;
+            font-size:13px;
+            opacity:.8;
+        }
+
+        .controls{
+            position:absolute;
+            bottom:25px;
+            left:50%;
+            transform:translateX(-50%);
+            z-index:10;
+            display:flex;
+            align-items:center;
+            gap:18px;
+            padding:12px 18px;
+            border-radius:40px;
+            background:rgba(20,20,20,.75);
+            backdrop-filter:blur(15px);
+        }
+
+        .control{
+            width:52px;
+            height:52px;
+            border:0;
+            border-radius:50%;
+            background:#333;
+            color:#fff;
+            font-size:22px;
+        }
+
+        .control.active{
+            background:#fff;
+            color:#000;
+        }
+
+        .end{
+            width:60px;
+            height:60px;
+            background:#e53935;
+            font-size:25px;
+        }
+
+        @media(max-width:480px){
+            #localVideo{
+                width:100px;
+                height:145px;
+                top:15px;
+                right:15px;
+            }
+
+            .controls{
+                gap:12px;
+                bottom:20px;
+            }
+        }
+    </style>
 </head>
 
-<body style="background:#000;color:white;text-align:center;padding-top:150px;">
+<body>
 
-<h2>📹 Video Calling {{ username }}</h2>
+<div class="call-screen">
 
-<video
-id="localVideo"
-autoplay
-muted
-playsinline
-style="
-width:220px;
-height:300px;
-border-radius:15px;
-background:#222;
-object-fit:cover;">
-</video>
+    <video
+        id="remoteVideo"
+        autoplay
+        playsinline>
+    </video>
 
-<br><br>
+    <video
+        id="localVideo"
+        autoplay
+        muted
+        playsinline>
+    </video>
 
-<video
-id="remoteVideo"
-autoplay
-playsinline
-style="
-width:220px;
-height:300px;
-border-radius:15px;
-background:#222;
-object-fit:cover;">
-</video>
+    <div class="top-bar">
+        <div class="username">📹 {{ username }}</div>
+        <div id="callStatus">Connecting...</div>
+    </div>
 
+    <div class="controls">
 
-<p>Connecting...</p>
+        <button
+            id="micButton"
+            class="control"
+            onclick="toggleMic()">
+            🎤
+        </button>
+
+        <button
+            id="cameraButton"
+            class="control"
+            onclick="toggleCamera()">
+            📷
+        </button>
+
+        <button
+            class="control"
+            onclick="switchCamera()">
+            🔄
+        </button>
+
+        <button
+            class="control end"
+            onclick="endVideoCall()">
+            ☎
+        </button>
+
+    </div>
+
+</div>
 
 <script>
 
 const socket = io();
 
-const room =
-["{{ session['username'] }}","{{ username }}"]
-.sort()
-.join("_");
+const me = "{{ session['username'] }}";
+const otherUser = "{{ chat_with }}";
 
-let pc;
+let pc = null;
+let localStream = null;
+
+let remoteDescriptionReady = false;
+let pendingCandidates = [];
+
+let currentFacingMode = "user";
+let callEnded = false;
 
 const configuration = {
-iceServers:[
-{
-urls:[
-"stun:stun.l.google.com:19302"
-]
-}
-]
+
+    iceServers: [
+
+        {
+            urls: [
+                "stun:stun.l.google.com:19302",
+                "stun:stun1.l.google.com:19302"
+            ]
+        }
+
+    ]
 };
 
-pc = new RTCPeerConnection(configuration);
-socket.emit("join",{
+const localVideo =
+    document.getElementById("localVideo");
 
-    room:room,
+const remoteVideo =
+    document.getElementById("remoteVideo");
 
-    username:"{{ session['username'] }}"
-
-});
-
-
-// 👇 YAHAN SE ADD KARO
-
-navigator.mediaDevices
-.getUserMedia({
-audio:true,
-video:true
-})
-.then(stream=>{
-
-window.localStream = stream;
-
-document.getElementById("localVideo").srcObject = stream;
+const statusText =
+    document.getElementById("callStatus");
 
 
-stream.getTracks().forEach(track=>{
-pc.addTrack(track,stream);
-});
+function setStatus(text){
 
-});
+    statusText.textContent = text;
 
-socket.on("joined", async ()=>{
+}
 
-    if(room.includes("{{ session['username'] }}")){
 
-        const offer = await pc.createOffer();
+function createPeerConnection(){
 
-        await pc.setLocalDescription(offer);
+    if(pc){
+        return pc;
+    }
 
-        socket.emit("offer",{
-            room:room,
-            offer:offer
+    pc = new RTCPeerConnection(configuration);
+
+    pc.onicecandidate = function(event){
+
+        if(!event.candidate){
+            return;
+        }
+
+        socket.emit("ice-candidate",{
+
+            from: me,
+            to: otherUser,
+
+            candidate: event.candidate
+
         });
+
+    };
+
+
+    pc.ontrack = function(event){
+
+        if(event.streams && event.streams[0]){
+
+            remoteVideo.srcObject =
+                event.streams[0];
+
+            remoteVideo.play().catch(()=>{});
+
+            setStatus("Connected");
+
+        }
+
+    };
+
+
+    pc.onconnectionstatechange = function(){
+
+        if(!pc){
+            return;
+        }
+
+        const state =
+            pc.connectionState;
+
+        console.log(
+            "WEBRTC CONNECTION:",
+            state
+        );
+
+        if(state === "connected"){
+
+            setStatus("Connected");
+
+        }
+
+        else if(
+            state === "connecting"
+        ){
+
+            setStatus("Connecting...");
+
+        }
+
+        else if(
+            state === "disconnected"
+        ){
+
+            setStatus("Reconnecting...");
+
+        }
+
+        else if(
+            state === "failed"
+        ){
+
+            setStatus("Connection failed");
+
+        }
+
+        else if(
+            state === "closed"
+        ){
+
+            setStatus("Call ended");
+
+        }
+
+    };
+
+
+    pc.oniceconnectionstatechange =
+        function(){
+
+            console.log(
+                "ICE STATE:",
+                pc.iceConnectionState
+            );
+
+        };
+
+
+    return pc;
+
+}
+
+
+async function startLocalMedia(){
+
+    if(localStream){
+        return localStream;
+    }
+
+    try{
+
+        setStatus("Starting camera...");
+
+        localStream =
+            await navigator.mediaDevices.getUserMedia({
+
+                audio:{
+                    echoCancellation:true,
+                    noiseSuppression:true,
+                    autoGainControl:true
+                },
+
+                video:{
+                    facingMode:currentFacingMode,
+                    width:{
+                        ideal:1280
+                    },
+                    height:{
+                        ideal:720
+                    },
+                    frameRate:{
+                        ideal:30,
+                        max:30
+                    }
+                }
+
+            });
+
+
+        localVideo.srcObject =
+            localStream;
+
+        localVideo.play().catch(()=>{});
+
+
+        const peer =
+            createPeerConnection();
+
+
+        localStream
+            .getTracks()
+            .forEach(track=>{
+
+                peer.addTrack(
+                    track,
+                    localStream
+                );
+
+            });
+
+
+        setStatus("Waiting for connection...");
+
+        return localStream;
+
+    }
+    catch(error){
+
+        console.error(
+            "GET USER MEDIA ERROR:",
+            error
+        );
+
+        setStatus(
+            "Camera/microphone permission required"
+        );
+
+        throw error;
 
     }
 
-});
+}
 
-socket.on("offer", async data=>{
 
-    await pc.setRemoteDescription(
-        new RTCSessionDescription(data.offer)
-    );
+async function flushCandidates(){
 
-    const answer = await pc.createAnswer();
+    if(!pc){
+        return;
+    }
 
-    await pc.setLocalDescription(answer);
-
-    socket.emit("answer",{
-        room:room,
-        answer:answer
-    });
-
-});
-
-socket.on("answer", async data=>{
-
-    await pc.setRemoteDescription(
-        new RTCSessionDescription(data.answer)
-    );
-
-});
-
-socket.on("ice_candidate", async data=>{
-
-    if(data.candidate){
+    for(
+        const candidate of pendingCandidates
+    ){
 
         try{
 
             await pc.addIceCandidate(
-                new RTCIceCandidate(data.candidate)
+                candidate
             );
 
-        }catch(e){
+        }
+        catch(error){
 
-            console.log(e);
+            console.error(
+                "ICE QUEUE ERROR:",
+                error
+            );
 
         }
 
     }
 
-});
+    pendingCandidates = [];
 
-pc.onicecandidate = event=>{
+}
 
-    if(event.candidate){
 
-        socket.emit("ice_candidate",{
+async function makeOffer(){
 
-            room:room,
+    if(callEnded){
+        return;
+    }
 
-            candidate:event.candidate
+    try{
+
+        const peer =
+            createPeerConnection();
+
+        setStatus("Calling...");
+
+        const offer =
+            await peer.createOffer({
+
+                offerToReceiveAudio:true,
+                offerToReceiveVideo:true
+
+            });
+
+
+        await peer.setLocalDescription(
+            offer
+        );
+
+
+        socket.emit("offer",{
+
+            from:me,
+            to:otherUser,
+
+            offer:{
+                type:offer.type,
+                sdp:offer.sdp
+            }
 
         });
 
     }
+    catch(error){
 
-};
+        console.error(
+            "CREATE OFFER ERROR:",
+            error
+        );
 
-pc.ontrack = event=>{
+    }
 
-    document.getElementById("remoteVideo").srcObject =
-        event.streams[0];
-
-};
+}
 
 
-function startVideoCall(){
+socket.on("offer", async function(data){
 
-    socket.emit("call_user",{
+    if(data.from !== otherUser){
+        return;
+    }
 
-        caller:"{{ session['username'] }}",
+    try{
 
-        receiver:"{{ chat_with }}",
+        await startLocalMedia();
 
-        room:[
-            "{{ session['username'] }}",
-            "{{ chat_with }}"
-        ].sort().join("_"),
+        const peer =
+            createPeerConnection();
 
+
+        await peer.setRemoteDescription(
+            new RTCSessionDescription(
+                data.offer
+            )
+        );
+
+
+        remoteDescriptionReady = true;
+
+        await flushCandidates();
+
+
+        const answer =
+            await peer.createAnswer({
+
+                offerToReceiveAudio:true,
+                offerToReceiveVideo:true
+
+            });
+
+
+        await peer.setLocalDescription(
+            answer
+        );
+
+
+        socket.emit("answer",{
+
+            from:me,
+            to:otherUser,
+
+            answer:{
+                type:answer.type,
+                sdp:answer.sdp
+            }
+
+        });
+
+
+        setStatus("Connecting...");
+
+    }
+    catch(error){
+
+        console.error(
+            "OFFER ERROR:",
+            error
+        );
+
+        setStatus("Connection failed");
+
+    }
+
+});
+
+
+socket.on("answer", async function(data){
+
+    if(data.from !== otherUser){
+        return;
+    }
+
+    try{
+
+        if(!pc){
+            return;
+        }
+
+        await pc.setRemoteDescription(
+            new RTCSessionDescription(
+                data.answer
+            )
+        );
+
+
+        remoteDescriptionReady = true;
+
+        await flushCandidates();
+
+        setStatus("Connecting...");
+
+    }
+    catch(error){
+
+        console.error(
+            "ANSWER ERROR:",
+            error
+        );
+
+    }
+
+});
+
+
+socket.on("ice-candidate", async function(data){
+
+    if(data.from !== otherUser){
+        return;
+    }
+
+    if(!data.candidate){
+        return;
+    }
+
+    try{
+
+        const candidate =
+            new RTCIceCandidate(
+                data.candidate
+            );
+
+
+        if(
+            pc &&
+            pc.remoteDescription
+        ){
+
+            await pc.addIceCandidate(
+                candidate
+            );
+
+        }
+        else{
+
+            pendingCandidates.push(
+                candidate
+            );
+
+        }
+
+    }
+    catch(error){
+
+        console.error(
+            "ICE ERROR:",
+            error
+        );
+
+    }
+
+});
+
+
+socket.on("call-ended", function(data){
+
+    if(
+        data &&
+        data.from &&
+        data.from !== otherUser
+    ){
+        return;
+    }
+
+    cleanupCall();
+
+});
+
+
+async function initializeCall(){
+
+    try{
+
+        await startLocalMedia();
+
+        /*
+         * Only one side creates the offer.
+         * This prevents both phones from creating
+         * simultaneous offers.
+         */
+
+        if(me < otherUser){
+
+            await makeOffer();
+
+        }
+
+    }
+    catch(error){
+
+        console.error(
+            "CALL INITIALIZATION ERROR:",
+            error
+        );
+
+    }
+
+}
+
+
+function toggleMic(){
+
+    if(!localStream){
+        return;
+    }
+
+    const track =
+        localStream.getAudioTracks()[0];
+
+    if(!track){
+        return;
+    }
+
+    track.enabled =
+        !track.enabled;
+
+
+    const button =
+        document.getElementById(
+            "micButton"
+        );
+
+    button.classList.toggle(
+        "active",
+        !track.enabled
+    );
+
+}
+
+
+function toggleCamera(){
+
+    if(!localStream){
+        return;
+    }
+
+    const track =
+        localStream.getVideoTracks()[0];
+
+    if(!track){
+        return;
+    }
+
+    track.enabled =
+        !track.enabled;
+
+
+    const button =
+        document.getElementById(
+            "cameraButton"
+        );
+
+    button.classList.toggle(
+        "active",
+        !track.enabled
+    );
+
+}
+
+
+async function switchCamera(){
+
+    if(!localStream){
+        return;
+    }
+
+    const videoTrack =
+        localStream.getVideoTracks()[0];
+
+    if(!videoTrack){
+        return;
+    }
+
+    currentFacingMode =
+        currentFacingMode === "user"
+        ? "environment"
+        : "user";
+
+
+    try{
+
+        const newStream =
+            await navigator.mediaDevices
+            .getUserMedia({
+
+                audio:false,
+
+                video:{
+                    facingMode:{
+                        exact:
+                            currentFacingMode
+                    }
+                }
+
+            });
+
+
+        const newTrack =
+            newStream.getVideoTracks()[0];
+
+
+        const sender =
+            pc
+            ? pc.getSenders().find(
+                s =>
+                    s.track &&
+                    s.track.kind === "video"
+            )
+            : null;
+
+
+        if(sender){
+
+            await sender.replaceTrack(
+                newTrack
+            );
+
+        }
+
+
+        videoTrack.stop();
+
+
+        localStream.removeTrack(
+            videoTrack
+        );
+
+        localStream.addTrack(
+            newTrack
+        );
+
+
+        localVideo.srcObject =
+            localStream;
+
+        localVideo.play().catch(()=>{});
+
+
+    }
+    catch(error){
+
+        console.error(
+            "CAMERA SWITCH ERROR:",
+            error
+        );
+
+    }
+
+}
+
+
+function endVideoCall(){
+
+    if(callEnded){
+        return;
+    }
+
+    callEnded = true;
+
+
+    socket.emit("end-call",{
+
+        from:me,
+        to:otherUser,
         type:"video"
 
     });
 
-    window.location="/video_call/{{ chat_with }}";
+
+    cleanupCall();
 
 }
+
+
+function cleanupCall(){
+
+    callEnded = true;
+
+
+    if(pc){
+
+        pc.ontrack = null;
+        pc.onicecandidate = null;
+
+        try{
+            pc.close();
+        }
+        catch(e){}
+
+        pc = null;
+
+    }
+
+
+    if(localStream){
+
+        localStream
+        .getTracks()
+        .forEach(
+            track=>track.stop()
+        );
+
+        localStream = null;
+
+    }
+
+
+    remoteVideo.srcObject = null;
+    localVideo.srcObject = null;
+
+}
+
+
+/*
+ * Join the user's own Socket.IO room.
+ * Backend already uses username rooms.
+ */
+
+socket.emit("join",{
+
+    username:me
+
+});
+
+
+initializeCall();
 
 </script>
 

@@ -1,11 +1,320 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&display=swap" rel="stylesheet">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Snapz Clone</title>
 
 <style>
+
+/* ============================================================
+   SNAPZ POST 3 HEART DOUBLE TAP BURST
+============================================================ */
+
+.snapz-post-heart-burst{
+    position:fixed;
+    left:0;
+    top:0;
+    width:0;
+    height:0;
+    pointer-events:none;
+    z-index:999999;
+}
+
+.snapz-post-burst-heart{
+    position:absolute;
+    width:42px;
+    height:42px;
+    pointer-events:none;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    transform:translate(-50%,-50%) scale(.55) rotate(0deg);
+    opacity:0;
+
+animation:snapzHeartFloat 1.15s cubic-bezier(.25,.46,.45,.94) forwards;
+
+    filter:drop-shadow(0 3px 5px rgba(255,64,129,.28));
+
+    will-change:transform,opacity;
+}
+
+.snapz-post-burst-heart svg{
+    display:block;
+    width:42px;
+    height:42px;
+    flex:none;
+}
+
+.snapz-post-burst-heart svg path{
+    fill:#FF4081;
+    stroke:none;
+}
+
+.snapz-post-burst-heart:nth-child(1){
+    animation-delay:0ms;
+}
+
+.snapz-post-burst-heart:nth-child(2){
+    animation-delay:90ms;
+}
+
+.snapz-post-burst-heart:nth-child(3){
+    animation-delay:180ms;
+}
+
+@keyframes snapzHeartFloat{
+
+    0%{
+        opacity:0;
+        transform:
+            translate(-50%,-50%)
+            translate(0,8px)
+            scale(.45)
+            rotate(0deg);
+    }
+
+    12%{
+        opacity:1;
+        transform:
+            translate(-50%,-50%)
+            translate(calc(var(--sx) * .35),0px)
+            scale(.82)
+            rotate(calc(var(--sr) * .35));
+    }
+
+    30%{
+        opacity:1;
+        transform:
+            translate(-50%,-50%)
+            translate(calc(var(--sx) * .7),-20px)
+            scale(1.05)
+            rotate(calc(var(--sr) * .7));
+    }
+
+    50%{
+        opacity:1;
+        transform:
+            translate(-50%,-50%)
+            translate(var(--mx),-48px)
+            scale(1)
+            rotate(var(--mr));
+    }
+
+    72%{
+        opacity:.85;
+        transform:
+            translate(-50%,-50%)
+            translate(
+                calc(var(--mx) + (var(--ex) - var(--mx)) * .45),
+                -72px
+            )
+            scale(.88)
+            rotate(
+                calc(var(--mr) + (var(--er) - var(--mr)) * .45)
+            );
+    }
+
+    100%{
+        opacity:0;
+        transform:
+            translate(-50%,-50%)
+            translate(var(--ex),-105px)
+            scale(.72)
+            rotate(var(--er));
+    }
+}
+
+
+
+
+
+
+
+.music-icon-btn {
+    width:48px;
+    height:48px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border:none;
+    border-radius:50%;
+
+    background:rgba(0,0,0,0.55);
+    color:white;
+
+    cursor:pointer;
+
+    box-shadow:0 6px 18px rgba(255,61,129,0.3);
+}
+
+.music-icon-btn svg {
+    width:23px;
+    height:23px;
+
+    fill:none;
+    stroke:currentColor;
+    stroke-width:1.9;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+}
+
+
+#storyEditorTop{
+position:absolute;
+top:20px;
+left:0;
+right:0;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:0 15px;
+z-index:100;
+}
+
+#storyEditorTools{
+display:flex;
+gap:15px;
+align-items:center;
+}
+
+#storyEditorTop button{
+background:none;
+border:none;
+color:white;
+cursor:pointer;
+}
+
+#storyEditorBottom{
+position:absolute;
+bottom:30px;
+left:0;
+right:0;
+display:flex;
+justify-content:center;
+z-index:100;
+}
+
+#shareStoryBtn{
+background:#0095f6;
+color:white;
+border:none;
+padding:12px 25px;
+border-radius:25px;
+font-size:16px;
+font-weight:bold;
+cursor:pointer;
+}
+
+#storyTools button{
+
+width:52px;
+height:52px;
+
+border:none;
+border-radius:50%;
+
+background:rgba(0,0,0,.45);
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+color:#fff;
+
+font-size:24px;
+
+cursor:pointer;
+
+margin-bottom:12px;
+
+backdrop-filter:blur(10px);
+
+}
+
+#storyMusicBtn svg{
+
+width:28px;
+height:28px;
+
+}
+
+
+#viewerSwipe{
+    position:absolute;
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%);
+    color:white;
+    font-size:30px;
+    z-index:30;
+    cursor:pointer;
+}
+
+
+#viewerPopup{
+    position:absolute;
+    left:0;
+    bottom:-100%;
+    width:100%;
+    height:50%;
+
+    background:#111;
+    border-radius:20px 20px 0 0;
+
+    z-index:50;
+
+    transition:.35s;
+}
+
+#viewerPopup.show{
+    bottom:0;
+}
+
+
+#viewerBox{
+
+height:100%;
+overflow-y:auto;
+padding:20px;
+color:white;
+
+}
+
+
+.viewer-close{
+
+position:absolute;
+right:15px;
+top:10px;
+
+background:none;
+border:none;
+color:white;
+
+font-size:30px;
+
+z-index:60;
+
+}
+
+
+@keyframes viewerUp{
+
+from{
+transform:translateY(100%);
+}
+
+to{
+transform:translateY(0);
+}
+
+}
 
 #startupScreen{
     position:fixed;
@@ -21,6 +330,47 @@
     animation:fadeOut 2.2s forwards;
     animation-delay:1.8s;
 }
+
+.share-icon{
+    color:white;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+.action-btn:hover .share-icon{
+    transform:scale(1.1);
+}
+
+.action-btn{
+    background:none;
+    border:none;
+    display:flex;
+    align-items:center;
+    gap:5px;
+    cursor:pointer;
+}
+
+.heart-icon svg{
+    width:28px;
+    height:28px;
+    color:white;
+}
+
+.action-btn.active .heart-icon svg{
+    fill:red;
+    color:red;
+}
+
+.comment-icon{
+    color:white;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+.action-btn:hover .comment-icon{
+    transform:scale(1.1);
+}
+
 
 #startupLogo{
     width:120px;
@@ -62,219 +412,101 @@
 }
 
 
-.story-buttons button{
-    background:none;
-    border:none;
-    color:white;
-    font-size:35px;
-    padding:15px;
-    cursor:pointer;
-}
-
-.story-ring{
-    border:3px solid #0095f6;
-}
-.story-ring.seen{
-    border:3px solid #666;
-}
-.story-avatar{
-    width:70px;
-    height:70px;
-    border-radius:50%;
-    object-fit:cover;
-}
-
-
-         .post {
-            width: 100%;
-            max-width: 480px;
-            margin: 0 auto 20px auto;
-            background: #000;
-            border-bottom: 1px solid #333;
-        }
-        .post-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px;
-        }
-        .post-img {
-            width: 100%;
-            display: block;
-            aspect-ratio: 3/4;
-            object-fit: cover;
-        }
-        .action-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px;
-        }
-        .action-btn {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-        }
-        .follow-btn {
-            background: #0095f6;
-            color: white;
-            border: none;
-            padding: 5px 15px;
-            border-radius: 5px;
-        }
-.comment-box {
-    padding: 0 10px 10px 10px;
-}
-
-.comment-input {
-    width: 70%;
-    padding: 5px;
-}
-
-
-
-
-.feed{
-    width:100%;
-    padding:0;
-}
-
-
-.post img {
-    width:100%;
-    height:400px;
-    object-fit:cover;
-    display:block;
-}
 
 
 .post{
     width:100%;
-    margin:0;
-    padding:0;
-    border:none;
-    border-radius:0;
+    max-width:480px;
+    margin:0 auto 20px auto;
     background:#000;
+    border-bottom:1px solid #333;
+    overflow:hidden;
+}
+
+.post-img{
+width:100% !important;
+height:auto !important;
+aspect-ratio:3 / 4;
+object-fit:cover;
+display:block;
 }
 
 
 .post-image-container{
-    width:100%;
-    background:#000;
-    position:relative;
-}
-
-
-.post-image{
-    width:100%;
-    height:auto;
-    object-fit:cover;
-}
-
-.story-viewer{
-    display:none;
-    position:fixed;
-    top:0;
-    left:0;
-    inset: 0;
-    width:100%;
-    height:100%;
-    background:black;
-    z-index:99999;
-    justify-content:center;
-    align-items:center;
-    flex-direction:column;
-}
-
-.story-header{
-
-position:absolute;
-top:20px;
-left:0;
 width:100%;
-padding:10px;
-
-color:white;
-
-}
-
-
-.progress-box{
-
-width:90%;
-height:4px;
-background:#555;
-border-radius:20px;
+position:relative;           
 overflow:hidden;
-
 }
 
 
-#progress{
-
-height:100%;
-width:0%;
-background:white;
-
+.feed{
+    width:100%;
+    max-width:100%;
+    margin:0;
+    padding:0;
 }
 
-
-
-#storyUser{
-
-display:inline-block;
-margin-top:15px;
-font-size:20px;
-font-weight:bold;
-
+.post-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px;
 }
 
-
-.story-header button{
-
-float:right;
-background:none;
-border:none;
-color:white;
-font-size:30px;
-
+.action-bar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:12px;
 }
 
 
 
-.story-image{
+.action-btn{
+    background:none;
+    border:none;
+    color:white;
+    font-size:24px;
+    cursor:pointer;
+}
 
-width:100%;
-height:100%;
-object-fit:contain;
+.follow-btn{
+    background:#0095f6;
+    color:white;
+    border:none;
+    padding:5px 15px;
+    border-radius:5px;
+}
 
+.comment-box{
+    padding:0 10px 10px;
+}
+
+.comment-input{
+    width:70%;
+    padding:5px;
+}
+
+
+/* Mobile Screen Fix */
+html,body{
+    width:100%;
+    max-width:100%;
+    overflow-x:hidden;
+    margin:0;
+    padding:0;
+}
+
+*{
+    box-sizing:border-box;
 }
 
 
 
-.story-buttons{
-
-position:absolute;
-bottom:40px;
-width:100%;
-display:flex;
-justify-content:space-between;
-
-}
 
 
 
-.story-buttons button{
 
-background:#0008;
-color:white;
-border:none;
-font-size:35px;
-padding:15px;
-
-}
 
 
 @media (max-width: 360px){
@@ -680,12 +912,13 @@ captionPage{
         <div class="top-icons">
             <div class="notify-icon" 
 onclick="window.location.href='/notifications'">
+
 <svg xmlns="http://www.w3.org/2000/svg"
      width="28"
      height="28"
      viewBox="0 0 24 24"
      fill="none"
-     stroke="currentColor"
+     stroke="#FF4081"
      stroke-width="2.8"
      stroke-linecap="round"
      stroke-linejoin="round">
@@ -694,6 +927,7 @@ onclick="window.location.href='/notifications'">
   <path d="M10 20a2 2 0 004 0"/>
 
 </svg>
+
 </div>
 <div class="search-icon"
 onclick="document.getElementById('searchModal').style.display='block'">
@@ -702,7 +936,7 @@ onclick="document.getElementById('searchModal').style.display='block'">
      height="28"
      viewBox="0 0 24 24"
      fill="none"
-     stroke="currentColor"
+     stroke="#FF4081"
      stroke-width="2.8"
      stroke-linecap="round"
      stroke-linejoin="round">
@@ -711,6 +945,7 @@ onclick="document.getElementById('searchModal').style.display='block'">
   <path d="M20 20l-4.2-4.2"/>
 
 </svg>
+
 </div>
 
 </div>
@@ -761,216 +996,11 @@ onclick="document.getElementById('searchModal').style.display='block'">
 
 
 
-<form action="/story"
-      method="POST"
-      enctype="multipart/form-data">
-
-    <input
-        type="file"
-        name="image"
-        accept="image/*,video/*"
-        onchange="this.form.submit();"
-        style="display:none;"
-        id="storyUpload">
-
-</form>
 
 
-<div style="display:flex;gap:15px;overflow-x:auto;padding:10px;">
 
+{% include 'navbar.html' %}
 
-{% if my_story %}
-
-<div
-onclick="openStory('{{ my_story[0] }}','{{ my_story[2] }}','{{ current_user }}')"
-style="text-align:center;cursor:pointer;display:inline-block;">
-
-    <div style="
-        width:60px;
-        height:60px;
-        border-radius:50%;
-        border:2px solid #00c853;
-        padding:2px;
-        overflow:hidden;">
-
-        {% if my_story[2].endswith('.mp4') or my_story[2].endswith('.webm') %}
-
-        <video
-            src="{{ my_story[2] }}"
-            autoplay
-            muted
-            loop
-            playsinline
-            style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
-        </video>
-
-        {% else %}
-
-        <img
-            src="{{ my_story[2] }}"
-            style="width:100%;height:100%;object-fit:cover;border-radius:50%;">
-
-        {% endif %}
-
-    </div>
-
-    <span style="font-size:12px;">You</span>
-
-</div>
-
-{% else %}
-
-<label
-for="storyUpload"
-style="text-align:center;cursor:pointer;display:inline-block;">
-
-    <div style="
-        width:60px;
-        height:60px;
-        border-radius:50%;
-        border:2px dashed #888;
-        display:flex;
-        justify-content:center;
-        align-items:center;
-        font-size:30px;">
-        +
-    </div>
-
-    <span style="font-size:12px;">Your Story</span>
-
-</label>
-
-{% endif %}
-
-
-{% for story in story_circles %}
-
-<div style="text-align:center;display:inline-block;cursor:pointer;"
-     onclick="openStory('{{ story[0] }}',
-                        '{{ story[2] }}',
-                        '{{ story[1] }}')">
-
-<div style="width:60px;height:60px;border-radius:50%;border:2px solid #d62976;padding:2px;overflow:hidden;">
-
-        {% if story[2].endswith('.mp4') or story[2].endswith('.webm') %}
-
-        <video
-            src="{{ story[2] }}"
-            muted
-            autoplay
-            loop
-            playsinline
-            style="width:100%;height:100%;border-radius:50%;object-fit:cover;">
-        </video>
-
-        {% else %}
-
-        <img
-	    src="{{ story[2] }}"
-            style="width:100%;height:100%;border-radius:50%;object-fit:cover;">
-
-        {% endif %}
-
-    </div>
-
-    <span style="font-size:12px;display:block;margin-top:5px;">
-        {{ story[1] }}
-    </span>
-
-</div>
-
-{% endfor %}
-
-</div>
-
-
-<div style="position: fixed; bottom: 0; left: 0; right: 0; background-color: #000; border-top: 1px solid #262626; display: flex; justify-content: space-around; align-items: center; padding: 12px 0; z-index: 9999;">
-    
-    <a href="/" style="text-decoration: none; display: flex; flex-direction: column; align-items: center; color: #fff;">
-<svg xmlns="http://www.w3.org/2000/svg"
-     width="28" height="28"
-     viewBox="0 0 24 24"
-     fill="none"
-     stroke="currentColor"
-     stroke-width="2.8"
-     stroke-linecap="round"
-     stroke-linejoin="round">
-
-  <path d="M3 10.5L12 3l9 7.5"/>
-  <path d="M5 9.8V20h14V9.8"/>
-</svg>
-	<span style="font-size: 11px; font-weight: bold;">Home</span>
-    </a>
-    <a href="/reels" style="text-decoration: none; display: flex; flex-direction: column; align-items: center; color: #a8a8a8;">
-<svg xmlns="http://www.w3.org/2000/svg"
-     width="28" height="28"
-     viewBox="0 0 24 24"
-     fill="none"
-     stroke="currentColor"
-     stroke-width="2.8"
-     stroke-linecap="round"
-     stroke-linejoin="round">
-
-  <rect x="3" y="3" width="18" height="18" rx="3"/>
-  <path d="M3 8h18"/>
-  <path d="M8 3l3 5"/>
-  <path d="M13 3l3 5"/>
-  <path d="M10 10l5 3-5 3z"/>
-</svg>
-        <span style="font-size: 11px;">Reels</span>
-    </a>
-    <button id="createBtn" style="background:none; border:none; cursor:pointer; display: flex; flex-direction: column; align-items: center; color: #a8a8a8;">
-<svg xmlns="http://www.w3.org/2000/svg"
-     width="28" height="28"
-     viewBox="0 0 24 24"
-     fill="none"
-     stroke="currentColor"
-     stroke-width="2.8"
-     stroke-linecap="round"
-     stroke-linejoin="round">
-
-  <rect x="3" y="3" width="18" height="18" rx="5"/>
-  <path d="M12 8v8"/>
-  <path d="M8 12h8"/>
-
-</svg>
-        <span style="font-size: 11px;">Create</span>
-    </button>
-    <a href="/users" style="text-decoration: none; display: flex; flex-direction: column; align-items: center; color: #a8a8a8;">
-<svg xmlns="http://www.w3.org/2000/svg"
-     width="28"
-     height="28"
-     viewBox="0 0 24 24"
-     fill="none"
-     stroke="currentColor"
-     stroke-width="2.8"
-     stroke-linecap="round"
-     stroke-linejoin="round">
-
-  <path d="M22 2L11 13"/>
-  <path d="M22 2L15 22L11 13L2 9L22 2Z"/>
-
-</svg>
-        <span style="font-size: 11px;">Messages</span>
-    </a>
-    <a href="/profile" style="text-decoration: none; display: flex; flex-direction: column; align-items: center; color: #a8a8a8;">
-<svg xmlns="http://www.w3.org/2000/svg"
-     width="28"
-     height="28"
-     viewBox="0 0 24 24"
-     fill="none"
-     stroke="currentColor"
-     stroke-width="2.8"
-     stroke-linecap="round"
-     stroke-linejoin="round">
-
-  <circle cx="12" cy="8" r="4"/>
-  <path d="M5 20c1.8-3.5 4.5-5 7-5s5.2 1.5 7 5"/>
-
-</svg>
-        <span style="font-size: 11px;">Profile</span>
-    </a>
-</div>
 
 
 
@@ -990,6 +1020,120 @@ style="text-align:center;cursor:pointer;display:inline-block;">
         <video id="previewVideo" autoplay loop muted playsinline style="width:100%; height:100%; object-fit:cover; display:none;"></video>
     </div>
 
+
+<div id="storyTools" style="
+display:none;
+position:absolute;
+top:20px;
+right:20px;
+z-index:100;
+flex-direction:column;
+gap:12px;
+">
+
+<button id="storyCameraTextBtn" class="story-text-btn">
+    <b>Aa</b>
+</button>
+
+<button class="music-icon-btn" type="button" onclick="openMusicPanel()">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M9 18V5l11-2v13"></path>
+        <circle cx="6" cy="18" r="3"></circle>
+        <circle cx="17" cy="16" r="3"></circle>
+    </svg>
+</button>
+
+
+<style>
+/* Story Text */
+.story-text-btn {
+    width: 46px;
+    height: 46px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 50%;
+
+    background:none;
+    color: white;
+
+    cursor: pointer;
+
+    font-size: 19px;
+
+    box-shadow: 0 6px 18px rgba(255, 64, 129, 0.30);
+}
+
+.story-text-btn b {
+    font-weight: 700;
+}
+
+
+/* Music */
+.music-icon-btn {
+    width: 46px;
+    height: 46px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 50%;
+
+    background: none;
+    color: white;
+
+    cursor: pointer;
+
+    box-shadow: 0 6px 18px rgba(255, 64, 129, 0.30);
+}
+
+.music-icon-btn svg {
+    width: 23px;
+    height: 23px;
+
+    fill: none;
+    stroke: currentColor;
+
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+
+/* Music Play */
+.story-music-play-btn {
+    width: 48px;
+    height: 48px;
+
+    border: none;
+    border-radius: 50%;
+
+    background:none;
+    color: white;
+
+    font-size: 22px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    box-shadow: 0 6px 18px rgba(255, 64, 129, 0.30);
+}
+</style>
+
+
+</div>
+
+
+
     <div class="mode" style="position:absolute; bottom:110px; left:0; width:100%; display:flex; justify-content:center; gap:25px; z-index:10;">
         <span id="opt-post" onclick="setMode('post')" style="cursor:pointer; color:#fff; font-weight:bold; text-shadow:1px 1px 2px #000;">Post</span>
         <span id="opt-story" onclick="setMode('story')" style="cursor:pointer; color:gray; text-shadow:1px 1px 2px #000;">Story</span>
@@ -997,29 +1141,855 @@ style="text-align:center;cursor:pointer;display:inline-block;">
     </div>
 
     <div style="position:absolute; bottom:30px; left:0; width:100%; display:flex; justify-content:space-around; align-items:center; z-index:10;">
-        <button onclick="galleryOpen()" style="background:none; border:none; color:#fff; font-size:28px; cursor:pointer;">🖼</button>
-        <input id="gallery" type="file" accept="image/*,video/*" hidden onchange="gallerySelect()">
+        <button onclick="galleryOpen()" style="background:none; border:none; color:#fff; font-size:28px; cursor:pointer;">
 
-        <button id="captureBtn" onclick="capture()" style="width:75px; height:75px; border-radius:50%; background:#fff; border:5px solid rgba(255,255,255,0.3); font-size:0; cursor:pointer;"></button>
 
-        <button onclick="switchCamera()" style="background:none; border:none; color:#fff; font-size:28px; cursor:pointer;">🔄</button>
+<svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+<rect 
+x="3" 
+y="3" 
+width="18" 
+height="18" 
+rx="2" 
+stroke="currentColor"
+stroke-width="2"/>
+
+<circle 
+cx="8.5" 
+cy="8.5" 
+r="1.5"
+fill="currentColor"/>
+
+<path 
+d="M21 15L16 10L5 21"
+stroke="currentColor"
+stroke-width="2"
+stroke-linecap="round"
+stroke-linejoin="round"/>
+
+</svg>
+
+</button>
+
+<input id="gallery"
+       type="file"
+       accept="image/*,video/*"
+       hidden
+       onchange="gallerySelect()">
+
+<button
+    id="captureBtn"
+    onclick="capture()"
+    style="
+        width:75px;
+        height:75px;
+        border-radius:50%;
+        background:#FF4081;
+        border:5px solid rgba(255,64,129,0.35);
+        box-shadow:0 6px 18px rgba(255,64,129,0.30);
+        font-size:0;
+        cursor:pointer;
+    ">
+</button>
+
+<button
+    onclick="switchCamera()"
+    style="
+        background:none;
+        border:none;
+        color:#fff;
+        font-size:28px;
+        cursor:pointer;
+    ">
+
+    <svg
+        width="28"
+        height="28"
+        viewBox="0 0 24 24"
+        fill="none">
+
+        <path
+            d="M21 12C21 16.97 16.97 21 12 21C8.69 21 5.8 19.21 4.39 16.5"
+            stroke="#FFFFFF"
+            stroke-width="2"
+            stroke-linecap="round"/>
+
+        <path
+            d="M3 12C3 7.03 7.03 3 12 3C15.31 3 18.2 4.79 19.61 7.5"
+            stroke="#FFFFFF"
+            stroke-width="2"
+            stroke-linecap="round"/>
+
+        <path
+            d="M18 3V8H23"
+            stroke="#FFFFFF"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"/>
+
+        <path
+            d="M6 21V16H1"
+            stroke="#FFFFFF"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"/>
+
+    </svg>
+
+</button>
+
+
     </div>
 </div>
 
-<div id="captionPage" style="display:none; width:100%; height:100%; position:fixed; top:0; left:0; background:#000; color:#fff; z-index:9999999; padding:20px; box-sizing:border-box;">
-    <h2 style="margin-top:20px;">New Caption</h2>
-    <textarea id="caption" placeholder="Write a caption..." style="width:100%; height:120px; background:#121212; color:#fff; border:1px solid #262626; border-radius:8px; padding:10px; font-size:16px; outline:none; resize:none; margin-bottom:20px;"></textarea>
-    <button onclick="finalUpload()" style="width:100%; background:#0095f6; border:none; color:#fff; padding:12px; font-size:16px; font-weight:bold; border-radius:8px; cursor:pointer;">Upload</button>
+<!-- =========================================================
+     SNAPZ POST SHARE PAGE
+     Instagram-style post details screen
+========================================================= -->
+
+<div id="captionPage"
+     style="
+     display:none;
+     position:fixed;
+     inset:0;
+     z-index:9999999;
+     background:#0b0e12;
+     color:#fff;
+     overflow-y:auto;
+     box-sizing:border-box;
+     ">
+
+    <!-- HEADER -->
+
+    <div style="
+         height:64px;
+         display:flex;
+         align-items:center;
+         gap:18px;
+         padding:0 18px;
+         border-bottom:1px solid #24272c;
+         box-sizing:border-box;
+         position:sticky;
+         top:0;
+         background:#0b0e12;
+         z-index:10;
+         ">
+
+        <button
+            onclick="closePostSharePage()"
+            style="
+            background:none;
+            border:0;
+            color:#fff;
+            font-size:34px;
+            line-height:1;
+            padding:0;
+            cursor:pointer;
+            ">
+            ‹
+        </button>
+
+        <div style="
+             font-size:22px;
+             font-weight:700;
+             ">
+            New post
+        </div>
+
+    </div>
+
+
+    <!-- POST PREVIEW -->
+
+    <div style="
+         padding:28px 26px 10px;
+         box-sizing:border-box;
+         ">
+
+        <div style="
+             width:100%;
+             display:flex;
+             justify-content:center;
+             ">
+
+            <div style="
+                 width:min(100%, 390px);
+                 aspect-ratio:3 / 4;
+                 position:relative;
+                 height:auto;
+                 background:#050505;
+                 display:flex;
+                 align-items:center;
+                 justify-content:center;
+                 overflow:hidden;
+                 border-radius:2px;
+                 ">
+
+                <img id="postShareImage"
+                     style="
+                     display:none;
+                     width:auto;
+                     height:auto;
+                     max-width:100%;
+                     max-height:100%;
+                     object-fit:contain;
+                     flex:none;
+                     ">
+
+                <!-- SNAPZ MANUAL ADJUST NEXT BUTTON -->
+                <button
+                    id="snapzPostAdjustNext"
+                    type="button"
+                    aria-label="Save adjustment and next photo"
+                    style="
+                        display:none;
+                        position:absolute;
+                        top:12px;
+                        right:12px;
+                        width:42px;
+                        height:42px;
+                        border:none;
+                        border-radius:50%;
+                        background:rgba(0,0,0,.68);
+                        color:#fff;
+                        font-size:25px;
+                        font-weight:600;
+                        line-height:42px;
+                        text-align:center;
+                        padding:0;
+                        z-index:50;
+                        cursor:pointer;
+                        -webkit-tap-highlight-color:transparent;
+                        box-shadow:0 2px 10px rgba(0,0,0,.35);
+                    "
+                >✓</button>
+
+                <video id="postShareVideo"
+                       muted
+                       playsinline
+                       controls
+                       style="
+                       display:none;
+                       width:100%;
+                       max-height:430px;
+                       object-fit:contain;
+                       ">
+                </video>
+<div
+    id="snapzPostMediaCounter"
+    style="
+        display:none;
+        position:absolute;
+        top:12px;
+        left:50%;
+        transform:translateX(-50%);
+        background:rgba(0,0,0,.55);
+        color:#fff;
+        padding:5px 10px;
+        border-radius:14px;
+        font-size:13px;
+        z-index:20;
+    "
+>
+    1 / 1
 </div>
+
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- CAPTION -->
+
+    <div style="
+         padding:10px 26px 5px;
+         ">
+
+        <textarea id="caption"
+            placeholder="Add a caption..."
+            style="
+            width:100%;
+            min-height:90px;
+            box-sizing:border-box;
+            background:transparent;
+            border:0;
+            outline:none;
+            resize:none;
+            color:#fff;
+            font-size:17px;
+            line-height:1.5;
+            font-family:inherit;
+            "
+        ></textarea>
+
+    </div>
+
+    <!-- TAG PEOPLE -->
+
+          <!-- POST ADD AUDIO -->
+      <div
+          id="postAddAudioButton"
+          onclick="openSnapzPostReelMusic('post')"
+          style="
+              min-height:72px;
+              display:flex;
+              align-items:center;
+              gap:18px;
+              padding:12px 26px;
+              border-top:1px solid #202329;
+              border-bottom:1px solid #202329;
+              box-sizing:border-box;
+              cursor:pointer;
+          "
+      >
+          <div style="
+              font-size:30px;
+              width:42px;
+              text-align:center;
+          ">♫</div>
+
+          <div style="
+              flex:1;
+              font-size:18px;
+          ">Add audio</div>
+
+          <div style="
+              font-size:30px;
+              color:#aeb4bd;
+          ">›</div>
+      </div>
+
+<div id="snapzTagPeopleButton" style="
+         min-height:72px;
+         display:flex;
+         align-items:center;
+         gap:18px;
+         padding:12px 26px;
+         border-bottom:1px solid #202329;
+         box-sizing:border-box;
+         ">
+
+        <div style="
+             font-size:31px;
+             width:42px;
+             text-align:center;
+             ">
+            ♙
+        </div>
+
+        <div style="
+             flex:1;
+             font-size:18px;
+             ">
+            Tag people
+        </div>
+
+        <div style="
+             font-size:30px;
+             color:#aeb4bd;
+             ">
+            ›
+        </div>
+
+    </div>
+
+
+
+
+
+
+    <!-- BOTTOM UPLOAD AREA -->
+
+    <div style="
+         padding:28px 26px 32px;
+         ">
+
+        <button
+            id="shareStoryBtn"
+            type="button"
+            onclick="finalUpload()"
+            style="
+            width:100%;
+            min-height:56px;
+            border:0;
+            border-radius:16px;
+            background:#4f5ff5;
+            color:#fff;
+            font-size:18px;
+            font-weight:700;
+            cursor:pointer;
+            box-shadow:0 5px 20px rgba(79,95,245,.25);
+            ">
+            Upload
+        </button>
+
+    </div>
+
+</div>
+
+
+<div id="storyEditor" style="
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:#000;
+z-index:99999999;
+">
+
+<img id="storyImage"
+style="
+display:none;
+width:100%;
+height:100%;
+object-fit:cover;
+">
+
+<video id="storyVideo"
+autoplay
+loop
+playsinline
+style="
+display:none;
+width:100%;
+height:100%;
+object-fit:cover;
+">
+</video>
+
+<!-- Top Bar -->
+<div id="storyEditorTop">
+
+<textarea
+id="storyTextInput"
+placeholder="Type something..."
+style="
+display:none;
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+background:transparent;
+border:none;
+outline:none;
+resize:none;
+color:white;
+font-size:38px;
+font-weight:bold;
+text-align:center;
+width:90%;
+z-index:200;">
+</textarea>
+
+<div id="storyTextLayer"
+style="
+display:none;
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+color:white;
+font-size:38px;
+font-weight:bold;
+text-align:center;
+z-index:201;
+cursor:move;
+touch-action:none;">
+</div>
+
+    <button id="storyCloseBtn" onclick="closeStoryEditor()">
+
+        <!-- Close SVG -->
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="28"
+     height="28"
+     viewBox="0 0 24 24"
+     fill="none"
+     stroke="#FFFFFF"
+     stroke-width="2.5"
+     stroke-linecap="round"
+     stroke-linejoin="round">
+
+  <line x1="18" y1="6" x2="6" y2="18"/>
+  <line x1="6" y1="6" x2="18" y2="18"/>
+
+</svg>
+
+    </button>
+
+<div id="storyEditorTools">
+
+    <!-- TEXT BUTTON -->
+<button id="storyTextBtn" class="story-text-btn">
+    <b>Aa</b>
+</button>
+
+<!-- SNAPZ FRESH STORY MUSIC BUTTON -->
+<button
+    id="snapzStoryMusicButton"
+    class="music-icon-btn"
+    type="button"
+    aria-label="Add Music"
+    onclick="openSnapzStoryMusic()"
+>
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M9 18V5l10-2v13"></path>
+        <circle cx="6" cy="18" r="3"></circle>
+        <circle cx="16" cy="16" r="3"></circle>
+    </svg>
+</button>
+
+
+
+<style>
+/* Story Text */
+.story-text-btn {
+    width: 46px;
+    height: 46px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 50%;
+
+    background: none;
+    color:white;
+
+    cursor: pointer;
+
+    font-size: 19px;
+
+    box-shadow: 0 6px 18px rgba(255, 64, 129, 0.30);
+}
+
+.story-text-btn b {
+    font-weight: 700;
+}
+
+
+/* Music */
+.music-icon-btn {
+    width: 46px;
+    height: 46px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    border-radius: 50%;
+
+    background: none;
+    color: white;
+
+    cursor: pointer;
+
+    box-shadow: 0 6px 18px rgba(255, 64, 129, 0.30);
+}
+
+.music-icon-btn svg {
+    width: 23px;
+    height: 23px;
+
+    fill: none;
+    stroke: currentColor;
+
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+
+/* Music Play */
+.story-music-play-btn {
+    width: 48px;
+    height: 48px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: none;
+    color: white;
+
+    font-size: 22px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    box-shadow: 0 6px 18px rgba(255, 64, 129, 0.30);
+}
+
+
+/* =====================================================
+   SNAPZ POST MEDIA CAROUSEL
+   INSTAGRAM STYLE
+   ===================================================== */
+
+.post-media-carousel{
+    position:relative;
+    width:100%;
+    overflow:hidden;
+    background:#000;
+    touch-action:pan-y;
+}
+
+.post-media-track{
+    display:flex;
+    width:100%;
+    transform:translate3d(0,0,0);
+    transition:transform .32s ease;
+    will-change:transform;
+}
+
+.post-media-slide{
+    flex:0 0 100%;
+    width:100%;
+    min-width:100%;
+    position:relative;
+    background:#000;
+    overflow:hidden;
+}
+
+.post-media-item{
+    display:block;
+    width:100%;
+    height:auto;
+    max-height:80vh;
+    min-height:250px;
+    object-fit:contain;
+    background:#000;
+}
+
+.post-media-slide video{
+    width:100%;
+    max-height:80vh;
+    object-fit:contain;
+    background:#000;
+}
+
+/* =========================
+   ARROWS
+   ========================= */
+
+.post-media-arrow{
+    display:none !important;
+    position:absolute;
+    top:50%;
+    transform:translateY(-50%);
+
+    width:38px;
+    height:38px;
+
+    border:none;
+    border-radius:50%;
+
+    background:rgba(0,0,0,.48);
+    backdrop-filter:blur(8px);
+
+    color:#fff;
+    font-size:30px;
+    line-height:1;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    cursor:pointer;
+    z-index:20;
+
+    transition:
+        opacity .2s ease,
+        transform .2s ease,
+        background .2s ease;
+}
+
+.post-media-arrow:hover{
+    background:rgba(0,0,0,.70);
+}
+
+.post-media-arrow:active{
+    transform:translateY(-50%) scale(.92);
+}
+
+.post-media-prev{
+    left:10px;
+}
+
+.post-media-next{
+    right:10px;
+}
+
+/* =========================
+   COUNTER
+   ========================= */
+
+.post-media-counter{
+    position:absolute;
+    top:12px;
+    right:12px;
+
+    min-width:42px;
+    padding:5px 9px;
+
+    border-radius:14px;
+
+    background:rgba(0,0,0,.55);
+    backdrop-filter:blur(8px);
+
+    color:#fff;
+    text-align:center;
+
+    font-size:12px;
+    font-weight:600;
+
+    z-index:20;
+}
+
+/* =========================
+   DOTS
+   ========================= */
+
+.post-media-dots{
+    position:absolute;
+    left:50%;
+    bottom:12px;
+
+    transform:translateX(-50%);
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    gap:5px;
+
+    z-index:20;
+}
+
+.post-media-dot{
+    width:6px;
+    height:6px;
+
+    border-radius:50%;
+
+    background:rgba(255,255,255,.45);
+
+    transition:
+        width .2s ease,
+        background .2s ease,
+        transform .2s ease;
+}
+
+.post-media-dot.active{
+    width:7px;
+    height:7px;
+
+    background:#fff;
+
+    transform:scale(1.1);
+}
+
+/* =========================
+   SINGLE MEDIA
+   ========================= */
+
+.post-media-carousel.single-media
+.post-media-arrow,
+.post-media-carousel.single-media
+.post-media-counter,
+.post-media-carousel.single-media
+.post-media-dots{
+    display:none;
+}
+
+</style>
+
+
+</div>
+
+
+
+</div>
+
+<div id="uploadStatus"
+     style="
+     display:none;
+     position:absolute;
+     bottom:80px;
+     left:50%;
+     transform:translateX(-50%);
+     width:80%;
+     text-align:center;
+     color:white;
+     font-size:18px;
+     font-weight:bold;
+     z-index:999999999;
+     ">
+
+    <div id="uploadStatusText">
+        Uploading... 0%
+    </div>
+
+    <div style="
+        width:100%;
+        height:6px;
+        background:rgba(255,255,255,0.25);
+        border-radius:10px;
+        margin-top:10px;
+        overflow:hidden;
+    ">
+
+        <div id="uploadProgress"
+             style="
+             width:0%;
+             height:100%;
+             background:white;
+             border-radius:10px;
+             transition:width:0.15s;
+             ">
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- Bottom -->
+<div id="storyEditorBottom">
+
+    <button id="shareStoryBtn" onclick="finalUpload()">
+        Your Story
+    </button>
+
+</div>
+
+</div>
+
 
 
 
 <script>
+console.log("JS START");
+
+
 // Master Global Variables
 let mode = "post";
 let facing = "environment"; // 'environment' matlab Back Camera, 'user' matlab Front Camera
 let stream = null;
+
 let selectedFile = null;
+let selectedFiles = [];
+
 let mediaRecorder;
 let chunks = [];
 let recording = false;
@@ -1027,9 +1997,12 @@ let allStories = {{ all_stories|tojson }};
 let storyList = {{ all_stories|tojson }};
 console.log("ALL STORIES =", allStories);
 
-
+console.log("JS Loaded");
 // Camera page open karne ke liye
+console.log(document.getElementById("createBtn"));
 document.getElementById("createBtn").onclick = function() {
+
+console.log("Create Clicked");
     let camera = document.getElementById("cameraPage");
     camera.style.display = "block";
     document.body.style.overflow = "hidden";
@@ -1050,6 +2023,47 @@ function setMode(value) {
         activeOption.style.color = "white";
         activeOption.style.fontWeight = "bold";
     }
+
+const storyTools = document.getElementById("storyTools");
+
+const galleryInput = document.getElementById("gallery");
+
+if (galleryInput) {
+
+    if (value === "post") {
+        galleryInput.multiple = true;
+        galleryInput.accept = "image/*,video/*";
+    } else if (value === "story") {
+        galleryInput.multiple = false;
+        galleryInput.accept = "image/*,video/*";
+    } else if (value === "reel") {
+        galleryInput.multiple = false;
+        galleryInput.accept = "video/*";
+    }
+
+}
+
+
+const nextBtn = document.querySelector('button[onclick="nextCaption()"]');
+const closeBtn = document.querySelector('button[onclick="closeCamera()"]');
+const timer = document.getElementById("timer");
+if (value === "story") {
+
+    storyTools.style.display = "flex";
+
+    nextBtn.style.display = "none";
+    closeBtn.style.display = "none";
+timer.style.display = "none";
+
+} else {
+
+    storyTools.style.display = "none";
+
+    nextBtn.style.display = "block";
+    closeBtn.style.display = "block";
+timer.style.display = "block";
+}
+
 
     resetMediaView();
 }
@@ -1114,6 +2128,7 @@ function resetMediaView() {
 
 // Next dabane par caption page par le jane ke liye
 function nextCaption() {
+
     if (!selectedFile) {
         alert("Pehle photo ya video click kijiye ya Gallery se select kijiye!");
         return;
@@ -1124,8 +2139,18 @@ function nextCaption() {
         stream = null;
     }
 
-    document.getElementById("cameraPage").style.display = "none";
-    document.getElementById("captionPage").style.display = "block";
+document.getElementById("cameraPage").style.display = "none";
+
+if(mode==="story"){
+
+    openStoryEditor();
+
+}else{
+
+    document.getElementById("captionPage").style.display="block";
+
+}
+
 }
 
 // Photo click ya Video Record trigger capture button
@@ -1160,6 +2185,10 @@ function capture() {
         video.style.display = "none";
         previewCont.style.display = "block";
         previewImg.style.display = "block";
+
+        nextCaption();
+
+
     }, "image/jpeg");
 }
 
@@ -1170,32 +2199,281 @@ function galleryOpen() {
 
 // 🖼️ Gallery se photo/video select hone ke baad ka logic
 function gallerySelect() {
-    let file = document.getElementById("gallery").files[0];
-    if (!file) return;
 
-    selectedFile = file; // Select ki hui file variable me save ho gayi
-    
-    let video = document.getElementById("cam");
-    let previewCont = document.getElementById("previewContainer");
-    let previewImg = document.getElementById("preview");
-    let previewVid = document.getElementById("previewVideo");
+    const gallery =
+        document.getElementById("gallery");
 
-    video.style.display = "none";
-    previewCont.style.display = "block";
+    if (!gallery || !gallery.files.length) {
+        return;
+    }
 
-    // Agar user ne video select kiya hai
-    if (file.type.startsWith("video/")) {
-        previewImg.style.display = "none";
-        previewVid.src = URL.createObjectURL(file);
-        previewVid.style.display = "block";
-        previewVid.play();
-        console.log("Gallery se Video select hua.");
-    } else {
-        // Agar user ne photo select ki hai
-        previewVid.style.display = "none";
-        previewImg.src = URL.createObjectURL(file);
-        previewImg.style.display = "block";
-        console.log("Gallery se Image select hui.");
+    const files =
+        Array.from(gallery.files);
+
+    console.log(
+        "GALLERY FILE COUNT =",
+        files.length
+    );
+
+    // =====================================================
+    // POST
+    // Multiple photos/videos
+    // =====================================================
+
+    if (mode === "post") {
+
+        if (files.length > 10) {
+
+            alert(
+                "Maximum 10 photos or videos allowed."
+            );
+
+            gallery.value = "";
+            return;
+        }
+
+        selectedFiles = files;
+
+        // Backward compatibility
+        selectedFile = files[0];
+
+        console.log(
+            "POST MEDIA SELECTED =",
+            selectedFiles.length
+        );
+
+        const video =
+            document.getElementById("cam");
+
+        const previewCont =
+            document.getElementById(
+                "previewContainer"
+            );
+
+        const previewImg =
+            document.getElementById("preview");
+
+        const previewVid =
+            document.getElementById(
+                "previewVideo"
+            );
+
+        video.style.display = "none";
+        previewCont.style.display = "block";
+
+        const firstFile =
+            selectedFiles[0];
+
+        if (
+            firstFile.type &&
+            firstFile.type.startsWith("video/")
+        ) {
+
+            previewImg.style.display = "none";
+
+            previewVid.src =
+                URL.createObjectURL(
+                    firstFile
+                );
+
+            previewVid.style.display =
+                "block";
+
+            previewVid.play().catch(
+                () => {}
+            );
+
+        } else {
+
+            previewVid.style.display =
+                "none";
+
+            previewImg.src =
+                URL.createObjectURL(
+                    firstFile
+                );
+
+            previewImg.style.display =
+                "block";
+        }
+
+// =====================================================
+ // SNAPZ POST
+ // Gallery -> Direct Caption Page
+ // Photo Editor bypass
+ // =====================================================
+
+ postEditFiles = Array.from(selectedFiles);
+ postEditCurrentIndex = 0;
+ postEditTexts = [];
+
+ const postEditor =
+     document.getElementById("postEditPage");
+
+ if (postEditor) {
+     postEditor.style.display = "none";
+ }
+
+ const captionPage =
+     document.getElementById("captionPage");
+
+ if (captionPage) {
+     captionPage.style.display = "block";
+ }
+
+ document.body.style.overflow = "hidden";
+
+updatePostSharePreview();
+updatePostShareMusic();
+
+snapzSetupPostCrop();
+snapzSetupPostSwipe();
+snapzUpdatePostMediaCounter();
+
+ return;
+
+    }
+
+
+    // =====================================================
+    // STORY
+    // Only ONE media
+    // =====================================================
+
+    if (mode === "story") {
+
+        const file = files[0];
+
+        selectedFiles = [file];
+        selectedFile = file;
+
+        console.log(
+            "STORY MEDIA SELECTED =",
+            file.name
+        );
+
+        const video =
+            document.getElementById("cam");
+
+        const previewCont =
+            document.getElementById(
+                "previewContainer"
+            );
+
+        const previewImg =
+            document.getElementById("preview");
+
+        const previewVid =
+            document.getElementById(
+                "previewVideo"
+            );
+
+        video.style.display = "none";
+        previewCont.style.display =
+            "block";
+
+        if (
+            file.type &&
+            file.type.startsWith("video/")
+        ) {
+
+            previewImg.style.display =
+                "none";
+
+            previewVid.src =
+                URL.createObjectURL(file);
+
+            previewVid.style.display =
+                "block";
+
+            previewVid.play().catch(
+                () => {}
+            );
+
+        } else {
+
+            previewVid.style.display =
+                "none";
+
+            previewImg.src =
+                URL.createObjectURL(file);
+
+            previewImg.style.display =
+                "block";
+        }
+
+        openStoryEditor();
+
+        return;
+    }
+
+
+    // =====================================================
+    // REEL
+    // Only ONE video
+    // =====================================================
+
+    if (mode === "reel") {
+
+        const file = files[0];
+
+        if (
+            !file.type ||
+            !file.type.startsWith("video/")
+        ) {
+
+            alert(
+                "Reel ke liye sirf video select kijiye."
+            );
+
+            gallery.value = "";
+            return;
+        }
+
+        selectedFiles = [file];
+        selectedFile = file;
+
+        console.log(
+            "REEL VIDEO SELECTED =",
+            file.name
+        );
+
+        const video =
+            document.getElementById("cam");
+
+        const previewCont =
+            document.getElementById(
+                "previewContainer"
+            );
+
+        const previewImg =
+            document.getElementById("preview");
+
+        const previewVid =
+            document.getElementById(
+                "previewVideo"
+            );
+
+        video.style.display = "none";
+        previewCont.style.display =
+            "block";
+
+        previewImg.style.display =
+            "none";
+
+        previewVid.src =
+            URL.createObjectURL(file);
+
+        previewVid.style.display =
+            "block";
+
+        previewVid.play().catch(
+            () => {}
+        );
+
+        openReelEditor();
+
+        return;
     }
 }
 
@@ -1245,53 +2523,2295 @@ function startRecording() {
     }, 15000);
 }
 
-// Server par final fetch request post data send karne ke liye
-function finalUpload() {
+
+/* =========================================================
+   SNAPZ POST 3:4 CROP / ADJUST
+   Caption Page par hi crop controls
+========================================================= */
+
+let snapzCropZoom = 1;
+let snapzCropX = 50;
+let snapzCropY = 50;
+let snapzCropReady = false;
+
+/* =========================================================
+   SNAPZ MULTIPLE POST PHOTO ADJUSTMENT
+   Har photo ki adjustment alag save hogi
+========================================================= */
+
+let snapzPostAdjustments = [];
+
+function snapzEnsurePostAdjustment(index){
+
+    if(!snapzPostAdjustments[index]){
+        snapzPostAdjustments[index] = {
+            scale: 1,
+            x: 0,
+            y: 0
+        };
+    }
+
+    return snapzPostAdjustments[index];
+}
+
+function snapzSaveCurrentPostAdjustment(){
+
+    if(
+        typeof postEditCurrentIndex !== "number"
+    ){
+        return;
+    }
+
+    const state =
+        snapzEnsurePostAdjustment(
+            postEditCurrentIndex
+        );
+
+    state.scale =
+        snapzCropState.scale;
+
+    state.x =
+        snapzCropState.x;
+
+    state.y =
+        snapzCropState.y;
+}
+
+function snapzLoadPostAdjustment(index){
+
+    snapzCropState.adjustmentSaved = false;
+
+    const state =
+        snapzEnsurePostAdjustment(index);
+
+    snapzCropState.scale =
+        state.scale;
+
+    snapzCropState.x =
+        state.x;
+
+    snapzCropState.y =
+        state.y;
+
+    snapzCropState.lastX =
+        state.x;
+
+    snapzCropState.lastY =
+        state.y;
+
+    snapzApplyCropTransform();
+}
+
+/* =========================================================
+   SNAPZ INSTAGRAM STYLE 3:4 GESTURE CROP
+   1 FINGER  = MOVE
+   2 FINGERS = PINCH ZOOM
+   FINAL     = 3:4
+========================================================= */
+
+let snapzCropState = {
+    scale: 1,
+    minScale: 1,
+    x: 0,
+    y: 0,
+    startX: 0,
+    startY: 0,
+    lastX: 0,
+    lastY: 0,
+    pinchStartDistance: 0,
+    pinchStartScale: 1,
+    dragging: false,
+    active: false,
+    adjustmentSaved: false,
+    adjustmentMode: false,
+    lastTapTime: 0
+};
+
+let snapzCropImageElement = null;
+
+function snapzClamp(v, min, max){
+    return Math.max(min, Math.min(max, v));
+}
+
+function snapzDistance(a, b){
+    const dx = a.clientX - b.clientX;
+    const dy = a.clientY - b.clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+}
 
 
-    if (!selectedFile) {
-        alert("Koi file select nahi hui hai.");
+/* =========================================================
+   SNAPZ MULTI PHOTO SWIPE NAVIGATION
+   LEFT  = NEXT
+   RIGHT = PREVIOUS
+========================================================= */
+
+function snapzUpdatePostMediaCounter(){
+
+    const counter =
+        document.getElementById("snapzPostMediaCounter");
+
+    if(!counter){
+        return;
+    }
+
+    const total =
+        postEditFiles &&
+        postEditFiles.length
+            ? postEditFiles.length
+            : 0;
+
+    if(total <= 1){
+        counter.style.display = "none";
+        return;
+    }
+
+    counter.textContent =
+        (postEditCurrentIndex + 1) +
+        " / " +
+        total;
+
+    counter.style.display = "block";
+}
+
+
+function snapzShowPostMedia(index){
+
+    if(!postEditFiles || postEditFiles.length <= 1){
+        return;
+    }
+
+    const total = postEditFiles.length;
+
+    if(index < 0){
+        index = total - 1;
+    }
+
+    if(index >= total){
+        index = 0;
+    }
+
+    // Current adjustment save
+    if(typeof snapzSaveCurrentPostAdjustment === "function"){
+        snapzSaveCurrentPostAdjustment();
+    }
+
+    // Hide manual adjust button while loading next photo
+    const adjustNextButton =
+        document.getElementById("snapzPostAdjustNext");
+
+    if(adjustNextButton){
+        adjustNextButton.style.display = "none";
+    }
+
+    // Change index
+    postEditCurrentIndex = index;
+
+    // Load new photo
+    updatePostSharePreview();
+
+    // Load its saved adjustment
+    if(typeof snapzLoadPostAdjustment === "function"){
+        snapzLoadPostAdjustment(index);
+    }
+
+    // Reconnect crop system
+    snapzCropImageElement = null;
+
+    const img =
+        document.getElementById("postShareImage");
+
+    if(img){
+        img.dataset.snapzGestureReady = "";
+    }
+
+    if(typeof snapzSetupPostCrop === "function"){
+        snapzSetupPostCrop();
+    }
+
+    // Update 1 / 3 counter
+    const counter =
+        document.getElementById("snapzPostMediaCounter");
+
+    if(counter){
+        counter.textContent =
+            (index + 1) + " / " + total;
+
+        counter.style.display = "block";
+    }
+}
+
+
+
+function snapzNextPostMedia(){
+
+    if(
+        !postEditFiles ||
+        postEditFiles.length <= 1
+    ){
+        return;
+    }
+
+    snapzShowPostMedia(
+        postEditCurrentIndex + 1
+    );
+}
+
+
+function snapzPreviousPostMedia(){
+
+    if(
+        !postEditFiles ||
+        postEditFiles.length <= 1
+    ){
+        return;
+    }
+
+    snapzShowPostMedia(
+        postEditCurrentIndex - 1
+    );
+}
+
+
+/* =========================================================
+   FINGER SWIPE
+========================================================= */
+
+let snapzSwipeStartX = 0;
+let snapzSwipeStartY = 0;
+
+function snapzSetupPostSwipe(){
+
+    const img =
+        document.getElementById("postShareImage");
+
+    const video =
+        document.getElementById("postShareVideo");
+
+    const area =
+        img?.parentElement;
+
+    if(!area){
+        return;
+    }
+
+    if(area.dataset.snapzSwipeReady === "1"){
+        return;
+    }
+
+    area.dataset.snapzSwipeReady = "1";
+
+    let startX = 0;
+    let startY = 0;
+    let tracking = false;
+
+
+    area.addEventListener(
+        "touchstart",
+        function(e){
+
+            if(e.touches.length !== 1){
+                tracking = false;
+                return;
+            }
+
+            /*
+               NORMAL PHOTO ONLY
+
+               scale <= 1:
+               swipe system active.
+
+               scale > 1:
+               crop system owns the finger.
+            */
+
+            if(
+                  typeof snapzCropState !== "undefined" &&
+                  snapzCropState.adjustmentMode === true
+              ){
+                tracking = false;
+                return;
+            }
+
+            startX =
+                e.touches[0].clientX;
+
+            startY =
+                e.touches[0].clientY;
+
+            tracking = true;
+        },
+        {passive:true}
+    );
+
+
+    area.addEventListener(
+        "touchend",
+        function(e){
+
+            if(!tracking){
+                return;
+            }
+
+            tracking = false;
+
+            /*
+               Zoomed image:
+               NEVER change photo.
+            */
+
+            if(
+                  typeof snapzCropState !== "undefined" &&
+                  snapzCropState.adjustmentMode === true
+              ){
+                return;
+            }
+
+            if(
+                !postEditFiles ||
+                postEditFiles.length <= 1
+            ){
+                return;
+            }
+
+            if(e.changedTouches.length !== 1){
+                return;
+            }
+
+            const endX =
+                e.changedTouches[0].clientX;
+
+            const endY =
+                e.changedTouches[0].clientY;
+
+            const dx =
+                endX - startX;
+
+            const dy =
+                endY - startY;
+
+
+            /*
+               Only horizontal swipe.
+            */
+
+            if(Math.abs(dx) < 60){
+                return;
+            }
+
+            if(Math.abs(dx) <= Math.abs(dy)){
+                return;
+            }
+
+
+            /*
+               IMPORTANT:
+               Image ko move nahi karna.
+               Sirf photo index change karna hai.
+            */
+
+            if(dx < 0){
+
+                snapzNextPostMedia();
+
+            }else{
+
+                snapzPreviousPostMedia();
+
+            }
+
+        },
+        {passive:true}
+    );
+}
+
+
+function snapzSetupPostCrop(){
+
+    snapzSetupAdjustNextButton();
+
+    const img =
+        document.getElementById("postShareImage");
+
+    if(!img){
+        return;
+    }
+
+    snapzCropImageElement = img;
+
+    /*
+       =====================================================
+       SNAPZ MANUAL ADJUST MODE
+
+       NORMAL:
+       - Photo fixed
+       - No zoom
+       - No move
+       - Swipe navigation allowed
+
+       DOUBLE TAP:
+       - Adjustment mode ON
+       - 1 finger = MOVE
+       - 2 fingers = PINCH ZOOM
+
+       DONE:
+       - Save adjustment
+       - Exit adjustment mode
+       - Photo stays saved
+    =====================================================
+    */
+
+    if(typeof snapzCropState.adjustmentMode !== "boolean"){
+        snapzCropState.adjustmentMode = false;
+    }
+
+    if(typeof snapzCropState.lastTapTime !== "number"){
+        snapzCropState.lastTapTime = 0;
+    }
+
+    img.style.userSelect = "none";
+    img.style.webkitUserSelect = "none";
+    img.style.cursor = "default";
+
+    /*
+       IMPORTANT:
+       Listener sirf ek baar attach hoga.
+    */
+
+    if(img.dataset.snapzGestureReady === "1"){
+        snapzLoadPostAdjustment(
+            postEditCurrentIndex || 0
+        );
+        snapzExitPostAdjustMode();
+        return;
+    }
+
+    img.dataset.snapzGestureReady = "1";
+
+    /*
+       =====================================================
+       DOUBLE TAP
+    =====================================================
+    */
+
+    img.addEventListener(
+        "touchend",
+        function(e){
+
+            /*
+               Adjustment mode mein normal touchend ko
+               double-tap detector nahi banana.
+            */
+            if(snapzCropState.adjustmentMode){
+                return;
+            }
+
+            /*
+               Swipe ko double tap na samjhe.
+            */
+            if(e.changedTouches.length !== 1){
+                return;
+            }
+
+            const now = Date.now();
+            const diff =
+                now - snapzCropState.lastTapTime;
+
+            if(diff > 0 && diff < 300){
+
+                e.preventDefault();
+                e.stopPropagation();
+
+                snapzEnterPostAdjustMode();
+
+                snapzCropState.lastTapTime = 0;
+
+                return;
+            }
+
+            snapzCropState.lastTapTime = now;
+
+            /*
+               Single tap ko thoda wait.
+               Agar swipe hai to navigation system
+               normally kaam karega.
+            */
+        },
+        {passive:false}
+    );
+
+    /*
+       =====================================================
+       DOUBLE CLICK - DESKTOP
+    =====================================================
+    */
+
+    img.addEventListener(
+        "dblclick",
+        function(e){
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            snapzEnterPostAdjustMode();
+        }
+    );
+
+    /*
+       =====================================================
+       TOUCH START
+       ONLY ACTIVE IN ADJUSTMENT MODE
+    =====================================================
+    */
+
+    img.addEventListener(
+        "touchstart",
+        function(e){
+
+            if(!snapzCropState.adjustmentMode){
+                return;
+            }
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            if(e.touches.length === 1){
+
+                const t = e.touches[0];
+
+                snapzCropState.dragging = true;
+
+                snapzCropState.startX =
+                    t.clientX;
+
+                snapzCropState.startY =
+                    t.clientY;
+
+                snapzCropState.lastX =
+                    snapzCropState.x;
+
+                snapzCropState.lastY =
+                    snapzCropState.y;
+
+            }
+
+            else if(e.touches.length === 2){
+
+                snapzCropState.dragging = false;
+
+                snapzCropState.pinchStartDistance =
+                    snapzDistance(
+                        e.touches[0],
+                        e.touches[1]
+                    );
+
+                snapzCropState.pinchStartScale =
+                    snapzCropState.scale;
+            }
+
+        },
+        {passive:false}
+    );
+
+    /*
+       =====================================================
+       TOUCH MOVE
+    =====================================================
+    */
+
+    img.addEventListener(
+        "touchmove",
+        function(e){
+
+            if(!snapzCropState.adjustmentMode){
+                return;
+            }
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            /*
+               ONE FINGER = MOVE
+            */
+
+            if(e.touches.length === 1){
+
+                if(!snapzCropState.dragging){
+                    return;
+                }
+
+                const t = e.touches[0];
+
+                const dx =
+                    t.clientX -
+                    snapzCropState.startX;
+
+                const dy =
+                    t.clientY -
+                    snapzCropState.startY;
+
+                snapzCropState.x =
+                    snapzCropState.lastX + dx;
+
+                snapzCropState.y =
+                    snapzCropState.lastY + dy;
+
+                snapzApplyCropTransform();
+            }
+
+            /*
+               TWO FINGERS = PINCH ZOOM
+            */
+
+            else if(e.touches.length === 2){
+
+                const distance =
+                    snapzDistance(
+                        e.touches[0],
+                        e.touches[1]
+                    );
+
+                if(
+                    snapzCropState.pinchStartDistance <= 0
+                ){
+                    return;
+                }
+
+                const ratio =
+                    distance /
+                    snapzCropState.pinchStartDistance;
+
+                let newScale =
+                    snapzCropState.pinchStartScale *
+                    ratio;
+
+                newScale =
+                    snapzClamp(
+                        newScale,
+                        snapzCropState.minScale,
+                        5
+                    );
+
+                snapzCropState.scale =
+                    newScale;
+
+                snapzApplyCropTransform();
+            }
+
+        },
+        {passive:false}
+    );
+
+    /*
+       =====================================================
+       TOUCH END
+    =====================================================
+    */
+
+    img.addEventListener(
+        "touchend",
+        function(e){
+
+            if(!snapzCropState.adjustmentMode){
+                return;
+            }
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            if(e.touches.length === 0){
+
+                snapzCropState.dragging = false;
+
+                snapzCropState.pinchStartDistance = 0;
+
+                snapzCropState.lastX =
+                    snapzCropState.x;
+
+                snapzCropState.lastY =
+                    snapzCropState.y;
+            }
+
+            else if(e.touches.length === 1){
+
+                const t = e.touches[0];
+
+                snapzCropState.dragging = true;
+
+                snapzCropState.startX =
+                    t.clientX;
+
+                snapzCropState.startY =
+                    t.clientY;
+
+                snapzCropState.lastX =
+                    snapzCropState.x;
+
+                snapzCropState.lastY =
+                    snapzCropState.y;
+            }
+
+        },
+        {passive:false}
+    );
+
+    /*
+       =====================================================
+       MOUSE SUPPORT
+    =====================================================
+    */
+
+    img.addEventListener(
+        "mousedown",
+        function(e){
+
+            if(!snapzCropState.adjustmentMode){
+                return;
+            }
+
+            e.preventDefault();
+
+            snapzCropState.dragging = true;
+
+            snapzCropState.startX =
+                e.clientX;
+
+            snapzCropState.startY =
+                e.clientY;
+
+            snapzCropState.lastX =
+                snapzCropState.x;
+
+            snapzCropState.lastY =
+                snapzCropState.y;
+
+            img.style.cursor = "grabbing";
+        }
+    );
+
+    window.addEventListener(
+        "mousemove",
+        function(e){
+
+            if(
+                !snapzCropState.adjustmentMode ||
+                !snapzCropState.dragging
+            ){
+                return;
+            }
+
+            const dx =
+                e.clientX -
+                snapzCropState.startX;
+
+            const dy =
+                e.clientY -
+                snapzCropState.startY;
+
+            snapzCropState.x =
+                snapzCropState.lastX + dx;
+
+            snapzCropState.y =
+                snapzCropState.lastY + dy;
+
+            snapzApplyCropTransform();
+        }
+    );
+
+    window.addEventListener(
+        "mouseup",
+        function(){
+
+            if(!snapzCropState.adjustmentMode){
+                return;
+            }
+
+            snapzCropState.dragging = false;
+
+            if(snapzCropImageElement){
+                snapzCropImageElement.style.cursor =
+                    "grab";
+            }
+
+            snapzCropState.lastX =
+                snapzCropState.x;
+
+            snapzCropState.lastY =
+                snapzCropState.y;
+        }
+    );
+
+    /*
+       Current saved adjustment load karo,
+       lekin adjustment mode OFF rakho.
+    */
+
+    snapzLoadPostAdjustment(
+        postEditCurrentIndex || 0
+    );
+
+    snapzExitPostAdjustMode();
+}
+
+
+/* =========================================================
+   SNAPZ ENTER ADJUST MODE
+========================================================= */
+/* =========================================================
+   SNAPZ INSTAGRAM-STYLE ADJUSTMENT ENGINE
+========================================================= */
+
+// Global State
+window.snapzPhotoCropData = window.snapzPhotoCropData || {};
+window.postEditCurrentIndex = window.postEditCurrentIndex || 0;
+
+window.snapzCropState = window.snapzCropState || {
+    adjustmentMode: false,
+    x: 0, y: 0, scale: 1,
+    lastX: 0, lastY: 0,
+    dragging: false,
+    pinchStartDistance: 0,
+    pinchStartScale: 1
+};
+
+// Helper: Active photo fetcher
+function snapzGetActiveImage() {
+    return document.getElementById("postShareImage") || 
+           document.querySelector(".preview-container img.active") ||
+           document.querySelector(".upload-preview-img") ||
+           document.querySelector("#imagePreview img");
+}
+
+// Helper: Distance for 2-finger zoom
+function snapzDistance(t1, t2) {
+    const dx = t1.clientX - t2.clientX;
+    const dy = t1.clientY - t2.clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
+// 1. TRANSFORM APPLY (Zoom & Move)
+function snapzApplyCropTransform() {
+    const img = snapzGetActiveImage();
+    if (!img) return;
+
+    img.style.transform = "translate3d(" + snapzCropState.x + "px, " + snapzCropState.y + "px, 0px) scale(" + snapzCropState.scale + ")";
+    img.style.transformOrigin = "center center";
+    img.style.transition = snapzCropState.dragging ? "none" : "transform 0.05s ease-out";
+
+    // Tick Button Show/Hide Toggle
+    const doneBtn = document.getElementById("snapzPostAdjustNext");
+    if (doneBtn) {
+        doneBtn.style.display = snapzCropState.adjustmentMode ? "block" : "none";
+    }
+}
+
+/* =========================================================
+   SNAPZ INSTAGRAM-STYLE ADJUSTMENT ENGINE
+========================================================= */
+
+// Global State
+window.snapzPhotoCropData = window.snapzPhotoCropData || {};
+window.postEditCurrentIndex = window.postEditCurrentIndex || 0;
+
+window.snapzCropState = window.snapzCropState || {
+    adjustmentMode: false,
+    x: 0, y: 0, scale: 1,
+    lastX: 0, lastY: 0,
+    dragging: false,
+    pinchStartDistance: 0,
+    pinchStartScale: 1
+};
+
+// Helper: Active photo fetcher
+function snapzGetActiveImage() {
+    return document.getElementById("postShareImage") || 
+           document.querySelector(".preview-container img.active") ||
+           document.querySelector(".upload-preview-img") ||
+           document.querySelector("#imagePreview img");
+}
+
+// Helper: Distance for 2-finger zoom
+function snapzDistance(t1, t2) {
+    const dx = t1.clientX - t2.clientX;
+    const dy = t1.clientY - t2.clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
+// 1. TRANSFORM APPLY (Zoom & Move)
+function snapzApplyCropTransform() {
+    const img = snapzGetActiveImage();
+    if (!img) return;
+
+    img.style.transform = "translate3d(" + snapzCropState.x + "px, " + snapzCropState.y + "px, 0px) scale(" + snapzCropState.scale + ")";
+    img.style.transformOrigin = "center center";
+    img.style.transition = snapzCropState.dragging ? "none" : "transform 0.05s ease-out";
+
+    // Tick Button Show/Hide Toggle
+    const doneBtn = document.getElementById("snapzPostAdjustNext");
+    if (doneBtn) {
+        doneBtn.style.display = snapzCropState.adjustmentMode ? "block" : "none";
+    }
+}
+
+// 2. ENTER ADJUSTMENT MODE (Double Tap Par Trigger)
+function snapzEnterPostAdjustMode() {
+    snapzCropState.adjustmentMode = true;
+
+    const img = snapzGetActiveImage();
+    if (img) {
+        img.style.touchAction = "none";
+        img.style.cursor = "grab";
+        img.style.pointerEvents = "auto";
+    }
+
+    const doneBtn = document.getElementById("snapzPostAdjustNext");
+    if (doneBtn) {
+        doneBtn.textContent = "✓";
+        doneBtn.style.display = "block";
+    }
+
+    snapzApplyCropTransform();
+}
+
+// 3. EXIT / SAVE ADJUSTMENT MODE (Done '✓' Button Click)
+function snapzExitPostAdjustMode() {
+    // Current photo ki transform save karo
+    snapzPhotoCropData[window.postEditCurrentIndex] = {
+        x: snapzCropState.x,
+        y: snapzCropState.y,
+        scale: snapzCropState.scale
+    };
+
+    snapzCropState.adjustmentMode = false;
+    snapzCropState.dragging = false;
+
+    const img = snapzGetActiveImage();
+    if (img) {
+        img.style.touchAction = "pan-y";
+        img.style.cursor = "default";
+    }
+
+    // Hide Done Button
+    const doneBtn = document.getElementById("snapzPostAdjustNext");
+    if (doneBtn) {
+        doneBtn.style.display = "none";
+    }
+}
+
+// 4. SWITCH NEXT / PREVIOUS PHOTO
+function snapzSwitchAdjustPhoto(newIndex) {
+    // Purani photo ki positioning pehle save kar lo
+    if (snapzCropState.adjustmentMode) {
+        snapzExitPostAdjustMode();
+    } else {
+        snapzPhotoCropData[window.postEditCurrentIndex] = {
+            x: snapzCropState.x,
+            y: snapzCropState.y,
+            scale: snapzCropState.scale
+        };
+    }
+
+    window.postEditCurrentIndex = newIndex;
+
+    // Agli photo ki purani state load karo ya fresh (0,0,1) reset karo
+    const saved = snapzPhotoCropData[newIndex] || { x: 0, y: 0, scale: 1 };
+    snapzCropState.x = saved.x;
+    snapzCropState.y = saved.y;
+    snapzCropState.scale = saved.scale;
+    snapzCropState.lastX = saved.x;
+    snapzCropState.lastY = saved.y;
+
+    snapzApplyCropTransform();
+}
+
+// 5. GLOBAL DOUBLE TAP & TOUCH LISTENERS
+document.addEventListener("DOMContentLoaded", function () {
+    
+    // Done Button Handler setup
+    const doneBtn = document.getElementById("snapzPostAdjustNext");
+    if (doneBtn) {
+        doneBtn.style.display = "none"; // Pehle se Hide rakhein
+        doneBtn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            snapzExitPostAdjustMode();
+        };
+    }
+
+    // Double Tap Event (To Open Editor)
+    document.addEventListener("dblclick", function (e) {
+
+        /* HOME FEED DOUBLE TAP - DO NOT ENTER POST EDITOR */
+        if (e.target && e.target.closest(".post-media-item")) {
+            return;
+        }
+
+        const img = snapzGetActiveImage();
+        if (e.target && (e.target === img || e.target.closest(".preview-container") || e.target.tagName === "IMG")) {
+            e.preventDefault();
+            snapzEnterPostAdjustMode();
+        }
+    });
+
+    // Touch Event Handlers (1 Finger Move, 2 Finger Pinch Zoom)
+    document.addEventListener("touchstart", function (e) {
+        if (!snapzCropState.adjustmentMode) return;
+        const img = snapzGetActiveImage();
+        if (!img || !img.contains(e.target)) return;
+
+        if (e.touches.length === 1) {
+            snapzCropState.dragging = true;
+            snapzCropState.startX = e.touches[0].clientX;
+            snapzCropState.startY = e.touches[0].clientY;
+            snapzCropState.lastX = snapzCropState.x;
+            snapzCropState.lastY = snapzCropState.y;
+        } else if (e.touches.length === 2) {
+            snapzCropState.dragging = false;
+            snapzCropState.pinchStartDistance = snapzDistance(e.touches[0], e.touches[1]);
+            snapzCropState.pinchStartScale = snapzCropState.scale;
+        }
+    }, { passive: false });
+
+    document.addEventListener("touchmove", function (e) {
+        if (!snapzCropState.adjustmentMode) return;
+
+        if (e.touches.length === 1 && snapzCropState.dragging) {
+            e.preventDefault();
+            const dx = e.touches[0].clientX - snapzCropState.startX;
+            const dy = e.touches[0].clientY - snapzCropState.startY;
+            snapzCropState.x = snapzCropState.lastX + dx;
+            snapzCropState.y = snapzCropState.lastY + dy;
+            snapzApplyCropTransform();
+        } else if (e.touches.length === 2 && snapzCropState.pinchStartDistance > 0) {
+            e.preventDefault();
+            const dist = snapzDistance(e.touches[0], e.touches[1]);
+            const ratio = dist / snapzCropState.pinchStartDistance;
+            snapzCropState.scale = Math.min(Math.max(snapzCropState.pinchStartScale * ratio, 0.5), 4);
+            snapzApplyCropTransform();
+        }
+    }, { passive: false });
+
+    document.addEventListener("touchend", function (e) {
+        if (!snapzCropState.adjustmentMode) return;
+        if (e.touches.length === 0) {
+            snapzCropState.dragging = false;
+            snapzCropState.pinchStartDistance = 0;
+            snapzCropState.lastX = snapzCropState.x;
+            snapzCropState.lastY = snapzCropState.y;
+        }
+    });
+});
+
+
+
+
+/* =========================================================
+   SERVER UPLOAD CROP
+   Canvas output = EXACT 3:4
+========================================================= */
+
+async function snapzCropImage(file){
+
+    if(!file){
+        return file;
+    }
+
+    if(
+        !file.type ||
+        !file.type.startsWith("image/")
+    ){
+        return file;
+    }
+
+    return new Promise(function(resolve){
+
+        const img = new Image();
+
+        img.onload = function(){
+
+            const targetW = 1080;
+            const targetH = 1440;
+
+            const canvas =
+                document.createElement("canvas");
+
+            canvas.width = targetW;
+            canvas.height = targetH;
+
+            const ctx =
+                canvas.getContext("2d");
+
+            /*
+               Base cover scale.
+            */
+
+            /*
+   IMPORTANT:
+   Photo ko automatically crop mat karo.
+
+   Initial state mein poori photo visible rahe.
+   User khud 2-finger pinch se zoom karega
+   aur 1-finger se position adjust karega.
+*/
+const baseScale =
+                Math.min(
+                    targetW / img.naturalWidth,
+                    targetH / img.naturalHeight
+                );
+
+            /*
+               User zoom.
+            */
+
+            const finalScale =
+                baseScale *
+                snapzCropState.scale;
+
+            const drawW =
+                img.naturalWidth *
+                finalScale;
+
+            const drawH =
+                img.naturalHeight *
+                finalScale;
+
+            /*
+               Center + user's movement.
+            */
+
+            let drawX =
+                (targetW - drawW) / 2;
+
+            let drawY =
+                (targetH - drawH) / 2;
+
+            /*
+               Convert screen movement
+               into canvas movement.
+            */
+
+            const preview =
+                snapzCropImageElement;
+
+            if(preview){
+
+                const rect =
+                    preview.getBoundingClientRect();
+
+                const screenW =
+                    rect.width ||
+                    targetW;
+
+                const screenH =
+                    rect.height ||
+                    targetH;
+
+                drawX +=
+                    snapzCropState.x *
+                    (targetW / screenW);
+
+                drawY +=
+                    snapzCropState.y *
+                    (targetH / screenH);
+            }
+
+            /*
+               Draw photo.
+            */
+
+            ctx.drawImage(
+                img,
+                drawX,
+                drawY,
+                drawW,
+                drawH
+            );
+
+            canvas.toBlob(
+                function(blob){
+
+                    if(!blob){
+                        resolve(file);
+                        return;
+                    }
+
+                    const newFile =
+                        new File(
+                            [blob],
+                            file.name
+                                .replace(
+                                    /\.[^/.]+$/,
+                                    ""
+                                )
+                                + "_3x4.jpg",
+                            {
+                                type:"image/jpeg",
+                                lastModified:
+                                    Date.now()
+                            }
+                        );
+
+                    resolve(newFile);
+
+                },
+                "image/jpeg",
+                0.92
+            );
+
+        };
+
+        img.onerror = function(){
+            resolve(file);
+        };
+
+        img.src =
+            URL.createObjectURL(file);
+
+    });
+}
+
+async function snapzPreparePostFiles(){
+
+    if (mode !== "post") {
+        return true;
+    }
+
+    if (
+        !selectedFiles ||
+        !selectedFiles.length
+    ) {
+        return false;
+    }
+
+    const processed = [];
+
+    for (
+        const file of selectedFiles
+    ) {
+
+        if (
+            file &&
+            file.type &&
+            file.type.startsWith("image/")
+        ) {
+
+            const cropped =
+                await snapzCropImage(file);
+
+            processed.push(cropped);
+
+        } else {
+
+            /*
+               Video ko 4:3 crop nahi kar rahe.
+               Existing video upload system same rahega.
+            */
+            processed.push(file);
+        }
+    }
+
+    selectedFiles = processed;
+
+    /*
+       Backward compatibility
+    */
+    selectedFile =
+        selectedFiles[0] || null;
+
+    postEditFiles =
+        Array.from(selectedFiles);
+
+    postEditCurrentIndex = 0;
+
+    return true;
+}
+
+
+/* =========================================================
+   FINAL UPLOAD WRAPPER
+========================================================= */
+
+
+/* =========================================================
+   SNAPZ FINAL UPLOAD
+========================================================= */
+
+async function finalUpload(){
+
+    /*
+       Story / Reel = existing system
+       Post = prepare 3:4 images first
+    */
+
+    if (mode === "post") {
+
+        const ok =
+            await snapzPreparePostFiles();
+
+        if (!ok) {
+            alert("Pehle media select kijiye.");
+            return;
+        }
+    }
+
+    await snapzOriginalFinalUpload();
+}
+
+async function snapzOriginalFinalUpload() {
+
+    if (
+        mode === "post"
+        ? (!selectedFiles || !selectedFiles.length)
+        : !selectedFile
+    ) {
+        alert("Pehle media select kijiye.");
         return;
     }
 
     let formData = new FormData();
+
+    /*
+   =====================================================
+   SNAPZ MEDIA UPLOAD
+   POST   = MULTIPLE MEDIA
+   STORY  = SINGLE MEDIA
+   REEL   = SINGLE VIDEO
+   =====================================================
+*/
+
+if (mode === "post") {
+
+    if (!selectedFiles || !selectedFiles.length) {
+        alert("Post ke liye media select kijiye.");
+        return;
+    }
+
+    if (selectedFiles.length > 10) {
+        alert("Maximum 10 photos or videos allowed.");
+        return;
+    }
+
+    selectedFiles.forEach(function(file) {
+        formData.append("files", file);
+    });
+
+    console.log(
+        "POST FILES UPLOADING =",
+        selectedFiles.length
+    );
+
+} else {
+
+    if (!selectedFile) {
+        alert("Koi media select nahi hui hai.");
+        return;
+    }
+
     formData.append("file", selectedFile);
-    formData.append("caption", document.getElementById("caption").value.trim());
+
+    console.log(
+        "SINGLE MEDIA UPLOADING =",
+        selectedFile.name
+    );
+}
+
+    formData.append(
+        "caption",
+        document.getElementById("caption").value.trim()
+    );
+
     formData.append("type", mode);
+
+
+  /* =========================
+     TAGGED PEOPLE
+     POST ONLY
+     MAXIMUM 5
+  ========================= */
+
+  if (mode === "post") {
+
+      const taggedPeople =
+          typeof snapzGetTaggedPeople === "function"
+              ? snapzGetTaggedPeople()
+              : [];
+
+      formData.append(
+          "tagged_users",
+          JSON.stringify(
+              taggedPeople.slice(0, 5)
+          )
+      );
+
+      console.log(
+          "POST TAGGED PEOPLE =",
+          taggedPeople
+      );
+
+    } else if (mode === "reel") {
+
+        const reelTaggedPeople =
+            typeof snapzGetTaggedPeople === "function"
+                ? snapzGetTaggedPeople()
+                : [];
+
+        formData.append(
+            "tagged_users",
+            JSON.stringify(
+                reelTaggedPeople.slice(0, 5)
+            )
+        );
+
+        console.log(
+            "REEL TAGGED PEOPLE =",
+            reelTaggedPeople
+        );
+
+    }
 
     let url = "/upload";
 
-    if(mode=="story"){
-        url="/story";
+    if (mode == "story") {
+        url = "/story";
     }
 
 
-    fetch(url, {
-        method: "POST",
-        body: formData
-    })
+    /* =========================
+       UPLOAD STATUS
+    ========================= */
 
-    .then(response => response.json())
+    const uploadStatus =
+        document.getElementById("uploadStatus");
 
-    .then(data => {
+    const uploadStatusText =
+        document.getElementById("uploadStatusText");
 
-        console.log(data);
+    const uploadProgress =
+        document.getElementById("uploadProgress");
 
-        if (data.status === "ok") {
-            window.location.href = "/";
-            // ya location.reload();
-        } else {
-            alert(data.message || "Upload Failed");
-        }
 
-    })
+    if (uploadStatus) {
+        uploadStatus.style.display = "block";
+    }
 
-    .catch(err => {
-        console.log(err);
-        alert("Network Error");
-    });
+
+    if (uploadStatusText) {
+        uploadStatusText.textContent =
+            "Uploading... 0%";
+    }
+
+
+    if (uploadProgress) {
+        uploadProgress.style.width = "0%";
+    }
+
+
+    /* =========================
+       DISABLE UPLOAD BUTTON
+    ========================= */
+
+    const uploadButton =
+        mode === "reel"
+            ? document.getElementById("reelUploadButton")
+            : document.getElementById("shareStoryBtn");
+
+    if (uploadButton) {
+
+        uploadButton.disabled = true;
+
+        uploadButton.style.opacity = "0.6";
+        uploadButton.dataset.originalText =
+            uploadButton.textContent.trim();
+        uploadButton.textContent =
+            "Uploading... 0%";
+
+    }
+
+
+    /* =========================
+       XHR
+    ========================= */
+
+    const xhr =
+        new XMLHttpRequest();
+
+
+    xhr.open(
+        "POST",
+        url,
+        true
+    );
+
+
+    /* =========================
+       UPLOAD PROGRESS
+    ========================= */
+
+    xhr.upload.onprogress =
+        function(event) {
+
+            if (!event.lengthComputable) {
+                return;
+            }
+
+
+            const percent =
+                Math.round(
+                    (event.loaded / event.total) * 100
+                );
+
+
+            console.log(
+                "UPLOAD PROGRESS =",
+                percent + "%"
+            );
+
+
+            if (uploadStatusText) {
+
+                uploadStatusText.textContent =
+                    "Uploading... " +
+                    percent +
+                    "%";
+
+            }
+
+            if (uploadButton) {
+                uploadButton.textContent =
+                    "Uploading... " +
+                    percent +
+                    "%";
+            }
+
+
+            if (uploadProgress) {
+
+                uploadProgress.style.width =
+                    percent + "%";
+
+            }
+
+        };
+
+
+    /* =========================
+       SERVER RESPONSE
+    ========================= */
+
+    xhr.onload =
+        function() {
+
+            console.log(
+                "UPLOAD STATUS =",
+                xhr.status
+            );
+
+
+            if (
+                xhr.status >= 200 &&
+                xhr.status < 300
+            ) {
+
+
+                /*
+                   Upload ho gaya.
+                   Ab server processing complete hai.
+                */
+
+                if (uploadStatusText) {
+
+                    uploadStatusText.textContent =
+                        "Upload Successful ✓";
+
+                }
+
+
+                if (uploadProgress) {
+
+                    uploadProgress.style.width =
+                        "100%";
+
+                }
+
+
+                /*
+                   Button wapas enable
+                */
+
+                if (uploadButton) {
+
+                    uploadButton.disabled = false;
+
+                    uploadButton.style.opacity = "1";
+                    uploadButton.textContent =
+                        uploadButton.dataset.originalText ||
+                        "Upload";
+
+                }
+
+
+                /*
+                   Successful message
+                   thoda time dikhne do
+                */
+
+                setTimeout(
+                    function() {
+
+                        window.location.href = "/";
+
+                    },
+                    1000
+                );
+
+
+            } else {
+
+
+                if (uploadStatusText) {
+
+                    uploadStatusText.textContent =
+                        "Upload Failed";
+
+                }
+
+
+                if (uploadButton) {
+
+                    uploadButton.disabled = false;
+
+                    uploadButton.style.opacity = "1";
+
+                }
+
+
+                console.log(
+                    "SERVER RESPONSE =",
+                    xhr.responseText
+                );
+
+
+                alert(
+                    "Upload Failed"
+                );
+
+            }
+
+        };
+
+
+    /* =========================
+       NETWORK ERROR
+    ========================= */
+
+    xhr.onerror =
+        function() {
+
+            console.log(
+                "UPLOAD NETWORK ERROR"
+            );
+
+
+            if (uploadStatusText) {
+
+                uploadStatusText.textContent =
+                    "Upload Failed";
+
+            }
+
+
+            if (uploadButton) {
+
+                uploadButton.disabled = false;
+
+                uploadButton.style.opacity = "1";
+
+            }
+
+
+            alert(
+                "Network Error"
+            );
+
+        };
+
+
+      /* =========================
+         SNAPZ POST / REEL MUSIC
+         CONNECT EXISTING SELECTED AUDIO
+      ========================= */
+
+      if (mode === "post" || mode === "reel") {
+
+          const selectedAudio =
+              window.snapzSelectedAudio;
+
+          if (
+              selectedAudio &&
+              selectedAudio.url
+          ) {
+
+              const musicStart =
+                  Number(
+                      selectedAudio.startTime || 0
+                  );
+
+              const musicDuration =
+                  Number(
+                      selectedAudio.duration || 0
+                  );
+
+              const musicEnd =
+                  musicStart + musicDuration;
+
+              formData.append(
+                  "music_url",
+                  selectedAudio.url
+              );
+
+              formData.append(
+                  "music_start",
+                  String(musicStart)
+              );
+
+              formData.append(
+                  "music_end",
+                  String(musicEnd)
+              );
+
+              formData.append(
+                  "music_duration",
+                  String(musicDuration)
+              );
+
+              formData.append(
+                  "music_id",
+                  String(
+                      selectedAudio.id || ""
+                  )
+              );
+
+              console.log(
+                  "POST/REEL MUSIC UPLOAD DATA =",
+                  selectedAudio
+              );
+
+          } else {
+
+              console.log(
+                  "NO POST/REEL MUSIC SELECTED"
+              );
+
+          }
+
+      }
+
+
+      /* =========================
+         FRESH STORY MUSIC
+      ========================= */
+
+      if (mode === "story") {
+
+          const savedMusic =
+              sessionStorage.getItem(
+                  "snapz_story_music_fresh"
+              );
+
+          if (savedMusic) {
+
+              try {
+
+                  const musicData =
+                      JSON.parse(
+                          savedMusic
+                      );
+
+                  if (
+                      musicData &&
+                      musicData.url
+                  ) {
+
+                      formData.append(
+                          "music_url",
+                          musicData.url
+                      );
+
+                      formData.append(
+                          "music_start",
+                          String(
+                              Number(
+                                  musicData.start || 0
+                              )
+                          )
+                      );
+
+                      formData.append(
+                          "music_end",
+                          String(
+                              Number(
+                                  musicData.end || 0
+                              )
+                          )
+                      );
+
+                      formData.append(
+                          "music_duration",
+                          String(
+                              Number(
+                                  musicData.duration || 0
+                              )
+                          )
+                      );
+
+                      formData.append(
+                          "music_id",
+                          String(
+                              musicData.id || ""
+                          )
+                      );
+
+                      console.log(
+                          "FRESH STORY MUSIC UPLOAD DATA =",
+                          musicData
+                      );
+
+                  }
+
+              } catch (error) {
+
+                  console.error(
+                      "FRESH STORY MUSIC DATA ERROR =",
+                      error
+                  );
+
+              }
+
+          } else {
+
+              console.log(
+                  "NO FRESH STORY MUSIC SELECTED"
+              );
+
+          }
+
+      }
+
+
+
+    /* =========================
+       UPLOAD START
+    ========================= */
+
+    console.log(
+        "UPLOAD STARTED"
+    );
+
+
+    xhr.send(formData);
+}
+
+
+function openStoryEditor(){
+
+    console.log("Story Editor Open");
+
+    const editor =
+        document.getElementById("storyEditor");
+
+    const img =
+        document.getElementById("storyImage");
+
+    const vid =
+        document.getElementById("storyVideo");
+
+    const editorTools =
+        document.getElementById("storyEditorTools");
+
+
+    if (!editor) {
+        console.error("storyEditor not found");
+        return;
+    }
+
+    editor.style.display = "block";
+
+    if (editorTools) {
+        editorTools.style.display = "flex";
+    }
+
+    if (img) {
+        img.style.display = "none";
+    }
+
+    if (vid) {
+        vid.style.display = "none";
+    }
+
+    console.log(
+        "STORY EDITOR TOOLS =",
+        editorTools
+    );
+
+
+    /*
+       MUSIC PLAY BUTTON
+    */
+
+    let musicPlayButton =
+        document.getElementById(
+            "storyMusicPlayBtn"
+        );
+
+
+    if (!musicPlayButton) {
+
+        musicPlayButton =
+            document.createElement("button");
+
+        musicPlayButton.id =
+            "storyMusicPlayBtn";
+
+        musicPlayButton.type =
+            "button";
+
+        musicPlayButton.innerHTML =
+            "▶";
+
+        musicPlayButton.style.position =
+            "absolute";
+
+        musicPlayButton.style.top =
+            "18px";
+
+        musicPlayButton.style.right =
+            "75px";
+
+        musicPlayButton.style.width =
+            "52px";
+
+        musicPlayButton.style.height =
+            "52px";
+
+        musicPlayButton.style.border =
+            "none";
+
+        musicPlayButton.style.borderRadius =
+            "50%";
+
+        musicPlayButton.style.background =
+            "rgba(0,0,0,0.55)";
+
+        musicPlayButton.style.color =
+            "white";
+
+        musicPlayButton.style.fontSize =
+            "22px";
+
+        musicPlayButton.style.zIndex =
+            "999999";
+
+        musicPlayButton.style.cursor =
+            "pointer";
+
+
+        musicPlayButton.onclick =
+            function(event){
+
+                event.stopPropagation();
+
+                toggleStoryMusicPreview();
+
+            };
+
+
+        editor.appendChild(
+            musicPlayButton
+        );
+
+    }
+
+
+    /*
+       STORY MEDIA
+    */
+
+    if (!selectedFile) {
+
+        console.log(
+            "Koi selected file nahi hai"
+        );
+
+        return;
+
+    }
+
+
+    if (
+        selectedFile.type.startsWith("image/")
+    ) {
+
+        img.src =
+            URL.createObjectURL(
+                selectedFile
+            );
+
+        img.style.display =
+            "block";
+
+    }
+
+
+    else if (
+        selectedFile.type.startsWith("video/")
+    ) {
+
+        vid.src =
+            URL.createObjectURL(
+                selectedFile
+            );
+
+        vid.style.display =
+            "block";
+
+          vid.muted =
+              false;
+
+        vid.play().catch(
+            function(error){
+
+                console.log(
+                    "Video play error:",
+                    error
+                );
+
+            }
+        );
+
+    }
 
 }
+
+
+
+
+
+
+
+const storyTextBtn =
+    document.getElementById("storyTextBtn");
+
+const storyTextInput =
+    document.getElementById("storyTextInput");
+
+const storyTextLayer =
+    document.getElementById("storyTextLayer");
+
+
+console.log(
+    "SNAPZ STORY TEXT BUTTON =",
+    storyTextBtn
+);
+
+console.log(
+    "SNAPZ STORY TEXT INPUT =",
+    storyTextInput
+);
+
+console.log(
+    "SNAPZ STORY TEXT LAYER =",
+    storyTextLayer
+);
+
+
+/* =========================
+   STORY TEXT BUTTON
+========================= */
+
+if (storyTextBtn && storyTextInput && storyTextLayer) {
+
+    storyTextBtn.addEventListener(
+        "click",
+        function(e) {
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            console.log(
+                "STORY TEXT BUTTON CLICKED"
+            );
+
+            storyTextInput.style.display =
+                "block";
+
+            storyTextLayer.style.display =
+                "none";
+
+            storyTextInput.value =
+                storyTextLayer.textContent || "";
+
+            storyTextInput.focus();
+        }
+    );
+
+
+    storyTextInput.addEventListener(
+        "input",
+        function() {
+
+            storyTextLayer.textContent =
+                this.value;
+        }
+    );
+
+
+    storyTextInput.addEventListener(
+        "blur",
+        function() {
+
+            storyTextLayer.textContent =
+                this.value;
+
+            storyTextLayer.style.display =
+                this.value.trim()
+                    ? "block"
+                    : "none";
+
+            storyTextInput.style.display =
+                "none";
+        }
+    );
+
+}
+
+
+/* =========================
+   STORY TEXT DRAG
+========================= */
+
+let isDragging = false;
+let offsetX = 0;
+let offsetY = 0;
+
+
+const storyLayer =
+    document.getElementById("storyTextLayer");
+
+
+if (storyLayer) {
+
+    storyLayer.addEventListener(
+        "touchstart",
+        function(e) {
+
+            if (!storyLayer.textContent.trim()) {
+                return;
+            }
+
+            const touch =
+                e.touches[0];
+
+            isDragging = true;
+
+            const rect =
+                storyLayer.getBoundingClientRect();
+
+            offsetX =
+                touch.clientX - rect.left;
+
+            offsetY =
+                touch.clientY - rect.top;
+        },
+        { passive: true }
+    );
+
+
+    storyLayer.addEventListener(
+        "touchmove",
+        function(e) {
+
+            if (!isDragging) {
+                return;
+            }
+
+            e.preventDefault();
+
+            const touch =
+                e.touches[0];
+
+            const parent =
+                storyLayer.parentElement;
+
+            const parentRect =
+                parent.getBoundingClientRect();
+
+            let left =
+                touch.clientX -
+                parentRect.left -
+                offsetX;
+
+            let top =
+                touch.clientY -
+                parentRect.top -
+                offsetY;
+
+            storyLayer.style.left =
+                left + "px";
+
+            storyLayer.style.top =
+                top + "px";
+
+            storyLayer.style.transform =
+                "none";
+        },
+        { passive: false }
+    );
+
+
+    storyLayer.addEventListener(
+        "touchend",
+        function() {
+
+            isDragging = false;
+        }
+    );
+
+}
+
+
+let savedMusic =
+    sessionStorage.getItem(
+        "snapz_story_music"
+    );
+
+if(savedMusic){
+
+    try{
+
+        let music =
+            JSON.parse(savedMusic);
+
+        console.log(
+            "SELECTED STORY MUSIC =",
+            music
+        );
+
+        window.selectedStoryMusic =
+            music;
+
+    }catch(e){
+
+        console.log(
+            "Music data error",
+            e
+        );
+
+    }
+
+}
+
+
+
 
 
 
@@ -1440,300 +4960,7 @@ function toggleSearchFollow(username){
 
 </script>
 
-
-<div id="storyViewer" class="story-viewer">
-
-    <div class="story-header">
-
-        <div class="progress-box">
-            <div id="progress"></div>
-        </div>
-
-        <span id="storyUser">User</span>
-
-        <button onclick="closeStory()">✕</button>
-
-    </div>
-
-    <img id="storyImage"
-         style="width:100%;height:80vh;object-fit:contain;display:block;margin:auto;">
-
-    <!-- Left tap -->
-    <div
-        onclick="prevStory()"
-        style="
-        position:absolute;
-        left:0;
-        top:0;
-        width:50%;
-        height:100%;
-        z-index:20;">
-    </div>
-
-    <!-- Right tap -->
-    <div
-        onclick="nextStory()"
-        style="
-        position:absolute;
-        right:0;
-        top:0;
-        width:50%;
-        height:100%;
-        z-index:20;">
-    </div>
-
-    <!-- Eye button -->
-    <button
-        onclick="showViewers()"
-        style="
-        position:absolute;
-        bottom:20px;
-        left:50%;
-        transform:translateX(-50%);
-        background:none;
-        border:none;
-        color:white;
-        font-size:32px;
-        z-index:30;">
-        👁️
-    </button>
-
-    <div id="viewerList"></div>
-
-    <button
-        onclick="document.getElementById('viewerPopup').style.display='none'"
-        style="
-        position:absolute;
-        top:10px;
-        left:10px;
-        border:none;
-        background:none;
-        color:white;
-        font-size:30px;
-        z-index:40;">
-        ✕
-    </button>
-
-</div>
-
-<script>
-
-let currentStory = 0;
-storyList = [];
-let timer;
-let barInterval;
-let firstUser = "";
-
-console.log("STORY LIST =", storyList);
-
-function openStory(storyId, image, user){
-    console.log(allStories);
-
-    console.log("openStory called", storyId, image, user);
-
-
-    console.log("CLICK USER =", user);
-    console.log("ALL STORIES =", allStories);
-
-    storyList = allStories.filter(
-        x => String(x[1]).trim() === String(user).trim()
-    );
-
-    firstUser = user;
-
-    console.log("FILTERED =", storyList);
-
-    if(storyList.length === 0){
-        alert("No stories found for: " + user);
-        return;
-    }
-
-    currentStory = 0;
-
-    document.getElementById("storyViewer").style.display = "block";
-
-    showStory();
-}
-
-function showStory() {
-
-    console.log("storyList =", storyList);
-
-    if (!storyList || storyList.length === 0) return;
-
-    let s = storyList[currentStory];
-
-    document.getElementById("storyUser").innerHTML = s[1];
-
-    fetch("/story_views/" + s[0])
-    .then(r => r.json())
-    .then(data => {
-        document.getElementById("viewerCount").innerHTML = data.length;
-    });
-
-    let file = s[2];
-
-    let storyUrl = file.startsWith("http")
-        ? file
-        : "/static/uploads/" + file;
-
-    let oldMedia = document.getElementById("storyImage");
-
-    if (storyUrl.endsWith(".mp4") || storyUrl.endsWith(".webm")) {
-
-        oldMedia.outerHTML = `
-        <video id="storyImage"
-               autoplay
-               muted
-               controls
-               playsinline
-               style="width:100%;height:80vh;object-fit:contain;">
-            <source src="${storyUrl}" type="video/mp4">
-        </video>`;
-
-    } else {
-
-        oldMedia.outerHTML = `
-        <img id="storyImage"
-             src="${storyUrl}"
-             style="width:100%;height:80vh;object-fit:contain;">`;
-    }
-
-    document.getElementById("storyViewer").style.display = "block";
-}
-
-
-function showViewers(){
-
-    let s = storyList[currentStory];
-
-    fetch("/story_views/" + s[0])
-    .then(r=>r.json())
-    .then(users=>{
-
-        let html = "<h2>Story Viewers</h2>";
-
-        html += "👁️ " + users.length + "<hr>";
-
-        users.forEach(u=>{
-            html += `
-            <div style="padding:12px;border-bottom:1px solid #333;">
-                ${u}
-            </div>`;
-        });
-
-        html += `<button onclick="closeViewer()">Close</button>`;
-
-        document.getElementById("viewerBox").innerHTML = html;
-        document.getElementById("viewerBox").style.display = "block";
-
-    });
-
-}
-
-
-function nextStory(){
-
-    if(currentStory < storyList.length-1){
-
-        currentStory++;
-        showStory();
-
-    }else{
-
-        nextUserStory();
-
-    }
-
-}
-
-function prevStory(){
-
-    if(currentStory > 0){
-
-        currentStory--;
-        showStory();
-
-    }else{
-
-        prevUserStory();
-
-    }
-
-}
-
-
-function nextUserStory(){
-
-    let currentUser = storyList[0][1];
-
-    let users = [...new Set(allStories.map(x => x[1]))];
-
-    let index = users.indexOf(currentUser);
-
-    let nextIndex = index + 1;
-
-    if(nextIndex >= users.length){
-        nextIndex = 0;
-    }
-
-    let nextUser = users[nextIndex];
-
-    if(nextUser === firstUser){
-        closeStory();
-        return;
-    }
-
-    storyList = allStories.filter(x => x[1] === nextUser);
-
-    currentStory = 0;
-
-    showStory();
-}
-
-function prevUserStory(){
-
-    let users = [...new Set(allStories.map(x => x[1]))];
-
-    let index = users.indexOf(firstUser);
-
-    if(index > 0){
-
-        firstUser = users[index - 1];
-
-    }else{
-
-        firstUser = users[users.length - 1];
-
-    }
-
-    storyList = allStories.filter(
-        x => String(x[1]).trim() === String(firstUser).trim()
-    );
-
-    currentStory = storyList.length - 1;
-
-    showStory();
-
-}
-
-function closeStory(){
-
-    document.getElementById("storyViewer").style.display="none";
-
-    clearTimeout(timer);
-    clearInterval(barInterval);
-
-}
-
-function openCamera(){
-
-    alert("Camera trigger open!");
-
-}
-
-</script>
-
+{% include "story.html" %}
 
 <body>
 {% for post in posts %}
@@ -1741,6 +4968,9 @@ function openCamera(){
     <div class="post-header">
         <div style="display: flex; align-items: center; gap: 10px;">
 {% set pic = post[3] or 'default.jpg' %}
+
+<a href="{{ url_for('profile_view', username=post[0]|trim) }}"
+   style="display: flex; align-items: center;">
 
 {% if pic.startswith('http') %}
 <img src="{{ pic }}"
@@ -1752,29 +4982,247 @@ function openCamera(){
      onerror="this.src='/static/images/default.jpg'">
 {% endif %}
 
+</a>
 
-            <h3 style="margin: 0; color: white; font-size: 16px;">{{post[0]}}</h3>
+
+<h3 style="margin: 0; font-size: 16px;">
+    <a href="{{ url_for('profile_view', username=post[0]|trim) }}"
+       style="color: white; text-decoration: none;">
+        {{ post[0] }}
+    </a>
+</h3>
+
+
         </div>
-       <button onclick="toggleFollow(this, '{{ post[0]|trim }}')">
-{% if post[0]|trim in following_users %}
-    Following
-{% else %}
-    Follow
-{% endif %}
+
+
+
+<button
+    data-follow-username="{{ post[0]|trim }}"
+    onclick="toggleFollow(this, '{{ post[0]|trim }}')"
+    style="
+        background:#FF4081;
+        color:white;
+        border:none;
+        border-radius:6px;
+        padding:7px 14px;
+        font-weight:600;
+        cursor:pointer;
+    ">
+
+    {% if post[0]|trim in following_users %}
+        Following
+    {% else %}
+        Follow
+    {% endif %}
 </button>
-    </div>
 
-    <img src="{{ post[1] }}" class="post-img">
+</div>
 
-    <div class="action-bar">
-<button onclick="toggleLike(this, '{{ post[4] }}')" class="action-btn">
-    <span class="heart-icon">🤍</span>
+  <!-- =========================================
+       SNAPZ POST MEDIA CAROUSEL
+       Supports multiple images + videos
+  ========================================== -->
+
+  <div class="post-media-carousel"
+       data-post-id="{{ post[4] }}">
+
+      <div class="post-media-track">
+
+      {% for media in post[7] %}
+
+          <div class="post-media-slide">
+
+              {% if media.type == "video" %}
+
+                  <video
+                      class="post-media-item"
+                      src="{{ media.url }}"
+                      playsinline
+                      preload="metadata"
+                      controls>
+                  </video>
+
+              {% else %}
+
+                  <img
+                      class="post-media-item"
+                      src="{{ media.url }}"
+                      loading="lazy"
+                      onerror="this.style.display='none'">
+
+              {% endif %}
+
+          </div>
+
+      {% endfor %}
+
+      </div>
+
+      <!-- SNAPZ POST TAG + MUSIC CONTROLS -->
+
+      {% if post[13] %}
+      <button
+          type="button"
+          class="snapz-post-tag-control"
+          aria-label="Tagged people"
+          onclick="event.stopPropagation(); snapzTogglePostTags(this);"
+      >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="9" cy="8" r="3"></circle>
+              <path d="M3.5 19c.6-3.2 2.4-5 5.5-5s4.9 1.8 5.5 5"></path>
+              <path d="M16 11c2.4.2 4 1.8 4.5 4"></path>
+              <path d="M16 5.5a2.5 2.5 0 1 1 0 5"></path>
+          </svg>
+      </button>
+
+      <div class="snapz-post-tags-popup" hidden>
+          <div class="snapz-post-tags-title">Tagged people</div>
+
+          {% for tagged in post[13] %}
+          <a
+              class="snapz-post-tag-user"
+              href="{{ url_for('profile_view', username=tagged.username|trim) }}"
+              onclick="event.stopPropagation();"
+          >
+              <img
+                  src="{% if tagged.profile_pic %}{% if tagged.profile_pic.startswith('http') or tagged.profile_pic.startswith('/') %}{{ tagged.profile_pic }}{% else %}/static/images/{{ tagged.profile_pic }}{% endif %}{% else %}/static/images/default.jpg{% endif %}"
+                  onerror="this.onerror=null;this.src='/static/images/default.jpg';"
+                  alt=""
+              >
+              <span>{{ tagged.username }}</span>
+          </a>
+          {% endfor %}
+      </div>
+      {% endif %}
+
+      {% if post[10] %}
+      <button
+          type="button"
+          class="snapz-post-music-control"
+          aria-label="Turn music off"
+          data-music-on="1"
+          onclick="event.stopPropagation(); snapzTogglePostMusic(this);"
+      >
+          <svg class="snapz-music-on-icon" viewBox="0 0 24 24">
+              <path d="M9 18V5l11-2v13"></path>
+              <circle cx="6" cy="18" r="3"></circle>
+              <circle cx="17" cy="16" r="3"></circle>
+          </svg>
+
+          <svg class="snapz-music-off-icon" viewBox="0 0 24 24">
+              <path d="M9 18V5l11-2v13"></path>
+              <circle cx="6" cy="18" r="3"></circle>
+              <circle cx="17" cy="16" r="3"></circle>
+              <path d="M4 4l16 16"></path>
+          </svg>
+      </button>
+      {% endif %}
+
+      {% if post[7]|length > 1 %}
+
+          <button
+              type="button"
+              class="post-media-arrow post-media-prev"
+              onclick="movePostMedia(this,-1)">
+              ‹
+          </button>
+
+          <button
+              type="button"
+              class="post-media-arrow post-media-next"
+              onclick="movePostMedia(this,1)">
+              ›
+          </button>
+
+          <div class="post-media-counter">
+              <span class="post-media-current">1</span>
+              /
+              {{ post[7]|length }}
+          </div>
+
+          <div class="post-media-dots">
+
+              {% for media in post[7] %}
+
+                  <span
+                      class="post-media-dot {% if loop.first %}active{% endif %}">
+                  </span>
+
+              {% endfor %}
+
+          </div>
+
+      {% endif %}
+
+  </div>
+
+  {% if post[10] %}
+  <audio
+      class="snapz-post-music"
+      src="{{ post[10] }}"
+      data-start="{{ post[11] or 0 }}"
+      data-end="{{ post[12] or 0 }}"
+      preload="metadata">
+  </audio>
+  {% endif %}
+
+<div class="action-bar">
+
+<button
+    onclick="toggleLike(this, '{{ post[4] }}')"
+    class="action-btn">
+
+    <span class="heart-icon">
+        <svg
+            width="28"
+            height="28"
+            viewBox="0 0 24 24"
+            fill="{% if post[14] %}red{% else %}none{% endif %}">
+
+            <path
+                d="M20.84 4.61C20.33 4.1 19.72 3.69 19.05 3.42C18.39 3.14 17.67 3 16.95 3.01C16.23 3.02 15.51 3.17 14.85 3.46C14.19 3.74 13.59 4.16 13.09 4.68L12 5.79L10.91 4.68C10.41 4.16 9.81 3.74 9.15 3.46C8.49 3.17 7.77 3.02 7.05 3.01C6.33 3 5.61 3.14 4.95 3.42C4.28 3.69 3.67 4.1 3.16 4.61C1.04 6.73 1.04 10.17 3.16 12.29L12 21L20.84 12.29C22.96 10.17 22.96 6.73 20.84 4.61Z"
+                stroke="{% if post[14] %}red{% else %}#FF4081{% endif %}"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"/>
+        </svg>
+    </span>
+
     <span class="like-count">{{ post[5] }}</span>
+
 </button>
 
-<button onclick="openComments('{{post[4]}}')" class="action-btn">
-    💬
+
+<button
+    onclick="openComments('{{post[4]}}')"
+    class="action-btn"
+    style="display:flex;align-items:center;gap:6px;">
+
+    <svg
+        class="reel-comment-icon"
+        width="32"
+        height="32"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg">
+
+        <path
+            d="M21 11.5C21 16.194 17.194 20 12.5 20H7L3 22V11.5C3 6.806 6.806 3 11.5 3H12.5C17.194 3 21 6.806 21 11.5Z"
+            stroke="#FF4081"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"/>
+
+    </svg>
+<span class="comment-count"
+      data-post-id="{{post[4]}}">
+    {{post[8]}}
+</span>
+
 </button>
+
+
 <div id="commentModal" style="
 display:none;
 position:fixed;
@@ -1785,34 +5233,146 @@ height:70%;
 background:black;
 color:white;
 z-index:9999;
-overflow:auto;
+overflow:hidden;
 border-top-left-radius:20px;
 border-top-right-radius:20px;
 ">
 
-    <div style="padding:15px;">
-        <h3>Comments</h3>
+    <div style="
+        position:relative;
+        height:100%;
+        display:flex;
+        flex-direction:column;
+    ">
 
-        <div id="modalComments"></div>
+        <div style="
+            position:relative;
+            flex-shrink:0;
+            padding:15px;
+            text-align:center;
+            border-bottom:1px solid #222;
+        ">
+            <h3 style="margin:0;">Comments</h3>
 
-        <input
-            id="modalCommentInput"
-            placeholder="Add comment..."
-            style="width:70%;padding:8px;"
-        >
+            <button
+                onclick="closeComments()"
+                aria-label="Close"
+                style="
+                    position:absolute;
+                    top:8px;
+                    right:10px;
+                    width:38px;
+                    height:38px;
+                    border:none;
+                    background:transparent;
+                    color:white;
+                    font-size:30px;
+                    line-height:38px;
+                    padding:0;
+                    cursor:pointer;
+                "
+            >×</button>
+        </div>
 
-        <button onclick="postModalComment()">
-            Post
-        </button>
+        <div
+            id="modalComments"
+            style="
+                flex:1;
+                overflow-y:auto;
+                padding:15px;
+                padding-bottom:75px;
+                box-sizing:border-box;
+            "
+        ></div>
 
-<button onclick="closeComments()">✖ Close</button>
+        <div style="
+            position:absolute;
+            left:0;
+            right:0;
+            bottom:0;
+            display:flex;
+            align-items:center;
+            gap:8px;
+            padding:10px;
+            background:black;
+            border-top:1px solid #222;
+            box-sizing:border-box;
+        ">
+
+            <input
+                id="modalCommentInput"
+                placeholder="Add comment..."
+                style="
+                    flex:1;
+                    min-width:0;
+                    height:42px;
+                    box-sizing:border-box;
+                    padding:0 14px;
+                    border:1px solid #444;
+                    border-radius:22px;
+                    background:#171717;
+                    color:white;
+                    outline:none;
+                    font-size:14px;
+                "
+            >
+
+            <button
+                onclick="postModalComment()"
+                style="
+                    flex-shrink:0;
+                    height:42px;
+                    padding:0 17px;
+                    border:none;
+                    border-radius:21px;
+                    background:#ff3d81;
+                    color:white;
+                    font-weight:700;
+                    font-size:14px;
+                    cursor:pointer;
+                "
+            >Post</button>
+
+        </div>
+
     </div>
 
 </div>
 
-<button onclick="openShare({{ post[4] }})" class="action-btn">
-📥
+<button
+    onclick="openShare({{ post[4] }})"
+    class="action-btn"
+    style="display:flex;align-items:center;gap:6px;">
+<svg
+    width="28"
+    height="28"
+    viewBox="0 0 24 24"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg">
+
+    <path
+        d="M22 2L11 13"
+        stroke="#FF4081"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+
+    <path
+        d="M22 2L15 22L11 13L2 9L22 2Z"
+        stroke="#FF4081"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+
+</svg>
+
+<span class="share-count"
+      data-post-id="{{post[4]}}">
+    {{post[9]}}
+</span>
+
 </button>
+
     </div>
 
     <div id="comment-box-{{loop.index}}" style="display: none; padding: 10px; color: white;">
@@ -1820,13 +5380,138 @@ border-top-right-radius:20px;
 
 <button onclick="addComment('{{loop.index}}','{{post[4]}}')">
  Post
-</y
 <button>
         <div id="comments-list-{{loop.index}}" style="margin-top: 5px;"></div>
     </div>
 </div>
 {% endfor %}
-</body>
+    <script src="{{ url_for("static", filename="js/tag_people.js") }}"></script>
+
+
+
+
+
+<script>
+/* =====================================================
+   SNAPZ STORY MUSIC BUTTON - DIRECT CLICK FIX
+===================================================== */
+
+(function () {
+
+    function bindStoryMusicButton() {
+
+        const btn =
+            document.getElementById("storyMusicBtn");
+
+        if (!btn) {
+            console.log(
+                "STORY MUSIC BUTTON NOT FOUND YET"
+            );
+            return;
+        }
+
+        console.log(
+            "STORY MUSIC BUTTON BOUND",
+            btn
+        );
+
+        btn.style.pointerEvents = "auto";
+        btn.style.position = "relative";
+        btn.style.zIndex = "999999999";
+
+        /*
+           Capture phase:
+           Agar koi parent/overlay click ko stop kare,
+           tab bhi Story Music button yahan pakda jayega.
+        */
+        btn.addEventListener(
+            "click",
+            function (e) {
+
+                e.preventDefault();
+                e.stopPropagation();
+
+                console.log(
+                    "STORY MUSIC BUTTON CLICK RECEIVED"
+                );
+
+                const panel =
+                    document.getElementById(
+                        "snapzMusicPanel"
+                    );
+
+                if (!panel) {
+                    alert(
+                        "snapzMusicPanel nahi mila."
+                    );
+                    return;
+                }
+
+                panel.style.display = "block";
+                panel.style.visibility = "visible";
+                panel.style.opacity = "1";
+                panel.style.position = "fixed";
+                panel.style.inset = "0";
+                panel.style.zIndex = "2147483647";
+
+                document.body.style.overflow =
+                    "hidden";
+
+                console.log(
+                    "STORY MUSIC PANEL FORCED OPEN"
+                );
+
+                if (
+                    typeof loadSnapzMusic ===
+                    "function"
+                ) {
+                    loadSnapzMusic();
+                }
+
+            },
+            true
+        );
+    }
+
+
+    /*
+       DOM ready
+    */
+    if (
+        document.readyState ===
+        "loading"
+    ) {
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            bindStoryMusicButton
+        );
+
+    } else {
+
+        bindStoryMusicButton();
+
+    }
+
+
+    /*
+       Extra retry because Story Editor
+       may be initialized dynamically.
+    */
+    setTimeout(
+        bindStoryMusicButton,
+        500
+    );
+
+    setTimeout(
+        bindStoryMusicButton,
+        1500
+    );
+
+})();
+</script>
+
+<script src="/static/js/snapz_post_reel_music.js"></script>
 
 
 <script>
@@ -1839,7 +5524,6 @@ fetch("/like_post/" + postId,{
 .then(res => res.json())
 .then(data => {
 
-    let heart = btn.querySelector(".heart-icon");
     let countSpan = btn.querySelector(".like-count");
 
     countSpan.innerText = data.likes;
@@ -1847,12 +5531,10 @@ fetch("/like_post/" + postId,{
     if(data.status == "liked"){
 
         btn.classList.add("active");
-        heart.innerText = "❤️";
 
     }else{
 
         btn.classList.remove("active");
-        heart.innerText = "🤍";
 
     }
 
@@ -1870,61 +5552,507 @@ function toggleCommentBox(id) {
 // Add Comment
 let currentPostId = null;
 
-function openComments(postId){
+let currentReplyTo = null;
+let currentReplyUsername = null;
+
+const snapzCurrentUsername = {{ session.get('username', '')|tojson }};
+
+
+/* ================================
+   COMMENT HELPERS
+================================ */
+
+function escapeCommentHtml(value) {
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+
+function commentProfileUrl(profilePic) {
+
+    if (!profilePic) {
+        return "/static/images/default.jpg";
+    }
+
+    profilePic = String(profilePic);
+
+    if (
+        profilePic.startsWith("http://") ||
+        profilePic.startsWith("https://") ||
+        profilePic.startsWith("/")
+    ) {
+        return profilePic;
+    }
+
+    return "/static/images/" + profilePic;
+}
+
+
+/* ================================
+   REPLY MODE
+================================ */
+
+function setReplyMode(commentId, username) {
+
+    currentReplyTo = Number(commentId);
+    currentReplyUsername = username || "";
+
+    const modal = document.getElementById("commentModal");
+    const input = document.getElementById("modalCommentInput");
+
+    if (modal) {
+        modal.style.display = "block";
+    }
+
+    if (input) {
+
+        input.placeholder =
+            "Reply to @" + currentReplyUsername;
+
+        input.removeAttribute("readonly");
+        input.removeAttribute("disabled");
+
+        input.value = "";
+
+        showReplyCancelButton();
+
+        // Make sure the input is visible above the keyboard.
+        setTimeout(function() {
+
+            input.focus();
+
+            try {
+                input.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center"
+                });
+            } catch (e) {}
+
+        }, 100);
+
+    }
+}
+
+function cancelReplyMode() {
+
+    currentReplyTo = null;
+    currentReplyUsername = null;
+
+    const input = document.getElementById("modalCommentInput");
+
+    if (input) {
+        input.placeholder = "Add comment...";
+    }
+
+    const cancelBtn = document.getElementById("snapzCancelReply");
+
+    if (cancelBtn) {
+        cancelBtn.style.display = "none";
+    }
+}
+
+
+function showReplyCancelButton() {
+
+    let btn = document.getElementById("snapzCancelReply");
+
+    if (!btn) {
+
+        const input = document.getElementById("modalCommentInput");
+
+        if (!input || !input.parentElement) {
+            return;
+        }
+
+        btn = document.createElement("button");
+
+        btn.id = "snapzCancelReply";
+        btn.type = "button";
+        btn.innerHTML = "×";
+        btn.title = "Cancel reply";
+
+        btn.style.cssText = `
+            flex-shrink:0;
+            width:34px;
+            height:34px;
+            border:none;
+            border-radius:50%;
+            background:#292929;
+            color:white;
+            font-size:22px;
+            line-height:34px;
+            padding:0;
+            cursor:pointer;
+            display:none;
+        `;
+
+        btn.onclick = cancelReplyMode;
+
+        input.parentElement.insertBefore(btn, input);
+    }
+
+    btn.style.display = "block";
+}
+
+
+/* ================================
+   COMMENT RENDER
+================================ */
+
+function renderCommentBlock(comment, replies) {
+
+    const rawUsername = String(comment.username || "");
+    const username = escapeCommentHtml(rawUsername);
+    const text = escapeCommentHtml(comment.comment);
+    const profilePic = commentProfileUrl(comment.profile_pic);
+    const profileUrl = "/profile/" + encodeURIComponent(rawUsername);
+
+    let repliesHtml = "";
+
+    replies.forEach(reply => {
+
+        const replyUsername = escapeCommentHtml(reply.username);
+        const replyText = escapeCommentHtml(reply.comment);
+        const replyPic = commentProfileUrl(reply.profile_pic);
+
+        const isMine =
+            String(reply.username || "") ===
+            String(snapzCurrentUsername || "");
+
+        repliesHtml += `
+            <div style="
+                width:100%;
+                display:flex;
+                justify-content:${isMine ? "flex-end" : "flex-start"};
+                margin:7px 0;
+                box-sizing:border-box;
+            ">
+
+                <div style="
+                    display:flex;
+                    flex-direction:${isMine ? "row-reverse" : "row"};
+                    align-items:flex-end;
+                    gap:7px;
+                    max-width:88%;
+                ">
+
+                    <img
+                        src="${replyPic}"
+                        onerror="this.src='/static/images/default.jpg'"
+                        style="
+                            width:30px;
+                            height:30px;
+                            border-radius:50%;
+                            object-fit:cover;
+                            flex-shrink:0;
+                        "
+                    >
+
+                    <div style="
+                        max-width:100%;
+                        padding:8px 11px;
+                        border-radius:${isMine
+                            ? "16px 16px 4px 16px"
+                            : "16px 16px 16px 4px"};
+                        background:${isMine ? "#ff3d81" : "#242424"};
+                        color:white;
+                        font-size:13px;
+                        line-height:1.35;
+                        word-break:break-word;
+                    ">
+
+                        <div style="
+                            font-size:11px;
+                            font-weight:700;
+                            opacity:.8;
+                            margin-bottom:2px;
+                        ">
+                            ${replyUsername}
+                        </div>
+
+                        ${replyText}
+
+                    </div>
+
+                </div>
+
+            </div>
+        `;
+    });
+
+
+    return `
+        <div style="
+            margin-bottom:14px;
+            padding:10px 0;
+            border-bottom:1px solid #222;
+        ">
+
+            <div style="
+                display:flex;
+                align-items:flex-start;
+                gap:10px;
+                width:100%;
+            ">
+
+                <img
+                    src="${profilePic}"
+                    onclick="window.location.href='${profileUrl}'"
+                    onerror="this.src='/static/images/default.jpg'"
+                    style="
+                        width:38px;
+                        height:38px;
+                        border-radius:50%;
+                        object-fit:cover;
+                        flex-shrink:0;
+                        cursor:pointer;
+                    "
+                >
+
+                <div style="
+                    flex:1;
+                    min-width:0;
+                ">
+
+                    <div style="
+                        display:flex;
+                        align-items:flex-start;
+                        justify-content:space-between;
+                        gap:8px;
+                    ">
+
+                        <div style="
+                            flex:1;
+                            min-width:0;
+                            color:white;
+                            font-size:14px;
+                            line-height:1.4;
+                            word-break:break-word;
+                        ">
+
+                            <b
+                                onclick="window.location.href='${profileUrl}'"
+                                style="
+                                    cursor:pointer;
+                                "
+                            >${username}</b>
+                            <span>: ${text}</span>
+
+                        </div>
+
+                        <button
+                            type="button"
+                            class="snapz-comment-reply-btn"
+                            data-comment-id="${Number(comment.id)}"
+                            data-comment-username="${escapeCommentHtml(String(comment.username || ""))}"
+                            style="
+                                flex-shrink:0;
+                                border:none;
+                                background:none;
+                                color:#aaa;
+                                font-size:12px;
+                                font-weight:600;
+                                padding:3px 0;
+                                cursor:pointer;
+                                position:relative;
+                                z-index:10;
+                            "
+                        >
+                            Reply
+                        </button>
+
+                    </div>
+
+                    ${
+                        repliesHtml
+                        ? `
+                            <div style="
+                                margin-top:9px;
+                                padding-left:2px;
+                            ">
+                                ${repliesHtml}
+                            </div>
+                        `
+                        : ""
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+    `;
+}
+
+
+/* ================================
+   LOAD COMMENTS
+================================ */
+
+function openComments(postId) {
 
     currentPostId = postId;
+    currentReplyTo = null;
+    currentReplyUsername = null;
+
+    const input = document.getElementById("modalCommentInput");
+
+    if (input) {
+        input.value = "";
+        input.placeholder = "Add comment...";
+    }
+
+    const cancelBtn = document.getElementById("snapzCancelReply");
+
+    if (cancelBtn) {
+        cancelBtn.style.display = "none";
+    }
 
     fetch("/comments/" + postId)
 
-    .then(r => r.json())
+        .then(r => r.json())
 
-    .then(data => {
+        .then(data => {
 
-        let html = "";
+            if (!Array.isArray(data)) {
+                throw new Error("Invalid comments response");
+            }
 
-        data.forEach(c => {
+            const topLevel = [];
+            const repliesMap = {};
 
-            html += `
-            <div style="margin-bottom:10px;">
-                <b>${c[0]}</b>: ${c[1]}
-            </div>
-            `;
+            data.forEach(c => {
+
+                if (c.reply_to === null || c.reply_to === undefined) {
+
+                    topLevel.push(c);
+
+                } else {
+
+                    if (!repliesMap[c.reply_to]) {
+                        repliesMap[c.reply_to] = [];
+                    }
+
+                    repliesMap[c.reply_to].push(c);
+                }
+
+            });
+
+
+            let html = "";
+
+            topLevel.forEach(comment => {
+
+                html += renderCommentBlock(
+                    comment,
+                    repliesMap[comment.id] || []
+                );
+
+            });
+
+
+            if (html === "") {
+
+                html = `
+                    <div style="
+                        color:#888;
+                        padding:25px 0;
+                        text-align:center;
+                    ">
+                        No comments yet
+                    </div>
+                `;
+
+            }
+
+
+            document.getElementById("modalComments").innerHTML = html;
+
+            document.getElementById("commentModal").style.display = "block";
+
+        })
+
+        .catch(err => {
+
+            console.error("COMMENT LOAD ERROR:", err);
+
+            document.getElementById("modalComments").innerHTML =
+                `
+                    <div style="
+                        color:#f66;
+                        padding:20px 0;
+                        text-align:center;
+                    ">
+                        Failed to load comments
+                    </div>
+                `;
+
+            document.getElementById("commentModal").style.display = "block";
 
         });
-
-        document.getElementById("modalComments")
-            .innerHTML = html;
-
-        document.getElementById("commentModal")
-            .style.display = "block";
-
-    });
-
 }
+
+
+/* ================================
+   CLOSE COMMENTS
+================================ */
 
 function closeComments() {
-    document.getElementById("commentsModal").style.display = "none";
+
+    cancelReplyMode();
+
+    document.getElementById("commentModal").style.display = "none";
 }
 
 
-function postModalComment(){
+/* ================================
+   POST COMMENT / REPLY
+================================ */
 
-    let text =
-        document.getElementById(
-            "modalCommentInput"
-        ).value;
+function postModalComment() {
+
+    const input =
+        document.getElementById("modalCommentInput");
+
+    if (!input) {
+        return;
+    }
+
+    const text = input.value.trim();
+
+    if (!text) {
+        return;
+    }
+
+    if (!currentPostId) {
+        return;
+    }
+
+
+    const params = new URLSearchParams();
+
+    params.append("comment", text);
+
+    if (currentReplyTo !== null) {
+        params.append("reply_to", currentReplyTo);
+    }
+
 
     fetch("/comment/" + currentPostId, {
 
-        method:"POST",
+        method: "POST",
 
-        headers:{
+        headers: {
             "Content-Type":
-            "application/x-www-form-urlencoded"
+                "application/x-www-form-urlencoded"
         },
 
-        body:"comment=" +
-        encodeURIComponent(text)
+        body: params.toString()
 
     })
 
@@ -1932,27 +6060,100 @@ function postModalComment(){
 
     .then(data => {
 
-        document.getElementById("modalComments")
-        .innerHTML +=
-        `<div><b>${data.username}</b>: ${data.comment}</div>`;
+        if (data.status === "blocked") {
+            alert(data.message);
+            return;
+        }
 
-        document.getElementById(
-            "modalCommentInput"
-        ).value = "";
+        if (data.status === "error") {
+            alert(data.message);
+            return;
+        }
+
+
+        input.value = "";
+
+        cancelReplyMode();
+
+        // Reload the complete thread so replies stay
+        // correctly grouped under their parent comment.
+        openComments(currentPostId);
+
+    })
+
+    .catch(err => {
+
+        console.error("COMMENT POST ERROR:", err);
+
+        alert("Failed to post comment.");
 
     });
-
 }
+
+
+/* ================================
+   REPLY BUTTON CLICK
+================================ */
+
+document.addEventListener("click", function(event) {
+
+    const replyButton =
+        event.target.closest(".snapz-comment-reply-btn");
+
+    if (!replyButton) {
+        return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const commentId =
+        Number(replyButton.dataset.commentId);
+
+    const username =
+        replyButton.dataset.commentUsername || "";
+
+    if (!commentId) {
+        console.error("INVALID REPLY COMMENT ID");
+        return;
+    }
+
+    setReplyMode(commentId, username);
+
+});
+
+
+/* ================================
+   ENTER TO POST
+================================ */
+
+document.addEventListener("keydown", function(event) {
+
+    const input =
+        document.getElementById("modalCommentInput");
+
+    if (!input) {
+        return;
+    }
+
+    if (
+        document.activeElement === input &&
+        event.key === "Enter"
+    ) {
+
+        event.preventDefault();
+
+        postModalComment();
+
+    }
+
+});
 
 
 // Share Logic (Ensure shareBox ID exists in HTML)
 function openShare() {
     let box = document.getElementById('shareBox');
     if (box) box.style.display = "block";
-}
-
-function closeComments() {
-    document.getElementById("commentModal").style.display = "none";
 }
 
 // Follow Logic
@@ -2229,8 +6430,2035 @@ function sharePost(username){
 
 
 
+
+
+<script>
+
+/* =====================================================
+   SNAPZ POST MEDIA CAROUSEL JS
+   INSTAGRAM STYLE
+   ===================================================== */
+
+(function(){
+
+    function getSlides(carousel){
+        return Array.from(
+            carousel.querySelectorAll(".post-media-slide")
+        );
+    }
+
+
+    function getTrack(carousel){
+        return carousel.querySelector(".post-media-track");
+    }
+
+
+    function getCurrentIndex(carousel){
+
+        const value =
+            parseInt(
+                carousel.dataset.carouselIndex || "0",
+                10
+            );
+
+        return Number.isFinite(value) ? value : 0;
+    }
+
+
+    function setCurrentIndex(carousel,index){
+
+        const slides = getSlides(carousel);
+        const track = getTrack(carousel);
+
+        if(!slides.length || !track) return;
+
+        const maxIndex = slides.length - 1;
+
+        index = Math.max(
+            0,
+            Math.min(index,maxIndex)
+        );
+
+        carousel.dataset.carouselIndex = String(index);
+
+        track.style.transform =
+            "translate3d(" +
+            (-index * 100) +
+            "%,0,0)";
+
+        /* =========================
+           DOTS
+           ========================= */
+
+        carousel
+        .querySelectorAll(".post-media-dot")
+        .forEach(function(dot,i){
+
+            dot.classList.toggle(
+                "active",
+                i === index
+            );
+
+        });
+
+
+        /* =========================
+           COUNTER
+           ========================= */
+
+        const counter =
+            carousel.querySelector(
+                ".post-media-current"
+            );
+
+        if(counter){
+
+            counter.textContent =
+                String(index + 1);
+
+        }
+
+
+        /* =========================
+           ARROWS
+           ========================= */
+
+        const prev =
+            carousel.querySelector(
+                ".post-media-prev"
+            );
+
+        const next =
+            carousel.querySelector(
+                ".post-media-next"
+            );
+
+        if(prev){
+
+            prev.style.opacity =
+                index === 0 ? ".35" : "1";
+
+        }
+
+        if(next){
+
+            next.style.opacity =
+                index === maxIndex ? ".35" : "1";
+
+        }
+
+
+        /* =========================
+           VIDEO CONTROL
+           ========================= */
+
+        slides.forEach(function(slide,i){
+
+            const video =
+                slide.querySelector("video");
+
+            if(!video) return;
+
+            if(i !== index){
+
+                try{
+                    video.pause();
+                }catch(e){}
+
+            }
+
+        });
+
+    }
+
+
+    window.movePostMedia =
+    function(button,direction){
+
+        const carousel =
+            button.closest(
+                ".post-media-carousel"
+            );
+
+        if(!carousel) return;
+
+        const slides =
+            getSlides(carousel);
+
+        if(slides.length <= 1) return;
+
+        const current =
+            getCurrentIndex(carousel);
+
+        setCurrentIndex(
+            carousel,
+            current + direction
+        );
+
+    };
+
+
+    function setupCarousel(carousel){
+
+        const track =
+            getTrack(carousel);
+
+        const slides =
+            getSlides(carousel);
+
+        if(!track || !slides.length)
+            return;
+
+
+        /* =========================
+           SINGLE MEDIA
+           ========================= */
+
+        if(slides.length <= 1){
+
+            carousel.classList.add(
+                "single-media"
+            );
+
+        }else{
+
+            carousel.classList.remove(
+                "single-media"
+            );
+
+        }
+
+
+        carousel.dataset.carouselIndex = "0";
+
+        setCurrentIndex(
+            carousel,
+            0
+        );
+
+
+        /* =========================
+           TOUCH SWIPE
+           ========================= */
+
+        let startX = 0;
+        let startY = 0;
+        let dragging = false;
+
+
+        track.addEventListener(
+            "touchstart",
+            function(e){
+
+                if(!e.touches.length)
+                    return;
+
+                startX =
+                    e.touches[0].clientX;
+
+                startY =
+                    e.touches[0].clientY;
+
+                dragging = true;
+
+            },
+            {passive:true}
+        );
+
+
+        track.addEventListener(
+            "touchend",
+            function(e){
+
+                if(!dragging)
+                    return;
+
+                dragging = false;
+
+                if(!e.changedTouches.length)
+                    return;
+
+                const endX =
+                    e.changedTouches[0].clientX;
+
+                const endY =
+                    e.changedTouches[0].clientY;
+
+                const diffX =
+                    endX - startX;
+
+                const diffY =
+                    endY - startY;
+
+
+                /* Ignore mostly vertical swipe */
+
+                if(
+                    Math.abs(diffX) <
+                    Math.abs(diffY)
+                ){
+
+                    return;
+
+                }
+
+
+                /* Minimum swipe distance */
+
+                if(Math.abs(diffX) < 45)
+                    return;
+
+
+                const current =
+                    getCurrentIndex(carousel);
+
+
+                if(diffX < 0){
+
+                    /* Swipe LEFT */
+
+                    setCurrentIndex(
+                        carousel,
+                        current + 1
+                    );
+
+                }else{
+
+                    /* Swipe RIGHT */
+
+                    setCurrentIndex(
+                        carousel,
+                        current - 1
+                    );
+
+                }
+
+            },
+            {passive:true}
+        );
+
+
+        /* =========================
+           PREVENT IMAGE DRAG
+           ========================= */
+
+        carousel
+        .querySelectorAll("img")
+        .forEach(function(img){
+
+            img.addEventListener(
+                "dragstart",
+                function(e){
+                    e.preventDefault();
+                }
+            );
+
+        });
+
+    }
+
+
+    function initPostCarousels(){
+
+        document
+        .querySelectorAll(
+            ".post-media-carousel"
+        )
+        .forEach(function(carousel){
+
+            setupCarousel(carousel);
+
+        });
+
+    }
+
+
+    if(
+        document.readyState ===
+        "loading"
+    ){
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            initPostCarousels
+        );
+
+    }else{
+
+        initPostCarousels();
+
+    }
+
+})();
+
+</script>
+
+
+<!-- =========================================================
+     SNAPZ POST EDITOR
+========================================================= -->
+
+
+
+
+<!-- =========================================================
+     TEXT EDITOR
+========================================================= -->
+
+<div id="postTextEditor"
+     style="
+     display:none;
+     position:fixed;
+     inset:0;
+     z-index:100000;
+     background:rgba(0,0,0,.92);
+     align-items:center;
+     justify-content:center;
+     ">
+
+    <div style="
+         width:90%;
+         max-width:420px;
+         background:#151515;
+         border-radius:18px;
+         padding:20px;
+         ">
+
+        <div style="
+             font-size:18px;
+             font-weight:bold;
+             margin-bottom:15px;
+             ">
+            Add Text
+        </div>
+
+        <input id="postTextInput"
+               type="text"
+               placeholder="Write something..."
+               style="
+               width:100%;
+               box-sizing:border-box;
+               padding:14px;
+               border-radius:12px;
+               border:1px solid #444;
+               background:#222;
+               color:white;
+               outline:none;
+               ">
+
+        <div style="
+             display:flex;
+             gap:10px;
+             margin-top:15px;
+             ">
+
+            <button onclick="closePostTextEditor()"
+                    style="
+                    flex:1;
+                    padding:12px;
+                    border:0;
+                    border-radius:10px;
+                    background:#333;
+                    color:#fff;
+                    ">
+                Cancel
+            </button>
+
+            <button onclick="savePostText()"
+                    style="
+                    flex:1;
+                    padding:12px;
+                    border:0;
+                    border-radius:10px;
+                    background:#ff3d81;
+                    color:#fff;
+                    font-weight:bold;
+                    ">
+                Add
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   SNAPZ POST EDITOR
+========================================================= */
+
+let postEditFiles = [];
+let postEditCurrentIndex = 0;
+
+/* =========================================================
+   SNAPZ POST MULTI PHOTO NAVIGATION
+========================================================= */
+
+  function snapzShowPostMedia(index){
+
+      if(!postEditFiles || !postEditFiles.length){
+          return;
+      }
+
+      const total = postEditFiles.length;
+
+      if(index < 0){
+          index = total - 1;
+      }
+
+      if(index >= total){
+          index = 0;
+      }
+
+      /* Save current photo adjustment */
+      if(typeof snapzSaveCurrentPostAdjustment === "function"){
+          snapzSaveCurrentPostAdjustment();
+      }
+
+      /*
+         IMPORTANT:
+         No slide animation.
+         No translate.
+         No movement.
+         Only instant photo switching.
+      */
+
+      const img = document.getElementById("postShareImage");
+      const video = document.getElementById("postShareVideo");
+
+      if(img){
+          img.style.transition = "none";
+          img.style.animation = "none";
+      }
+
+      if(video){
+          video.style.transition = "none";
+          video.style.animation = "none";
+      }
+
+      postEditCurrentIndex = index;
+
+      /* Change selected media */
+      updatePostSharePreview();
+
+      /* Load this photo's own adjustment */
+      if(typeof snapzLoadPostAdjustment === "function"){
+          snapzLoadPostAdjustment(index);
+      }
+
+      /* Update only counter */
+      snapzUpdatePostNavigation();
+
+      /* Keep swipe active */
+      snapzSetupPostSwipe();
+  }
+
+
+function snapzNextPostMedia(){
+
+    if(!postEditFiles || postEditFiles.length <= 1){
+        return;
+    }
+
+    snapzShowPostMedia(
+        postEditCurrentIndex + 1
+    );
+}
+
+
+function snapzPreviousPostMedia(){
+
+    if(!postEditFiles || postEditFiles.length <= 1){
+        return;
+    }
+
+    snapzShowPostMedia(
+        postEditCurrentIndex - 1
+    );
+}
+
+
+function snapzUpdatePostNavigation(){
+
+    const counter =
+        document.getElementById(
+            "snapzPostMediaCounter"
+        );
+
+    if(counter){
+
+        counter.textContent =
+            (postEditCurrentIndex + 1) +
+            " / " +
+            postEditFiles.length;
+    }
+
+    const prev =
+        document.getElementById(
+            "snapzPostPrev"
+        );
+
+    const next =
+        document.getElementById(
+            "snapzPostNext"
+        );
+
+    const show =
+        postEditFiles &&
+        postEditFiles.length > 1;
+
+    if(prev){
+        prev.style.display =
+            show ? "flex" : "none";
+    }
+
+    if(next){
+        next.style.display =
+            show ? "flex" : "none";
+    }
+
+    if(counter){
+        counter.style.display =
+            show ? "block" : "none";
+    }
+}
+
+let snapzPostSwipeStartX = 0;
+let snapzPostSwipeStartY = 0;
+let snapzPostSwipeTracking = false;
+
+function updatePostSharePreview() {
+
+    const img =
+        document.getElementById("postShareImage");
+
+    const video =
+        document.getElementById("postShareVideo");
+
+    if (!img || !video) {
+        return;
+    }
+
+    /* Reset previous photo transform */
+    img.style.transition = "none";
+    img.style.animation = "none";
+    img.style.transform = "none";
+
+    video.style.transition = "none";
+    video.style.animation = "none";
+    video.style.transform = "none";
+
+    img.style.display = "none";
+    video.style.display = "none";
+
+    if (!postEditFiles || !postEditFiles.length) {
+        return;
+    }
+
+    const file =
+        postEditFiles[postEditCurrentIndex];
+
+    if (!file) {
+        return;
+    }
+
+    const url =
+        URL.createObjectURL(file);
+
+    if (
+        file.type &&
+        file.type.startsWith("video/")
+    ) {
+
+        video.src = url;
+        video.style.display = "block";
+
+        video.play().catch(
+            function(){}
+        );
+
+    } else {
+
+        img.src = url;
+        img.style.display = "block";
+    }
+}
+/* =========================================================
+                  POST SHARE MUSIC            
+========================================================= */                            
+
+
+function closePostSharePage() {
+
+    const sharePage =
+        document.getElementById(
+            "captionPage"
+        );
+
+    const editor =
+        document.getElementById(
+            "postEditPage"
+        );
+
+    if (sharePage) {
+        sharePage.style.display =
+            "none";
+    }
+
+    if (editor) {
+        editor.style.display =
+            "block";
+    }
+
+    document.body.style.overflow =
+        "hidden";
+
+    showPostEditMedia();
+
+}
+
+
+/* =========================================================
+   MUSIC PANEL CLOSE / RETURN
+   Selected music ke baad Share screen refresh
+========================================================= */
+
+function refreshPostShareMusic() {
+
+    if (
+        document.getElementById(
+            "captionPage"
+        ).style.display !== "none"
+    ) {
+
+        updatePostShareMusic();
+
+    }
+
+}
+
+
+
+
+
+</script>
+
+
+
+
+
+<!-- =========================================================
+     SNAPZ REELS EDITOR
+     SEPARATE REEL EDITOR PAGE
+     9:16 PREVIEW + CAPTION + AUDIO + TAG PEOPLE + UPLOAD
+     ========================================================= -->
+
+<div id="reelEditor"
+     style="
+        display:none;
+        position:fixed;
+        inset:0;
+        z-index:100000000;
+        background:#0b0e12;
+        color:#fff;
+        overflow-y:auto;
+        box-sizing:border-box;
+     ">
+
+    <!-- HEADER -->
+    <div style="
+        height:64px;
+        display:flex;
+        align-items:center;
+        gap:18px;
+        padding:0 18px;
+        border-bottom:1px solid #24272c;
+        position:sticky;
+        top:0;
+        background:#0b0e12;
+        z-index:10;
+        box-sizing:border-box;
+    ">
+
+        <button
+            id="reelEditorBackBtn"
+            type="button"
+            style="
+                background:none;
+                border:0;
+                color:#fff;
+                font-size:34px;
+                line-height:1;
+                padding:0;
+                cursor:pointer;
+            "
+        >‹</button>
+
+        <div style="
+            font-size:22px;
+            font-weight:700;
+        ">
+            New Reel
+        </div>
+
+    </div>
+
+
+    <!-- REEL 9:16 PREVIEW -->
+    <div style="
+        padding:24px 20px 12px;
+        display:flex;
+        justify-content:center;
+        box-sizing:border-box;
+    ">
+
+        <div id="reelEditorPreviewBox"
+             style="
+                width:min(100%,390px);
+                aspect-ratio:9 / 16;
+                position:relative;
+                background:#000;
+                overflow:hidden;
+                border-radius:4px;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+             ">
+
+            <video
+                id="reelEditorVideo"
+                playsinline
+                controls
+                style="
+                    display:none;
+                    width:100%;
+                    height:100%;
+                    object-fit:cover;
+                "
+            ></video>
+
+        </div>
+
+    </div>
+
+
+    <!-- CAPTION -->
+    <div style="
+        padding:12px 26px 5px;
+    ">
+
+        <textarea
+            id="reelCaption"
+            placeholder="Add a caption..."
+            style="
+                width:100%;
+                min-height:90px;
+                box-sizing:border-box;
+                background:transparent;
+                border:0;
+                outline:none;
+                resize:none;
+                color:#fff;
+                font-size:17px;
+                line-height:1.5;
+                font-family:inherit;
+            "
+        ></textarea>
+
+    </div>
+
+
+    <!-- ADD AUDIO -->
+    <div
+        id="reelAddAudioButton"
+        onclick="openSnapzPostReelMusic('reel')"
+        style="
+            min-height:72px;
+            display:flex;
+            align-items:center;
+            gap:18px;
+            padding:12px 26px;
+            border-top:1px solid #202329;
+            border-bottom:1px solid #202329;
+            box-sizing:border-box;
+            cursor:pointer;
+        "
+    >
+
+        <div style="
+            font-size:30px;
+            width:42px;
+            text-align:center;
+        ">
+            ♫
+        </div>
+
+        <div style="
+            flex:1;
+            font-size:18px;
+        ">
+            Add audio
+        </div>
+
+        <div style="
+            font-size:30px;
+            color:#aeb4bd;
+        ">
+            ›
+        </div>
+
+    </div>
+
+
+    <!-- TAG PEOPLE -->
+    <div
+        id="reelTagPeopleButton"
+        style="
+            min-height:72px;
+            display:flex;
+            align-items:center;
+            gap:18px;
+            padding:12px 26px;
+            border-bottom:1px solid #202329;
+            box-sizing:border-box;
+            cursor:pointer;
+        "
+    >
+
+        <div style="
+            font-size:30px;
+            width:42px;
+            text-align:center;
+        ">
+            ♙
+        </div>
+
+        <div style="
+            flex:1;
+            font-size:18px;
+        ">
+            Tag people
+        </div>
+
+        <div style="
+            font-size:30px;
+            color:#aeb4bd;
+        ">
+            ›
+        </div>
+
+    </div>
+
+
+    <!-- UPLOAD -->
+    <div style="
+        padding:28px 26px 32px;
+    ">
+
+        <button
+            id="reelUploadButton"
+            onclick="finalUpload()"
+            type="button"
+            style="
+                width:100%;
+                min-height:56px;
+                border:0;
+                border-radius:16px;
+                background:#4f5ff5;
+                color:#fff;
+                font-size:18px;
+                font-weight:700;
+                cursor:pointer;
+                box-shadow:0 5px 20px rgba(79,95,245,.25);
+            "
+        >
+            Upload
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+/* =========================================================
+   SNAPZ REEL EDITOR
+   ONLY REEL EDITOR — STORY/POST UNTOUCHED
+========================================================= */
+
+
+/* =========================================================
+   SNAPZ REEL AUDIO
+   ONLY REEL — STORY/POST UNTOUCHED
+========================================================= */
+
+function openReelEditor() {
+
+    const editor =
+        document.getElementById("reelEditor");
+
+    const reelVideo =
+        document.getElementById("reelEditorVideo");
+
+    if (!editor || !reelVideo) {
+        console.error("REEL EDITOR NOT FOUND");
+        return;
+    }
+
+    if (!selectedFile) {
+        alert("Pehle Reel video select kijiye.");
+        return;
+    }
+
+    if (
+        !selectedFile.type ||
+        !selectedFile.type.startsWith("video/")
+    ) {
+        alert("Reel ke liye sirf video select kijiye.");
+        return;
+    }
+
+    reelVideo.src =
+        URL.createObjectURL(selectedFile);
+
+    reelVideo.style.display = "block";
+
+    editor.style.display = "block";
+
+    document.body.style.overflow = "hidden";
+
+    reelVideo.play().catch(() => {});
+
+    console.log("SNAPZ REEL EDITOR OPENED");
+}
+
+
+/* ---------------------------------------------------------
+   CLOSE REEL EDITOR
+--------------------------------------------------------- */
+
+function closeReelEditor() {
+
+    const editor =
+        document.getElementById("reelEditor");
+
+    const reelVideo =
+        document.getElementById("reelEditorVideo");
+
+    if (reelVideo) {
+        reelVideo.pause();
+    }
+
+    if (editor) {
+        editor.style.display = "none";
+    }
+
+    document.body.style.overflow = "hidden";
+
+    console.log("SNAPZ REEL EDITOR CLOSED");
+}
+
+
+/* ---------------------------------------------------------
+   REEL EDITOR BACK BUTTON
+--------------------------------------------------------- */
+
+document.addEventListener("DOMContentLoaded", function() {
+
+    const backButton =
+        document.getElementById("reelEditorBackBtn");
+
+    if (backButton) {
+
+        backButton.onclick = function() {
+            closeReelEditor();
+        };
+
+    }
+
+});
+
+
+document.addEventListener("dblclick", function(e){
+
+    /* HOME FEED DOUBLE TAP - DO NOT ENTER POST EDITOR */
+    if (e.target && e.target.closest(".post-media-item")) {
+        return;
+    }
+
+    if(e.target && (e.target.tagName === 'IMG' || e.target.closest('.preview-container'))){
+        if(typeof snapzEnterPostAdjustMode === "function"){
+            e.preventDefault();
+            snapzEnterPostAdjustMode();
+        }
+    }
+});
+
+
+/* =====================================================
+   RESTORE SELECTED MUSIC LOGO & WAVE DRAG IN STORY EDITOR
+===================================================== */
+document.addEventListener("DOMContentLoaded", function() {
+    if (typeof refreshSnapzStoryMusicLogo === "function") {
+        refreshSnapzStoryMusicLogo();
+    }
+
+    const selection = document.getElementById("snapzWaveSelection");
+    if (!selection) return;
+
+    // Waveform touch and mouse drag bindings
+    selection.addEventListener("touchstart", startSnapzWaveDrag, { passive: false });
+    selection.addEventListener("touchmove", moveSnapzWaveDrag, { passive: false });
+    selection.addEventListener("touchend", stopSnapzWaveDrag);
+    selection.addEventListener("mousedown", startSnapzWaveDrag);
+    document.addEventListener("mousemove", moveSnapzWaveDrag);
+    document.addEventListener("mouseup", stopSnapzWaveDrag);
+});
+
+
+/* =========================================================
+   SNAPZ UNIFIED POST ADJUSTMENT & CAROUSEL ENGINE (NEW)
+========================================================= */
+
+window.snapzPhotoCropData = window.snapzPhotoCropData || {};
+window.postEditCurrentIndex = window.postEditCurrentIndex || 0;
+
+window.snapzCropState = {
+    adjustmentMode: false,
+    x: 0, y: 0, scale: 1,
+    lastX: 0, lastY: 0,
+    dragging: false,
+    pinchStartDistance: 0,
+    pinchStartScale: 1
+};
+
+// Target image helper
+function snapzGetActiveImg() {
+    return document.getElementById("postShareImage") || 
+           document.querySelector(".preview-container img") || 
+           document.querySelector(".upload-preview-img");
+}
+
+function snapzCalcDist(t1, t2) {
+    let dx = t1.clientX - t2.clientX;
+    let dy = t1.clientY - t2.clientY;
+    return Math.sqrt(dx * dx + dy * dy);
+}
+
+function snapzRenderTransform() {
+    let img = snapzGetActiveImg();
+    if (!img) return;
+
+    img.style.transform = "translate3d(" + snapzCropState.x + "px, " + snapzCropState.y + "px, 0px) scale(" + snapzCropState.scale + ")";
+    img.style.transformOrigin = "center center";
+    img.style.transition = snapzCropState.dragging ? "none" : "transform 0.1s ease-out";
+
+    let btn = document.getElementById("snapzPostAdjustNext");
+    if (btn) {
+        btn.style.display = snapzCropState.adjustmentMode ? "block" : "none";
+    }
+}
+
+function snapzEnterPostAdjustMode() {
+    snapzCropState.adjustmentMode = true;
+    let img = snapzGetActiveImg();
+    if (img) {
+        img.style.touchAction = "none";
+        img.style.cursor = "grab";
+    }
+    let btn = document.getElementById("snapzPostAdjustNext");
+    if (btn) {
+        btn.textContent = "✓";
+        btn.style.display = "block";
+    }
+    snapzRenderTransform();
+}
+
+function snapzExitPostAdjustMode() {
+    // Save current crop
+    window.snapzPhotoCropData[window.postEditCurrentIndex] = {
+        x: snapzCropState.x,
+        y: snapzCropState.y,
+        scale: snapzCropState.scale
+    };
+
+    snapzCropState.adjustmentMode = false;
+    snapzCropState.dragging = false;
+
+    let img = snapzGetActiveImg();
+    if (img) {
+        img.style.touchAction = "pan-y";
+        img.style.cursor = "default";
+    }
+
+    let btn = document.getElementById("snapzPostAdjustNext");
+    if (btn) btn.style.display = "none";
+}
+
+function snapzSwitchAdjustPhoto(newIdx) {
+    // Save previous
+    window.snapzPhotoCropData[window.postEditCurrentIndex] = {
+        x: snapzCropState.x,
+        y: snapzCropState.y,
+        scale: snapzCropState.scale
+    };
+
+    window.postEditCurrentIndex = newIdx;
+    let saved = window.snapzPhotoCropData[newIdx] || { x: 0, y: 0, scale: 1 };
+    
+    snapzCropState.x = saved.x;
+    snapzCropState.y = saved.y;
+    snapzCropState.scale = saved.scale;
+    snapzCropState.lastX = saved.x;
+    snapzCropState.lastY = saved.y;
+
+    snapzRenderTransform();
+}
+
+// MAIN LISTENERS
+document.addEventListener("DOMContentLoaded", function () {
+    
+    // Hide Done button initially
+    let btn = document.getElementById("snapzPostAdjustNext");
+    if (btn) {
+        btn.style.display = "none";
+        btn.onclick = function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            snapzExitPostAdjustMode();
+        };
+    }
+
+    // Story Editor Wave Drag Restore
+    if (typeof refreshSnapzStoryMusicLogo === "function") {
+        refreshSnapzStoryMusicLogo();
+    }
+    let selection = document.getElementById("snapzWaveSelection");
+    if (selection) {
+        selection.addEventListener("touchstart", startSnapzWaveDrag, { passive: false });
+        selection.addEventListener("touchmove", moveSnapzWaveDrag, { passive: false });
+        selection.addEventListener("touchend", stopSnapzWaveDrag);
+        selection.addEventListener("mousedown", startSnapzWaveDrag);
+        document.addEventListener("mousemove", moveSnapzWaveDrag);
+        document.addEventListener("mouseup", stopSnapzWaveDrag);
+    }
+
+    // Double Tap to Open Adjust Mode
+    document.addEventListener("dblclick", function (e) {
+
+        /* HOME FEED DOUBLE TAP - DO NOT ENTER POST EDITOR */
+        if (e.target && e.target.closest(".post-media-item")) {
+            return;
+        }
+
+        let img = snapzGetActiveImg();
+        if (e.target && (e.target === img || e.target.closest(".preview-container") || e.target.tagName === "IMG")) {
+            e.preventDefault();
+            snapzEnterPostAdjustMode();
+        }
+    });
+
+    // Touch Handling (Drag/Pinch or Swipe Carousel)
+    let touchStartX = 0;
+
+    document.addEventListener("touchstart", function (e) {
+        let img = snapzGetActiveImg();
+        if (e.touches.length === 1) touchStartX = e.touches[0].clientX;
+
+        if (!snapzCropState.adjustmentMode || !img) return;
+
+        if (e.touches.length === 1) {
+            snapzCropState.dragging = true;
+            snapzCropState.startX = e.touches[0].clientX;
+            snapzCropState.startY = e.touches[0].clientY;
+            snapzCropState.lastX = snapzCropState.x;
+            snapzCropState.lastY = snapzCropState.y;
+        } else if (e.touches.length === 2) {
+            snapzCropState.dragging = false;
+            snapzCropState.pinchStartDistance = snapzCalcDist(e.touches[0], e.touches[1]);
+            snapzCropState.pinchStartScale = snapzCropState.scale;
+        }
+    }, { passive: false });
+
+    document.addEventListener("touchmove", function (e) {
+        if (!snapzCropState.adjustmentMode) return;
+
+        if (e.touches.length === 1 && snapzCropState.dragging) {
+            e.preventDefault();
+            let dx = e.touches[0].clientX - snapzCropState.startX;
+            let dy = e.touches[0].clientY - snapzCropState.startY;
+            snapzCropState.x = snapzCropState.lastX + dx;
+            snapzCropState.y = snapzCropState.lastY + dy;
+            snapzRenderTransform();
+        } else if (e.touches.length === 2 && snapzCropState.pinchStartDistance > 0) {
+            e.preventDefault();
+            let dist = snapzCalcDist(e.touches[0], e.touches[1]);
+            let ratio = dist / snapzCropState.pinchStartDistance;
+            snapzCropState.scale = Math.min(Math.max(snapzCropState.pinchStartScale * ratio, 0.5), 4);
+            snapzRenderTransform();
+        }
+    }, { passive: false });
+
+    document.addEventListener("touchend", function (e) {
+        if (snapzCropState.adjustmentMode) {
+            if (e.touches.length === 0) {
+                snapzCropState.dragging = false;
+                snapzCropState.pinchStartDistance = 0;
+                snapzCropState.lastX = snapzCropState.x;
+                snapzCropState.lastY = snapzCropState.y;
+            }
+        } else {
+            // Swipe Carousel logic when adjustment mode is OFF
+            if (e.changedTouches.length === 1) {
+                let touchEndX = e.changedTouches[0].clientX;
+                let diffX = touchStartX - touchEndX;
+                let maxFiles = (typeof selectedFiles !== "undefined" && selectedFiles) ? selectedFiles.length : 1;
+
+                if (Math.abs(diffX) > 50) {
+                    if (diffX > 0 && window.postEditCurrentIndex < maxFiles - 1) {
+                        snapzSwitchAdjustPhoto(window.postEditCurrentIndex + 1);
+                        if (typeof renderPostPreview === "function") renderPostPreview();
+                    } else if (diffX < 0 && window.postEditCurrentIndex > 0) {
+                        snapzSwitchAdjustPhoto(window.postEditCurrentIndex - 1);
+                        if (typeof renderPostPreview === "function") renderPostPreview();
+                    }
+                }
+            }
+        }
+    });
+});
+
+
+
+
+</script>
+
+
+
+
+
+
+
+
+
+<script>
+/* =========================================================
+   SNAPZ UNIFIED MULTI-PHOTO PREVIEW & SWIPE ENGINE
+========================================================= */
+window.postEditCurrentIndex = 0;
+window.snapzPhotoCropData = window.snapzPhotoCropData || {};
+
+function snapzRenderCarouselImage() {
+    let files = window.selectedFiles || window.postEditFiles;
+    let img = document.getElementById("postShareImage") || 
+              document.querySelector(".preview-container img") || 
+              document.querySelector(".upload-preview-img");
+
+    if (img && files && files[window.postEditCurrentIndex]) {
+        img.src = URL.createObjectURL(files[window.postEditCurrentIndex]);
+        
+        // Restore saved crop position for current index
+        let saved = window.snapzPhotoCropData[window.postEditCurrentIndex] || { x: 0, y: 0, scale: 1 };
+        if (typeof snapzCropState !== "undefined") {
+            snapzCropState.x = saved.x;
+            snapzCropState.y = saved.y;
+            snapzCropState.scale = saved.scale;
+            if (typeof snapzRenderTransform === "function") snapzRenderTransform();
+            else if (typeof snapzApplyCropTransform === "function") snapzApplyCropTransform();
+        }
+    }
+    
+    // Counter Update (e.g., 1/2)
+    let counter = document.getElementById("snapzCarouselCounter");
+    if (!counter && img) {
+        counter = document.createElement("div");
+        counter.id = "snapzCarouselCounter";
+        counter.style.cssText = "position:absolute; top:10px; right:10px; background:rgba(0,0,0,0.7); color:#fff; padding:4px 8px; border-radius:12px; font-size:12px; z-index:10;";
+        img.parentElement.style.position = "relative";
+        img.parentElement.appendChild(counter);
+    }
+    if (counter && files) {
+        counter.style.display = files.length > 1 ? "block" : "none";
+        counter.innerText = (window.postEditCurrentIndex + 1) + " / " + files.length;
+    }
+}
+
+function snapzNextPhoto() {
+    let files = window.selectedFiles || window.postEditFiles;
+    if (files && window.postEditCurrentIndex < files.length - 1) {
+        if(typeof snapzCropState !== "undefined") {
+            window.snapzPhotoCropData[window.postEditCurrentIndex] = {
+                x: snapzCropState.x, y: snapzCropState.y, scale: snapzCropState.scale
+            };
+        }
+        window.postEditCurrentIndex++;
+        snapzRenderCarouselImage();
+    }
+}
+
+function snapzPrevPhoto() {
+    let files = window.selectedFiles || window.postEditFiles;
+    if (files && window.postEditCurrentIndex > 0) {
+        if(typeof snapzCropState !== "undefined") {
+            window.snapzPhotoCropData[window.postEditCurrentIndex] = {
+                x: snapzCropState.x, y: snapzCropState.y, scale: snapzCropState.scale
+            };
+        }
+        window.postEditCurrentIndex--;
+        snapzRenderCarouselImage();
+    }
+}
+
+// Bind Multi-file input & Left/Right Swipe Gestures
+document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("change", function(e) {
+        if (e.target && e.target.type === "file") {
+            if (e.target.files && e.target.files.length > 0) {
+                window.selectedFiles = Array.from(e.target.files);
+                window.postEditFiles = Array.from(e.target.files);
+                window.postEditCurrentIndex = 0;
+                window.snapzPhotoCropData = {};
+                snapzRenderCarouselImage();
+            }
+        }
+    });
+
+    // LEFT / RIGHT SWIPE GESTURE DETECTOR
+    let touchStartX = 0;
+    let touchStartY = 0;
+
+    document.addEventListener("touchstart", function(e) {
+        if (e.touches.length === 1) {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+        }
+    }, { passive: true });
+
+    document.addEventListener("touchend", function(e) {
+        // Agar adjustment mode ON hai, to swipe stop rakhein taaki crop/move ho sake
+        if (typeof snapzCropState !== "undefined" && snapzCropState.adjustmentMode) return;
+
+        if (e.changedTouches.length === 1) {
+            let diffX = touchStartX - e.changedTouches[0].clientX;
+            let diffY = touchStartY - e.changedTouches[0].clientY;
+
+            // Horizontal Swipe Check (> 40px drag)
+            if (Math.abs(diffX) > 40 && Math.abs(diffX) > Math.abs(diffY)) {
+                if (diffX > 0) {
+                    snapzNextPhoto(); // Left Drag -> Next Image
+                } else {
+                    snapzPrevPhoto(); // Right Drag -> Previous Image
+                }
+            }
+        }
+    }, { passive: true });
+});
+</script>
+
+
+
+
+
+<script>
+/* =====================================================
+   SNAPZ HOME POST MUSIC PLAYER
+   Uses saved post audio + trim range.
+   Does NOT modify post/reel music editor.
+===================================================== */
+(function(){
+
+    let activeMusic = null;
+
+    function stopMusic(audio){
+        if(!audio) return;
+
+        try{
+            audio.pause();
+            audio.currentTime = 0;
+        }catch(e){}
+    }
+
+    function setupPostMusic(){
+
+        const posts = document.querySelectorAll(".post");
+
+        posts.forEach(function(post){
+
+            const music = post.querySelector(".snapz-post-music");
+
+            if(!music) return;
+
+            const start = Number(music.dataset.start || 0);
+            const end = Number(music.dataset.end || 0);
+
+            /*
+             * USER INTERACTION TRIGGER
+             * Starts saved post music when the user taps
+             * the actual post photo/video.
+             *
+             * Does NOT modify carousel/swipe/adjustment logic.
+             */
+            post.querySelectorAll(".post-media-item").forEach(function(media){
+
+                if(media.dataset.snapzMusicTrigger === "1") return;
+
+                media.dataset.snapzMusicTrigger = "1";
+
+                media.addEventListener("click", function(){
+
+                    if(typeof window.snapzPlayPostMusic === "function"){
+                        window.snapzPlayPostMusic(post);
+                    }
+
+                });
+
+            });
+
+            music.addEventListener("loadedmetadata", function(){
+
+                if(start >= 0 && start < music.duration){
+                    try{
+                        music.currentTime = start;
+                    }catch(e){}
+                }
+
+            });
+
+            music.addEventListener("timeupdate", function(){
+
+                if(end > start && music.currentTime >= end){
+
+                    if(music.loop){
+                        music.currentTime = start;
+                    }else{
+                        music.pause();
+                    }
+
+                }
+
+            });
+
+        });
+
+    }
+
+    function playPostMusic(post){
+
+        const music = post.querySelector(".snapz-post-music");
+
+        if(!music) return;
+
+        if(activeMusic && activeMusic !== music){
+            stopMusic(activeMusic);
+        }
+
+        activeMusic = music;
+
+        const start = Number(music.dataset.start || 0);
+
+        try{
+
+            if(
+                Number.isFinite(start) &&
+                start >= 0 &&
+                music.readyState >= 1 &&
+                Math.abs(music.currentTime - start) > 0.5
+            ){
+                music.currentTime = start;
+            }
+
+            music.play().catch(function(){
+                /*
+                 Browser autoplay policy may require
+                 user interaction before audio can start.
+                */
+            });
+
+        }catch(e){}
+
+    }
+
+    function stopAllPostMusic(){
+
+        document
+        .querySelectorAll(".snapz-post-music")
+        .forEach(function(audio){
+            stopMusic(audio);
+        });
+
+        activeMusic = null;
+    }
+
+
+    /* =====================================================
+       SNAPZ CENTER POST AUTO MUSIC
+       Automatically plays the music of the Post
+       closest to the center of the screen.
+       ===================================================== */
+
+    function setupCenterPostAutoMusic(){
+
+        const posts =
+            Array.from(document.querySelectorAll(".post"));
+
+        if(!posts.length) return;
+
+        let currentPost = null;
+        let ticking = false;
+
+        function updateCenterPostMusic(){
+
+            const screenCenter =
+                window.innerHeight / 2;
+
+            let centerPost = null;
+            let closestDistance = Infinity;
+
+            posts.forEach(function(post){
+
+                const rect =
+                    post.getBoundingClientRect();
+
+                const visibleTop =
+                    Math.max(rect.top, 0);
+
+                const visibleBottom =
+                    Math.min(
+                        rect.bottom,
+                        window.innerHeight
+                    );
+
+                const visibleHeight =
+                    Math.max(
+                        0,
+                        visibleBottom - visibleTop
+                    );
+
+                if(visibleHeight <= 0) return;
+
+                const visibleRatio =
+                    rect.height > 0
+                    ? visibleHeight / rect.height
+                    : 0;
+
+                if(visibleRatio < 0.45) return;
+
+                const postCenter =
+                    rect.top + (rect.height / 2);
+
+                const distance =
+                    Math.abs(
+                        postCenter - screenCenter
+                    );
+
+                if(distance < closestDistance){
+
+                    closestDistance = distance;
+                    centerPost = post;
+
+                }
+
+            });
+
+            if(!centerPost){
+
+                stopAllPostMusic();
+                currentPost = null;
+                return;
+
+            }
+
+            if(centerPost === currentPost) return;
+
+            currentPost = centerPost;
+
+            const music =
+                centerPost.querySelector(".snapz-post-music");
+
+            if(music){
+
+                playPostMusic(centerPost);
+
+            }else{
+
+                stopAllPostMusic();
+
+            }
+
+        }
+
+
+        function scheduleCenterMusicUpdate(){
+
+            if(ticking) return;
+
+            ticking = true;
+
+            requestAnimationFrame(function(){
+
+                ticking = false;
+                updateCenterPostMusic();
+
+            });
+
+        }
+
+
+        window.addEventListener(
+            "scroll",
+            scheduleCenterMusicUpdate,
+            {passive:true}
+        );
+
+        window.addEventListener(
+            "resize",
+            scheduleCenterMusicUpdate,
+            {passive:true}
+        );
+
+
+        setTimeout(function(){
+
+            updateCenterPostMusic();
+
+        }, 500);
+
+    }
+
+
+    if(document.readyState === "loading"){
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            setupCenterPostAutoMusic
+        );
+
+    }else{
+
+        setupCenterPostAutoMusic();
+
+    }
+
+    window.snapzPlayPostMusic = playPostMusic;
+    window.snapzStopPostMusic = stopAllPostMusic;
+
+    if(document.readyState === "loading"){
+        document.addEventListener(
+            "DOMContentLoaded",
+            setupPostMusic
+        );
+    }else{
+        setupPostMusic();
+    }
+
+})();
+</script>
+
+<style>
+/* =========================================================
+   SNAPZ POST TAG + MUSIC CONTROLS
+========================================================= */
+
+.post-media-carousel {
+    position: relative;
+}
+
+.snapz-post-tag-control,
+.snapz-post-music-control {
+    position: absolute;
+    bottom: 12px;
+    width: 38px;
+    height: 38px;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(0,0,0,.58);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 80;
+    cursor: pointer;
+    padding: 0;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.snapz-post-tag-control {
+    left: 12px;
+}
+
+.snapz-post-music-control {
+    right: 12px;
+}
+
+.snapz-post-tag-control svg,
+.snapz-post-music-control svg {
+    width: 21px;
+    height: 21px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.snapz-post-music-control .snapz-music-off-icon {
+    display: none;
+}
+
+.snapz-post-music-control[data-music-on="0"] .snapz-music-on-icon {
+    display: none;
+}
+
+.snapz-post-music-control[data-music-on="0"] .snapz-music-off-icon {
+    display: block;
+}
+
+.snapz-post-tags-popup {
+    position: absolute;
+    left: 12px;
+    bottom: 58px;
+    width: min(235px, calc(100% - 24px));
+    max-height: 240px;
+    overflow-y: auto;
+    background: rgba(17,19,24,.96);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 16px;
+    padding: 10px;
+    box-sizing: border-box;
+    z-index: 100;
+    box-shadow: 0 10px 35px rgba(0,0,0,.45);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+}
+
+.snapz-post-tags-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    padding: 5px 8px 9px;
+}
+
+.snapz-post-tag-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 42px;
+    padding: 5px 7px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #fff;
+    box-sizing: border-box;
+}
+
+.snapz-post-tag-user:active {
+    background: rgba(255,255,255,.08);
+}
+
+.snapz-post-tag-user img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.snapz-post-tag-user span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 14px;
+    font-weight: 600;
+}
+</style>
+
+<script>
+/* =========================================================
+   SNAPZ POST TAG POPUP
+========================================================= */
+
+window.snapzTogglePostTags = function(button) {
+    const carousel = button.closest(".post-media-carousel");
+    if (!carousel) return;
+
+    const popup = carousel.querySelector(".snapz-post-tags-popup");
+    if (!popup) return;
+
+    const wasHidden = popup.hidden;
+
+    document.querySelectorAll(".snapz-post-tags-popup").forEach(function(other) {
+        if (other !== popup) {
+            other.hidden = true;
+        }
+    });
+
+    popup.hidden = !wasHidden;
+};
+
+/* =========================================================
+   SNAPZ POST MUSIC TOGGLE
+   Existing center autoplay remains untouched.
+========================================================= */
+
+window.snapzTogglePostMusic = function(button) {
+    const post = button.closest(".post");
+    if (!post) return;
+
+    const music = post.querySelector(".snapz-post-music");
+    if (!music) return;
+
+    const isOn = button.dataset.musicOn !== "0";
+
+    if (isOn) {
+
+        if (typeof window.snapzStopPostMusic === "function") {
+            window.snapzStopPostMusic();
+        } else {
+            music.pause();
+            music.currentTime = 0;
+        }
+
+        button.dataset.musicOn = "0";
+        button.setAttribute("aria-label", "Turn music on");
+
+    } else {
+
+        if (typeof window.snapzPlayPostMusic === "function") {
+            window.snapzPlayPostMusic(post);
+        } else {
+            music.play().catch(function(){});
+        }
+
+        button.dataset.musicOn = "1";
+        button.setAttribute("aria-label", "Turn music off");
+    }
+};
+
+/* Close tag popup outside */
+document.addEventListener("click", function(e) {
+    if (
+        !e.target.closest(".snapz-post-tag-control") &&
+        !e.target.closest(".snapz-post-tags-popup")
+    ) {
+        document.querySelectorAll(".snapz-post-tags-popup").forEach(function(popup) {
+            popup.hidden = true;
+        });
+    }
+});
+</script>
+
+
+
+<script>
+/* ============================================================
+   SNAPZ POST 3 HEART DOUBLE TAP BURST
+============================================================ */
+
+function snapzShowThreePostHeartBurst(clientX, clientY){
+
+    const burst = document.createElement("div");
+    burst.className = "snapz-post-heart-burst";
+
+    burst.style.left = clientX + "px";
+    burst.style.top = clientY + "px";
+
+    const routes = [
+        {
+            sx:"-10px",
+            mx:"-20px",
+            ex:"-42px",
+            sr:"-8deg",
+            mr:"-14deg",
+            er:"-22deg"
+        },
+        {
+            sx:"10px",
+            mx:"22px",
+            ex:"38px",
+            sr:"8deg",
+            mr:"14deg",
+            er:"22deg"
+        },
+        {
+            sx:"-2px",
+            mx:"-10px",
+            ex:"8px",
+            sr:"-3deg",
+            mr:"8deg",
+            er:"-8deg"
+        }
+    ];
+
+    routes.forEach(function(route){
+
+        const heart = document.createElement("span");
+
+        heart.className = "snapz-post-burst-heart";
+
+        heart.innerHTML = `
+            <svg
+                width="42"
+                height="42"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <path
+                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78Z"
+                    fill="#FF4081"
+                />
+            </svg>
+        `;
+
+        heart.style.setProperty("--sx", route.sx);
+        heart.style.setProperty("--mx", route.mx);
+        heart.style.setProperty("--ex", route.ex);
+
+        heart.style.setProperty("--sr", route.sr);
+        heart.style.setProperty("--mr", route.mr);
+        heart.style.setProperty("--er", route.er);
+
+        burst.appendChild(heart);
+    });
+
+    document.body.appendChild(burst);
+
+    setTimeout(function(){
+        burst.remove();
+    }, 1250);
+}
+
+
+/* ============================================================
+   POST DOUBLE TAP
+============================================================ */
+
+document.addEventListener("dblclick", function(e){
+
+    if (!e.target) return;
+
+    const post = e.target.closest(".post");
+
+    if (!post) return;
+
+    /* Buttons / action area par animation nahi */
+    if (
+        e.target.closest("button") ||
+        e.target.closest("a") ||
+        e.target.closest(".actions")
+    ){
+        return;
+    }
+
+    snapzShowThreePostHeartBurst(e.clientX, e.clientY);
+});
+
+</script>
+
+
 </body>
 </html>
-
-
 

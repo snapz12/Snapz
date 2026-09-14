@@ -9,29 +9,112 @@ body{
     color:white;
     font-family:sans-serif;
 }
+
 .user{
-    padding:15px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:12px 15px;
     border-bottom:1px solid #333;
+    color:white;
+    text-decoration:none;
+    cursor:pointer;
 }
-a{
+
+.user img{
+    width:48px;
+    height:48px;
+    border-radius:50%;
+    object-fit:cover;
+    flex-shrink:0;
+}
+
+.username{
+    font-size:16px;
+    font-weight:600;
+    flex:1;
+    min-width:0;
+}
+
+.follow-btn{
+    flex-shrink:0;
+    border:none;
+    border-radius:8px;
+    padding:8px 14px;
+    background:#303030;
+    color:white;
+    font-size:13px;
+    font-weight:700;
+    cursor:pointer;
+}
+
+.follow-btn:disabled{
+    opacity:.7;
+}
+
+.back-link{
     color:white;
     text-decoration:none;
 }
 </style>
 </head>
+
 <body>
 
 <h2>{{ username }} Following</h2>
 
 {% for user in following %}
-<div class="user">
-    {{ user[0] }}
-</div>
+<a href="/profile/{{ user[0] }}" class="user">
+
+    {% set pic = user[1] or "/static/images/default.jpg" %}
+    {% if not (pic.startswith("http://") or pic.startswith("https://") or pic.startswith("/")) %}
+        {% set pic = "/static/images/" + pic %}
+    {% endif %}
+
+    <img src="{{ pic }}" alt="Profile">
+
+    <div class="username">
+        {{ user[0] }}
+    </div>
+
+    <button
+        type="button"
+        class="follow-btn"
+        onclick="event.preventDefault(); event.stopPropagation(); unfollowUser(this, '{{ user[0] }}')">
+        Unfollow
+    </button>
+
+</a>
 {% endfor %}
 
 <br>
-<a href="/profile">⬅ Back</a>
+<a href="/profile" class="back-link">⬅ Back</a>
+
+<script>
+async function unfollowUser(button, username) {
+
+    button.disabled = true;
+
+    try {
+        const response = await fetch(
+            "/unfollow/" + encodeURIComponent(username),
+            {
+                method: "POST"
+            }
+        );
+
+        const data = await response.json();
+
+        if (data.status === "unfollowed") {
+            button.textContent = "Unfollowed";
+        }
+
+    } catch (error) {
+        console.error("Unfollow error:", error);
+        button.disabled = false;
+    }
+}
+</script>
 
 </body>
 </html>
-

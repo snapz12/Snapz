@@ -1,0 +1,1786 @@
+<!-- =========================
+     SIMPLE STORIES
+========================= -->
+
+<style>
+#storyViewersPanel{
+    position:fixed;
+    left:0;
+    right:0;
+    bottom:0;
+
+    display:none;
+
+    z-index:1000000;
+
+    background:#111;
+    color:#fff;
+
+    max-height:70vh;
+    overflow-y:auto;
+
+    border-radius:24px 24px 0 0;
+}
+
+
+.story-viewers-overlay{
+
+    position:absolute;
+
+    inset:0;
+
+    z-index:200;
+
+    background:rgba(0,0,0,.65);
+
+    display:flex;
+
+    align-items:flex-end;
+
+}
+
+
+.story-viewers-box{
+
+    width:100%;
+
+    max-height:65vh;
+
+    overflow-y:auto;
+
+    background:#111;
+
+    color:#fff;
+
+    border-radius:20px 20px 0 0;
+
+    padding:18px;
+
+}
+
+
+.story-viewers-header{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    font-size:18px;
+
+    margin-bottom:12px;
+
+}
+
+
+.story-viewers-header button{
+
+    width:35px;
+
+    height:35px;
+
+    border:0;
+
+    border-radius:50%;
+
+    background:#333;
+
+    color:#fff;
+
+    font-size:22px;
+
+}
+
+
+.story-viewers-count{
+
+    color:#aaa;
+
+    margin-bottom:10px;
+
+}
+
+
+.story-viewer-user{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    padding:12px 0;
+
+    border-bottom:1px solid #292929;
+
+    font-size:15px;
+
+}
+
+
+.story-viewer-avatar{
+
+    width:42px;
+
+    height:42px;
+
+    border-radius:50%;
+
+    background:#333;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+}
+
+
+.no-story-viewers{
+
+    text-align:center;
+
+    color:#888;
+
+    padding:30px 10px;
+
+}
+
+
+#storyViewButton{
+    position:absolute;
+    left:24px;
+    bottom:24px;
+
+    z-index:100;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    min-width:108px;
+    height:48px;
+
+    padding:0 18px;
+
+    border:1px solid #555;
+    border-radius:28px;
+
+    background:rgba(0,0,0,.65);
+    color:#fff;
+
+    cursor:pointer;
+
+    pointer-events:auto;
+}
+
+#simpleStoryHeader{
+    position:absolute;
+
+    top:0;
+    left:0;
+
+    width:100%;
+
+    height:60px;
+
+    display:flex;
+
+    align-items:center;
+
+    padding:10px 15px;
+
+    z-index:100;
+}
+
+#simpleStoryUsername{
+    color:#fff;
+
+    font-size:16px;
+
+    font-weight:bold;
+
+    text-shadow:
+        0 1px 4px #000;
+
+    white-space:nowrap;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+
+    max-width:70%;
+}
+
+#simpleStoryClose{
+    margin-left:auto;
+
+    width:42px;
+    height:42px;
+
+    border:none;
+
+    background:rgba(0,0,0,.45);
+
+    color:#fff;
+
+    border-radius:50%;
+
+    font-size:30px;
+
+    line-height:42px;
+
+    cursor:pointer;
+}
+
+
+.stories{
+    display:flex;
+    gap:12px;
+    padding:10px;
+    overflow-x:auto;
+}
+
+.story-item{
+    width:70px;
+    flex:0 0 70px;
+    text-align:center;
+    cursor:pointer;
+}
+
+.story-circle{
+    width:66px;
+    height:66px;
+    padding:3px;
+    border-radius:50%;
+    background:linear-gradient(
+        45deg,
+        #feda75,
+        #fa7e1e,
+        #d62976,
+        #962fbf,
+        #4f5bd5
+    );
+}
+
+.story-inner{
+    width:60px;
+    height:60px;
+    border-radius:50%;
+    overflow:hidden;
+    background:#222;
+    border:2px solid #fff;
+}
+
+.story-inner img,
+.story-inner video{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+}
+
+.story-name{
+    color:#fff;
+    font-size:11px;
+    margin-top:4px;
+    white-space:nowrap;
+    overflow:hidden;
+}
+
+
+/* =========================
+   FULL SCREEN VIEWER
+========================= */
+
+#simpleStoryViewer{
+    display:none;
+
+    position:fixed !important;
+
+    inset:0 !important;
+
+    width:100vw !important;
+    height:100vh !important;
+    height:100dvh !important;
+
+    background:#000 !important;
+
+    z-index:2147483647 !important;
+
+    align-items:center !important;
+    justify-content:center !important;
+
+    overflow:hidden !important;
+}
+
+
+#simpleStoryImage,
+#simpleStoryVideo{
+    display:none;
+
+    width:min(100vw, 56.25vh);
+    height:min(100vh, 177.78vw);
+
+    aspect-ratio:9 / 16;
+
+    object-fit:contain;
+
+    background:#000;
+
+    margin:0 auto;
+}
+
+
+
+
+/* ===== SNAPZ STORY CIRCLES FIX ===== */
+
+.stories{
+    display:flex !important;
+    flex-direction:row !important;
+    align-items:flex-start !important;
+    gap:18px !important;
+    width:100% !important;
+    overflow-x:auto !important;
+    overflow-y:hidden !important;
+    padding:12px 18px 18px !important;
+    box-sizing:border-box !important;
+    white-space:nowrap !important;
+}
+
+.stories::-webkit-scrollbar{
+    display:none !important;
+}
+
+.story-item{
+    flex:0 0 78px !important;
+    width:78px !important;
+    min-width:78px !important;
+    max-width:78px !important;
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:flex-start !important;
+    text-align:center !important;
+    white-space:normal !important;
+}
+
+.story-circle{
+    width:72px !important;
+    height:72px !important;
+    min-width:72px !important;
+    min-height:72px !important;
+    border-radius:50% !important;
+    padding:3px !important;
+    box-sizing:border-box !important;
+    background:linear-gradient(135deg,#ff3d81,#8b5cf6,#ff9f43) !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+}
+
+.story-inner{
+    width:100% !important;
+    height:100% !important;
+    border-radius:50% !important;
+    overflow:hidden !important;
+    background:#111 !important;
+    border:3px solid #000 !important;
+    box-sizing:border-box !important;
+}
+
+.story-inner img,
+.story-inner video{
+    width:100% !important;
+    height:100% !important;
+    display:block !important;
+    object-fit:cover !important;
+    border-radius:50% !important;
+}
+
+.story-name{
+    width:78px !important;
+    margin-top:7px !important;
+    font-size:13px !important;
+    line-height:16px !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+    white-space:nowrap !important;
+}
+
+.story-item:first-child{
+    margin-left:0 !important;
+}
+
+</style>
+
+
+<!-- =========================
+     STORY CIRCLES
+========================= -->
+
+<div class="stories">
+
+<!-- =========================
+     FIXED CURRENT USER CIRCLE
+========================= -->
+
+<div class="story-item">
+
+    {% if my_story %}
+
+    <div
+        class="story-circle"
+        onclick="simpleOpenStory(
+            '{{ my_story[0] }}',
+            '{{ my_story[2] }}',
+            '{{ my_story[1] }}',
+            '{{ my_story[3] or "" }}',
+            '{{ my_story[4] or 0 }}',
+            '{{ my_story[5] or 0 }}'
+        )"
+    >
+
+        <div class="story-inner">
+
+            {% if
+                my_story[2].lower().endswith('.mp4')
+                or my_story[2].lower().endswith('.webm')
+                or my_story[2].lower().endswith('.mov')
+            %}
+
+            <video
+                src="{{ my_story[2] }}"
+                muted
+                playsinline
+            ></video>
+
+            {% else %}
+
+            <img src="{{ my_story[2] }}">
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    {% else %}
+
+    <div class="story-circle">
+
+        <div class="story-inner">
+
+            {% set my_profile = session.get('profile_pic') %}
+
+            {% if my_profile and (
+                my_profile.startswith('http://')
+                or my_profile.startswith('https://')
+                or my_profile.startswith('/')
+            ) %}
+
+                <img src="{{ my_profile }}">
+
+            {% elif my_profile %}
+
+                <img src="/static/images/{{ my_profile }}">
+
+            {% else %}
+
+                <img src="/static/images/default.jpg">
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+    <div class="story-name">
+        Your Story
+    </div>
+
+</div>
+
+
+<!-- =========================
+     OTHER USERS STORIES
+========================= -->
+
+{% for story in story_circles %}
+
+<div
+    class="story-item"
+    onclick="simpleOpenStory(
+        '{{ story[0] }}',
+        '{{ story[2] }}',
+        '{{ story[1] }}',
+        '{{ story[3] or "" }}',
+        '{{ story[4] or 0 }}',
+        '{{ story[5] or 0 }}'
+    )"
+>
+
+    <div class="story-circle">
+
+        <div class="story-inner">
+
+            {% if
+                story[2].lower().endswith('.mp4')
+                or story[2].lower().endswith('.webm')
+                or story[2].lower().endswith('.mov')
+            %}
+
+            <video
+                src="{{ story[2] }}"
+                muted
+                playsinline
+            ></video>
+
+            {% else %}
+
+            <img src="{{ story[2] }}">
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    <div class="story-name">
+        {{ story[1] }}
+    </div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+
+<!-- =========================
+     SIMPLE STORY VIEWER
+========================= -->
+
+<div id="simpleStoryViewer">
+
+    <!-- TOP HEADER -->
+
+    <div id="simpleStoryHeader">
+
+        <div id="simpleStoryUsername">
+            Username
+        </div>
+
+        <button
+            id="simpleStoryClose"
+            onclick="simpleCloseStory()"
+        >
+            ×
+        </button>
+
+    </div>
+
+<!-- =========================
+     STORY VIEW COUNT
+========================= -->
+
+<div
+    id="storyViewButton"
+    onclick="openStoryViewers()"
+    style="display:none;"
+>
+
+    <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+    >
+        <path
+            d="M2.5 12C4.2 7.8 7.7 5.5 12 5.5C16.3 5.5 19.8 7.8 21.5 12C19.8 16.2 16.3 18.5 12 18.5C7.7 18.5 4.2 16.2 2.5 12Z"
+            stroke="white"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+        />
+
+        <circle
+            cx="12"
+            cy="12"
+            r="3"
+            stroke="white"
+            stroke-width="1.8"
+        />
+    </svg>
+
+    <span id="storyViewCount">0</span>
+
+</div>
+
+
+<div  
+    onclick="simpleprevStory()"  
+    style="  
+    position:absolute;  
+    left:0;  
+    top:0;  
+    width:50%;  
+    height:100%;  
+    z-index:20;">  
+</div>  
+
+<!-- Right tap -->  
+<div  
+    onclick="simplenextStory()"  
+    style="  
+    position:absolute;  
+    right:0;  
+    top:0;  
+    width:50%;  
+    height:100%;  
+    z-index:20;">  
+</div>
+
+
+    <!-- STORY MEDIA -->
+
+    <img
+        id="simpleStoryImage"
+        alt="Story"
+    >
+
+    <video
+        id="simpleStoryVideo"
+        controls
+        playsinline
+    ></video>
+
+</div>
+
+
+<script>
+
+
+let simpleStoryUrl = "";
+
+let simpleStoryMusic = null;
+let simpleStoryMusicStart = 0;
+let simpleStoryMusicEnd = 0;
+
+function stopSimpleStoryMusic() {
+
+    if (simpleStoryMusic) {
+
+        try {
+            simpleStoryMusic.pause();
+            simpleStoryMusic.currentTime = 0;
+        } catch(e) {
+            console.log("STORY MUSIC STOP ERROR =", e);
+        }
+
+        simpleStoryMusic.src = "";
+        simpleStoryMusic.load();
+
+        simpleStoryMusic = null;
+    }
+
+    simpleStoryMusicStart = 0;
+    simpleStoryMusicEnd = 0;
+}
+
+
+function playSimpleStoryMusic(audioUrl, musicStart, musicEnd) {
+
+    stopSimpleStoryMusic();
+
+    if (!audioUrl) {
+        console.log("NO STORY MUSIC");
+        return;
+    }
+
+    simpleStoryMusicStart =
+        Number(musicStart) || 0;
+
+    simpleStoryMusicEnd =
+        Number(musicEnd) || 0;
+
+    console.log(
+        "STORY MUSIC =",
+        audioUrl,
+        "START =",
+        simpleStoryMusicStart,
+        "END =",
+        simpleStoryMusicEnd
+    );
+
+    const audio =
+        new Audio(audioUrl);
+
+    simpleStoryMusic = audio;
+
+    audio.preload = "auto";
+
+    audio.addEventListener(
+        "loadedmetadata",
+        function() {
+
+            if (
+                simpleStoryMusicStart >= 0 &&
+                simpleStoryMusicStart < audio.duration
+            ) {
+                audio.currentTime =
+                    simpleStoryMusicStart;
+            }
+
+        }
+    );
+
+    audio.addEventListener(
+        "timeupdate",
+        function() {
+
+            if (
+                simpleStoryMusicEnd > simpleStoryMusicStart &&
+                audio.currentTime >= simpleStoryMusicEnd
+            ) {
+
+                audio.currentTime =
+                    simpleStoryMusicStart;
+
+            }
+
+        }
+    );
+
+    audio.addEventListener(
+        "ended",
+        function() {
+
+            if (
+                simpleStoryMusicEnd > simpleStoryMusicStart
+            ) {
+
+                audio.currentTime =
+                    simpleStoryMusicStart;
+
+                audio.play().catch(function(error) {
+
+                    console.log(
+                        "STORY MUSIC REPLAY ERROR =",
+                        error
+                    );
+
+                });
+
+            }
+
+        }
+    );
+
+    audio.addEventListener(
+        "error",
+        function(error) {
+
+            console.error(
+                "STORY MUSIC LOAD ERROR =",
+                error
+            );
+
+        }
+    );
+
+    audio.play().then(function() {
+
+        console.log(
+            "STORY MUSIC PLAYING"
+        );
+
+    }).catch(function(error) {
+
+        console.log(
+            "STORY MUSIC PLAY ERROR =",
+            error
+        );
+
+    });
+}
+
+let simpleStoryTimer = null;
+
+/* =========================
+   OPEN STORY
+========================= */
+
+function simpleOpenStory(storyId, mediaUrl, username,audioUrl,musicStart,musicEnd){
+
+    /*
+       Purana timer clear karo
+    */
+
+    if(simpleStoryTimer){
+
+        clearTimeout(simpleStoryTimer);
+
+        simpleStoryTimer = null;
+
+    }
+
+
+    currentUsername =
+        String(username || "").trim();
+
+
+    /* =========================
+       STORY VIEW BUTTON
+    ========================= */
+
+    const storyViewButton =
+        document.getElementById("storyViewButton");
+
+
+    if(storyViewButton){
+
+        const loggedInUser =
+            String("{{ current_user }}").trim();
+
+
+        const storyOwner =
+            String(username || "").trim();
+
+
+        if(loggedInUser === storyOwner){
+
+            storyViewButton.style.display =
+                "flex";
+
+        }else{
+
+            storyViewButton.style.display =
+                "none";
+
+        }
+
+    }
+
+
+    /* =========================
+       CURRENT USER STORIES
+    ========================= */
+
+    storyList =
+        allStories.filter(function(story){
+
+            return String(story[1] || "").trim()
+                === currentUsername;
+
+        });
+
+
+    currentStory =
+        storyList.findIndex(function(story){
+
+            return String(story[0])
+                === String(storyId);
+
+        });
+
+
+    if(currentStory < 0){
+
+        currentStory = 0;
+
+    }
+
+
+    /* =========================
+   ALL STORY USERS
+   LOGIN USER EXCLUDED
+========================= */
+
+const loggedInUserForNavigation =
+    String("{{ current_user }}").trim();
+
+storyUsers = [];
+
+allStories.forEach(function(story){
+
+    const user =
+        String(story[1] || "").trim();
+
+    if(
+        user &&
+        user !== loggedInUserForNavigation &&
+        !storyUsers.includes(user)
+    ){
+
+        storyUsers.push(user);
+
+    }
+
+});
+
+
+/*
+   Your Story ke liye
+   external users ki list me index nahi hoga
+*/
+
+if(currentUsername === loggedInUserForNavigation){
+
+    currentUserIndex = -1;
+
+}else{
+
+    currentUserIndex =
+        storyUsers.indexOf(currentUsername);
+
+    if(currentUserIndex < 0){
+
+        currentUserIndex = 0;
+
+    }
+
+}
+
+
+console.log(
+    "STORY USERS (LOGIN USER EXCLUDED) =",
+    storyUsers
+);
+
+console.log(
+    "CURRENT USER INDEX =",
+    currentUserIndex
+);
+
+console.log(
+    "CURRENT STORY LIST =",
+    storyList
+);
+
+console.log(
+    "CURRENT STORY =",
+    currentStory
+);
+
+
+    console.log(
+        "STORY USERS =",
+        storyUsers
+    );
+
+
+    console.log(
+        "CURRENT USER INDEX =",
+        currentUserIndex
+    );
+
+
+    console.log(
+        "CURRENT STORY LIST =",
+        storyList
+    );
+
+
+    console.log(
+        "CURRENT STORY =",
+        currentStory
+    );
+
+
+    /* =========================
+       USERNAME
+    ========================= */
+
+    const usernameElement =
+        document.getElementById(
+            "simpleStoryUsername"
+        );
+
+
+    if(usernameElement){
+
+        usernameElement.textContent =
+            username || "Username";
+
+    }
+
+
+    console.log(
+        "SIMPLE STORY OPEN"
+    );
+
+
+    console.log(
+        "ID:",
+        storyId
+    );
+
+
+    console.log(
+        "URL:",
+        mediaUrl
+    );
+
+
+    console.log(
+        "USER:",
+        username
+    );
+
+
+    /* =========================
+       ELEMENTS
+    ========================= */
+
+    const viewer =
+        document.getElementById(
+            "simpleStoryViewer"
+        );
+
+
+    const image =
+        document.getElementById(
+            "simpleStoryImage"
+        );
+
+
+    const video =
+        document.getElementById(
+            "simpleStoryVideo"
+        );
+
+
+    if(
+        !viewer ||
+        !image ||
+        !video
+    ){
+
+        console.error(
+            "STORY ELEMENT NOT FOUND"
+        );
+
+        return;
+
+    }
+
+
+    /* =========================
+       RESET
+    ========================= */
+
+    image.onload = null;
+    image.onerror = null;
+
+    image.style.display =
+        "none";
+
+    image.removeAttribute(
+        "src"
+    );
+
+
+    video.pause();
+
+    stopSimpleStoryMusic();
+
+    video.onended = null;
+
+    video.style.display =
+        "none";
+
+    video.removeAttribute(
+        "src"
+    );
+
+
+    /* =========================
+       STORY URL
+    ========================= */
+
+    simpleStoryUrl =
+        String(mediaUrl || "").trim();
+
+
+    if(!simpleStoryUrl){
+
+        console.error(
+            "STORY URL EMPTY"
+        );
+
+        return;
+
+    }
+
+
+    console.log(
+        "STORY URL =",
+        simpleStoryUrl
+    );
+
+
+    /* =========================
+       CHECK MEDIA TYPE
+    ========================= */
+
+    const lowerUrl =
+        simpleStoryUrl.toLowerCase();
+
+
+    const isVideo =
+        lowerUrl.includes(".mp4") ||
+        lowerUrl.includes(".webm") ||
+        lowerUrl.includes(".mov") ||
+        lowerUrl.includes("video/upload");
+
+/* =========================
+   STORY MUSIC
+========================= */
+
+playSimpleStoryMusic(
+    audioUrl,
+    musicStart,
+    musicEnd
+);
+
+
+    /* =========================
+       VIDEO STORY
+       MAXIMUM 3 MINUTES
+    ========================= */
+
+    if(isVideo){
+
+        video.src =
+            simpleStoryUrl;
+
+/* =========================
+   VIDEO ORIGINAL AUDIO
+========================= */
+
+if (audioUrl && String(audioUrl).trim() !== "") {
+
+    // Selected music hai → video ka original audio OFF
+    video.muted = true;
+
+    console.log(
+        "SELECTED MUSIC → ORIGINAL VIDEO AUDIO OFF"
+    );
+
+} else {
+
+    // Music select nahi kiya → original audio ON
+    video.muted = false;
+
+    console.log(
+        "NO SELECTED MUSIC → ORIGINAL VIDEO AUDIO ON"
+    );
+}
+
+
+        video.style.display =
+            "block";
+
+
+        viewer.style.display =
+            "flex";
+
+
+        video.load();
+
+
+        /*
+           Video normally finish ho jaye
+           to next story
+        */
+
+        video.onended =
+            function(){
+
+                if(simpleStoryTimer){
+
+                    clearTimeout(
+                        simpleStoryTimer
+                    );
+
+                    simpleStoryTimer =
+                        null;
+
+                }
+
+
+                console.log(
+                    "VIDEO ENDED → NEXT STORY"
+                );
+
+
+                simplenextStory();
+
+            };
+
+
+        /*
+           Maximum 3 minutes
+        */
+
+        simpleStoryTimer =
+            setTimeout(
+                function(){
+
+                    console.log(
+                        "VIDEO 3 MINUTES OVER → NEXT STORY"
+                    );
+
+
+                    simpleStoryTimer =
+                        null;
+
+
+                    video.pause();
+
+
+                    simplenextStory();
+
+
+                },
+                180000
+            );
+
+
+        /*
+           Play video
+        */
+
+        video.play().catch(
+            function(error){
+
+                console.log(
+                    "VIDEO PLAY:",
+                    error
+                );
+
+            }
+        );
+
+    }
+
+
+    /* =========================
+       IMAGE STORY
+       MAXIMUM 15 SECONDS
+    ========================= */
+
+    else{
+
+        image.onload =
+            function(){
+
+                console.log(
+                    "IMAGE LOADED"
+                );
+
+            };
+
+
+        image.onerror =
+            function(){
+
+                console.error(
+                    "IMAGE LOAD FAILED:",
+                    simpleStoryUrl
+                );
+
+            };
+
+
+        image.src =
+            simpleStoryUrl;
+
+
+        image.style.display =
+            "block";
+
+
+        viewer.style.display =
+            "flex";
+
+
+        /*
+           Image maximum 15 seconds
+        */
+
+        simpleStoryTimer =
+            setTimeout(
+                function(){
+
+                    console.log(
+                        "IMAGE 15 SECONDS OVER → NEXT STORY"
+                    );
+
+
+                    simpleStoryTimer =
+                        null;
+
+
+                    simplenextStory();
+
+
+                },
+                15000
+            );
+
+    }
+
+
+    /* =========================
+       SAVE STORY VIEW
+    ========================= */
+
+    fetch(
+        "/view_story/" + storyId,
+        {
+            method: "POST"
+        }
+    )
+    .then(function(response){
+
+        console.log(
+            "VIEW STORY STATUS =",
+            response.status
+        );
+
+
+        /*
+           Count update
+        */
+
+        updateStoryViewCount(
+            storyId
+        );
+
+    })
+    .catch(function(error){
+
+        console.log(
+            "VIEW ERROR:",
+            error
+        );
+
+    });
+
+}
+
+
+/* =========================
+   CLOSE STORY
+========================= */
+
+function simpleCloseStory(){
+
+
+
+    if(simpleStoryTimer){
+
+        clearTimeout(simpleStoryTimer);
+
+        simpleStoryTimer = null;
+
+    }
+
+
+    const storyViewButton =
+        document.getElementById("storyViewButton");
+
+    if(storyViewButton){
+        storyViewButton.style.display = "none";
+    }
+
+    const viewer =
+        document.getElementById(
+            "simpleStoryViewer"
+        );
+
+    const image =
+        document.getElementById(
+            "simpleStoryImage"
+        );
+
+    const video =
+        document.getElementById(
+            "simpleStoryVideo"
+        );
+
+
+    if(video){
+
+        video.pause();
+
+        video.removeAttribute(
+            "src"
+        );
+
+    }
+
+
+    if(image){
+
+        image.removeAttribute(
+            "src"
+        );
+
+    }
+
+
+    if(viewer){
+
+        viewer.style.display =
+            "none";
+
+    }
+
+stopSimpleStoryMusic();
+
+}
+
+/* =========================
+   STORY VIEWERS
+========================= */
+
+
+function closeStoryViewers(){
+
+    const popup =
+        document.getElementById(
+            "storyViewersOverlay"
+        );
+
+    if(popup){
+
+        popup.remove();
+
+    }
+
+}
+
+
+function simplenextStory(){
+
+    console.log("NEXT STORY");
+
+    const loggedInUser =
+        String("{{ current_user }}").trim();
+
+
+    /*
+       =====================================
+       CURRENT USER KI NEXT STORY
+       =====================================
+    */
+
+    if(
+        storyList &&
+        currentStory < storyList.length - 1
+    ){
+
+        currentStory++;
+
+        const story =
+            storyList[currentStory];
+
+        if(story){
+
+            simpleOpenStory(
+                story[0],
+                story[2],
+                story[1],
+                story[3],
+                story[4],
+                story[5]
+            );
+
+        }
+
+        return;
+
+    }
+
+
+    /*
+       =====================================
+       CURRENT USER KI STORIES KHATAM
+       AB NEXT USER
+       =====================================
+    */
+
+    let nextUserIndex;
+
+
+    /*
+       Agar abhi Your Story par hain
+    */
+
+    if(currentUsername === loggedInUser){
+
+        nextUserIndex = 0;
+
+    }else{
+
+        nextUserIndex =
+            currentUserIndex + 1;
+
+    }
+
+
+    /*
+       =====================================
+       KOI NEXT USER HAI
+       =====================================
+    */
+
+    if(
+        nextUserIndex >= 0 &&
+        nextUserIndex < storyUsers.length
+    ){
+
+        currentUserIndex =
+            nextUserIndex;
+
+        currentUsername =
+            storyUsers[currentUserIndex];
+
+
+        storyList =
+            allStories.filter(function(story){
+
+                return String(story[1] || "").trim()
+                    === currentUsername;
+
+            });
+
+
+        currentStory = 0;
+
+
+        const story =
+            storyList[currentStory];
+
+
+        if(story){
+
+            simpleOpenStory(
+                story[0],
+                story[2],
+                story[1],
+                story[3],
+                story[4],
+                story[5]
+            );
+
+        }
+
+        return;
+
+    }
+
+
+    /*
+       =====================================
+       SAB USERS KI STORIES KHATAM
+       =====================================
+    */
+
+    console.log(
+        "ALL STORIES FINISHED"
+    );
+
+    simpleCloseStory();
+
+}
+
+function simpleprevStory(){
+
+
+    console.log("PREVIOUS STORY");
+
+
+    /*
+       CURRENT USER KI PREVIOUS STORY
+    */
+
+    if(currentStory > 0){
+
+        currentStory--;
+
+        const story =
+            storyList[currentStory];
+
+simpleOpenStory(
+    story[0],
+    story[2],
+    story[1],
+    story[3],
+    story[4],
+    story[5]
+);
+
+        return;
+    }
+
+
+    /*
+       CURRENT USER KI FIRST STORY HAI
+       AB PREVIOUS USER
+    */
+
+    if(currentUserIndex > 0){
+
+        currentUserIndex--;
+
+        currentUsername =
+            storyUsers[currentUserIndex];
+
+
+        storyList =
+            allStories.filter(function(story){
+
+                return String(story[1]).trim()
+                    === currentUsername;
+
+            });
+
+
+        /*
+           Previous user ki LAST story
+        */
+
+        currentStory =
+            storyList.length - 1;
+
+
+        const story =
+            storyList[currentStory];
+
+
+        if(story){
+
+            simpleOpenStory(
+    story[0],
+    story[2],
+    story[1],
+    story[3],
+    story[4],
+    story[5]
+);
+
+        }
+
+        return;
+    }
+
+
+    /*
+       Sabse pehli story par
+       Preview karne par kuch nahi
+    */
+
+    console.log(
+        "FIRST STORY - NO PREVIOUS"
+    );
+
+}
+
+function openStoryViewers(){
+
+    if(!storyList || storyList.length === 0){
+
+        console.log("NO STORY LIST");
+        return;
+
+    }
+
+    const story =
+        storyList[currentStory];
+
+    if(!story){
+
+        console.log("NO CURRENT STORY");
+        return;
+
+    }
+
+    const storyId =
+        story[0];
+
+    console.log(
+        "OPEN VIEWERS FOR STORY =",
+        storyId
+    );
+
+    window.location.href =
+        "/story_viewers?story_id=" +
+        encodeURIComponent(storyId);
+
+}
+  
+
+function updateStoryViewCount(storyId){
+
+    if(!storyId){
+        return;
+    }
+
+    fetch("/story_views/" + storyId)
+
+    .then(function(response){
+
+        if(!response.ok){
+            throw new Error("View count request failed");
+        }
+
+        return response.json();
+
+    })
+
+    .then(function(viewers){
+
+        const count =
+            document.getElementById("storyViewCount");
+
+        if(!count){
+            return;
+        }
+
+        if(Array.isArray(viewers)){
+
+            count.textContent =
+                viewers.length;
+
+        }else{
+
+            count.textContent = "0";
+
+        }
+
+    })
+
+    .catch(function(error){
+
+        console.log(
+            "VIEW COUNT ERROR:",
+            error
+        );
+
+    });
+}
+
+
+</script>
+

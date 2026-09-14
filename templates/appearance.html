@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Appearance</title>
+
+<style>
+
+:root {
+    --snapz-theme-color: #0095f6;
+    --snapz-font-size: 16px;
+    --snapz-bg: #000;
+    --snapz-card: #111;
+    --snapz-border: #222;
+    --snapz-text: #fff;
+    --snapz-secondary: #888;
+    --snapz-select: #222;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: sans-serif;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+}
+
+body {
+    background: var(--snapz-bg);
+    color: var(--snapz-text);
+    font-size: var(--snapz-font-size);
+    transition:
+        background-color .25s ease,
+        color .25s ease;
+}
+
+.container {
+    max-width: 500px;
+    margin: auto;
+    padding: 20px;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.back {
+    color: var(--snapz-text);
+    text-decoration: none;
+    font-size: 28px;
+    transition: color .25s ease;
+}
+
+.title {
+    font-size: calc(var(--snapz-font-size) + 8px);
+    font-weight: bold;
+}
+
+.card {
+    background: var(--snapz-card);
+    border-radius: 15px;
+    overflow: hidden;
+    transition:
+        background-color .25s ease,
+        color .25s ease;
+}
+
+.item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px;
+    border-bottom: 1px solid var(--snapz-border);
+    transition:
+        background-color .25s ease,
+        border-color .25s ease;
+}
+
+.item:last-child {
+    border-bottom: none;
+}
+
+.left {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: var(--snapz-font-size);
+}
+
+.right {
+    color: var(--snapz-secondary);
+}
+
+select {
+    background: var(--snapz-select);
+    color: var(--snapz-text);
+    border: none;
+    padding: 6px 10px;
+    border-radius: 8px;
+    outline: none;
+    cursor: pointer;
+    transition:
+        background-color .25s ease,
+        color .25s ease;
+}
+
+select:focus {
+    outline: 2px solid var(--snapz-theme-color);
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 26px;
+}
+
+.switch input {
+    display: none;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #555;
+    border-radius: 30px;
+    transition: .3s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: .3s;
+}
+
+input:checked + .slider {
+    background: var(--snapz-theme-color);
+}
+
+input:checked + .slider:before {
+    transform: translateX(22px);
+}
+
+.item .left svg {
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    flex-shrink: 0;
+}
+
+body.font-small {
+    --snapz-font-size: 14px;
+}
+
+body.font-medium {
+    --snapz-font-size: 16px;
+}
+
+body.font-large {
+    --snapz-font-size: 18px;
+}
+
+/* LIGHT MODE */
+
+body:not(.dark-mode) {
+    --snapz-bg: #f5f5f5;
+    --snapz-card: #ffffff;
+    --snapz-border: #dddddd;
+    --snapz-text: #111111;
+    --snapz-secondary: #666666;
+    --snapz-select: #eeeeee;
+}
+
+/* DARK MODE */
+
+body.dark-mode {
+    --snapz-bg: #000;
+    --snapz-card: #111;
+    --snapz-border: #222;
+    --snapz-text: #fff;
+    --snapz-secondary: #888;
+    --snapz-select: #222;
+}
+
+/* ANIMATIONS OFF */
+
+body.animations-disabled,
+body.animations-disabled * {
+    animation: none !important;
+    transition: none !important;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+
+<a href="/settings" class="back">←</a>
+
+<div class="title">
+    Appearance
+</div>
+
+</div>
+
+<div class="card">
+
+    <!-- Dark Mode -->
+    <div class="item">
+
+        <div class="left">
+
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M20 15.5A8 8 0 0 1 8.5 4a8 8 0 1 0 11.5 11.5z"/>
+            </svg>
+
+            <span>Dark Mode</span>
+
+        </div>
+
+        <label class="switch">
+
+            <input type="checkbox" id="darkModeToggle" checked>
+
+            <span class="slider"></span>
+
+        </label>
+
+    </div>
+
+
+    <!-- Theme Color -->
+    <div class="item">
+
+        <div class="left">
+
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 3a9 9 0 1 0 0 18h2a2 2 0 0 0 0-4h-1a2 2 0 0 1 0-4h2a7 7 0 0 0-3-10z"/>
+                <circle cx="7.5" cy="10" r="1"/>
+                <circle cx="9" cy="6.5" r="1"/>
+                <circle cx="14" cy="6.5" r="1"/>
+                <circle cx="17" cy="10" r="1"/>
+            </svg>
+
+            <span>Theme Color</span>
+
+        </div>
+
+        <select id="themeColorSelect">
+
+            <option>Blue</option>
+            <option>Pink</option>
+            <option>Purple</option>
+            <option>Green</option>
+
+        </select>
+
+    </div>
+
+
+    <!-- Font Size -->
+    <div class="item">
+
+        <div class="left">
+
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M4 19 9 5l5 14"/>
+                <path d="M6 14h6"/>
+                <path d="M14 19h6"/>
+                <path d="m17 19 3-8 3 8"/>
+            </svg>
+
+            <span>Font Size</span>
+
+        </div>
+
+        <select id="fontSizeSelect">
+
+            <option>Small</option>
+            <option selected>Medium</option>
+            <option>Large</option>
+
+        </select>
+
+    </div>
+
+
+    <!-- Animations -->
+    <div class="item">
+
+        <div class="left">
+
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/>
+            </svg>
+
+            <span>Animations</span>
+
+        </div>
+
+        <label class="switch">
+
+            <input type="checkbox" id="animationsToggle" checked>
+
+            <span class="slider"></span>
+
+        </label>
+
+    </div>
+
+</div>
+
+</div>
+
+
+<script>
+(function () {
+
+    const darkModeToggle = document.getElementById("darkModeToggle");
+    const themeColorSelect = document.getElementById("themeColorSelect");
+    const fontSizeSelect = document.getElementById("fontSizeSelect");
+    const animationsToggle = document.getElementById("animationsToggle");
+
+    const savedDarkMode =
+        localStorage.getItem("snapz_dark_mode");
+
+    const savedTheme =
+        localStorage.getItem("snapz_theme_color") || "Blue";
+
+    const savedFontSize =
+        localStorage.getItem("snapz_font_size") || "Medium";
+
+    const savedAnimations =
+        localStorage.getItem("snapz_animations");
+
+    function applyDarkMode(enabled) {
+
+        document.body.classList.toggle(
+            "dark-mode",
+            enabled
+        );
+
+        document.body.classList.toggle(
+            "light-mode",
+            !enabled
+        );
+    }
+
+
+    function applyTheme(theme) {
+
+        const colors = {
+            Blue: "#0095f6",
+            Pink: "#ff3d81",
+            Purple: "#8b5cf6",
+            Green: "#22c55e"
+        };
+
+        const color = colors[theme] || colors.Blue;
+
+        document.documentElement.style.setProperty(
+            "--snapz-theme-color",
+            color
+        );
+
+        document.documentElement.style.setProperty(
+            "--theme-color",
+            color
+        );
+
+        document.querySelectorAll(
+            "button, .btn, .primary-btn, a"
+        ).forEach(function (element) {
+
+            if (
+                element.classList.contains("theme-ignore") ||
+                element.closest(".item")
+            ) {
+                return;
+            }
+
+            if (
+                element.dataset.originalBg === undefined &&
+                getComputedStyle(element).backgroundColor !== "rgba(0, 0, 0, 0)"
+            ) {
+                element.dataset.originalBg =
+                    getComputedStyle(element).backgroundColor;
+            }
+
+        });
+
+        document.body.setAttribute(
+            "data-theme",
+            theme.toLowerCase()
+        );
+    }
+
+
+    function applyFontSize(size) {
+
+        const sizes = {
+            Small: "14px",
+            Medium: "16px",
+            Large: "18px"
+        };
+
+        document.documentElement.style.setProperty(
+            "--snapz-font-size",
+            sizes[size] || sizes.Medium
+        );
+
+        document.body.classList.remove(
+            "font-small",
+            "font-medium",
+            "font-large"
+        );
+
+        document.body.classList.add(
+            "font-" + size.toLowerCase()
+        );
+    }
+
+
+    function applyAnimations(enabled) {
+
+        document.body.classList.toggle(
+            "animations-disabled",
+            !enabled
+        );
+    }
+
+
+    /* LOAD SAVED SETTINGS */
+
+    if (darkModeToggle) {
+
+        darkModeToggle.checked =
+            savedDarkMode === null
+                ? true
+                : savedDarkMode === "true";
+
+        applyDarkMode(darkModeToggle.checked);
+    }
+
+
+    if (themeColorSelect) {
+
+        themeColorSelect.value = savedTheme;
+
+        applyTheme(savedTheme);
+    }
+
+
+    if (fontSizeSelect) {
+
+        fontSizeSelect.value = savedFontSize;
+
+        applyFontSize(savedFontSize);
+    }
+
+
+    if (animationsToggle) {
+
+        animationsToggle.checked =
+            savedAnimations === null
+                ? true
+                : savedAnimations === "true";
+
+        applyAnimations(animationsToggle.checked);
+    }
+
+
+    /* DARK MODE */
+
+    if (darkModeToggle) {
+
+        darkModeToggle.addEventListener(
+            "change",
+            function () {
+
+                const enabled =
+                    darkModeToggle.checked;
+
+                localStorage.setItem(
+                    "snapz_dark_mode",
+                    enabled
+                );
+
+                applyDarkMode(enabled);
+            }
+        );
+    }
+
+
+    /* THEME COLOR */
+
+    if (themeColorSelect) {
+
+        themeColorSelect.addEventListener(
+            "change",
+            function () {
+
+                const theme =
+                    themeColorSelect.value;
+
+                localStorage.setItem(
+                    "snapz_theme_color",
+                    theme
+                );
+
+                applyTheme(theme);
+            }
+        );
+    }
+
+
+    /* FONT SIZE */
+
+    if (fontSizeSelect) {
+
+        fontSizeSelect.addEventListener(
+            "change",
+            function () {
+
+                const size =
+                    fontSizeSelect.value;
+
+                localStorage.setItem(
+                    "snapz_font_size",
+                    size
+                );
+
+                applyFontSize(size);
+            }
+        );
+    }
+
+
+    /* ANIMATIONS */
+
+    if (animationsToggle) {
+
+        animationsToggle.addEventListener(
+            "change",
+            function () {
+
+                const enabled =
+                    animationsToggle.checked;
+
+                localStorage.setItem(
+                    "snapz_animations",
+                    enabled
+                );
+
+                applyAnimations(enabled);
+            }
+        );
+    }
+
+})();
+</script>
+
+</body>
+</html>

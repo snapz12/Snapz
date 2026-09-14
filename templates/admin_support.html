@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Admin Support</title>
+
+<style>
+
+body{
+background:#000;
+color:#fff;
+font-family:sans-serif;
+margin:0;
+}
+
+.container{
+max-width:550px;
+margin:auto;
+padding:20px;
+}
+
+.header{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    margin-bottom:20px;
+}
+
+.back{
+    color:white;
+    text-decoration:none;
+    font-size:34px;
+    font-weight:bold;
+}
+
+.title{
+    font-size:36px;
+    font-weight:bold;
+    color:white;
+    line-height:1.1;
+}
+
+.card{
+    background:#111;
+    border-radius:18px;
+    padding:20px;
+    margin-bottom:20px;
+}
+
+.stats{
+    display:flex;
+    justify-content:space-around;
+    text-align:center;
+}
+
+.stat-box{
+    flex:1;
+}
+
+.icon{
+    font-size:28px;
+    margin-bottom:6px;
+}
+
+.label{
+    color:#bbb;
+    font-size:14px;
+}
+
+.count{
+    color:white;
+    font-size:24px;
+    font-weight:bold;
+    margin-top:6px;
+}
+
+
+
+.search-box{
+display:flex;
+align-items:center;
+background:#111;
+padding:12px;
+border-radius:12px;
+margin:15px 0;
+}
+
+.search-box input{
+flex:1;
+background:none;
+border:none;
+outline:none;
+color:white;
+font-size:16px;
+margin-left:10px;
+}
+
+.search-box button{
+background:#0095f6;
+color:white;
+border:none;
+padding:10px 18px;
+border-radius:8px;
+}
+
+.filters{
+display:flex;
+gap:12px;
+margin:18px 0;
+}
+
+.filter{
+flex:1;
+text-align:center;
+text-decoration:none;
+background:#111;
+color:#fff;
+padding:12px;
+border-radius:10px;
+font-weight:bold;
+}
+
+.filter:hover{
+background:#0095f6;
+}
+
+
+.username{
+font-size:20px;
+font-weight:bold;
+margin-bottom:10px;
+}
+
+.subject,
+.status,
+.time{
+margin:8px 0;
+font-size:16px;
+}
+
+.open{
+color:#ff9800;
+font-weight:bold;
+}
+
+.replied{
+color:#00c853;
+font-weight:bold;
+}
+
+.view{
+display:inline-block;
+margin-top:12px;
+padding:10px 18px;
+background:#0095f6;
+color:#fff;
+text-decoration:none;
+border-radius:8px;
+}
+
+.empty{
+text-align:center;
+margin-top:100px;
+color:#888;
+font-size:18px;
+}
+
+.tabs{
+display:flex;
+gap:10px;
+margin:20px 0;
+}
+
+.tabs a{
+flex:1;
+text-align:center;
+padding:12px;
+background:#1c1c1c;
+color:white;
+text-decoration:none;
+border-radius:10px;
+font-weight:bold;
+}
+
+.tabs a.active{
+background:#0095f6;
+}
+
+
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+
+    <a href="/" class="back">←</a>
+
+    <div class="title">
+        Support Requests
+    </div>
+
+</div>
+
+<div class="card">
+
+    <div class="stats">
+
+        <div class="stat-box">
+            <div class="icon">🟠</div>
+            <div class="label">Open</div>
+            <div class="count">{{ open_count }}</div>
+        </div>
+
+        <div class="stat-box">
+            <div class="icon">🟢</div>
+            <div class="label">Replied</div>
+            <div class="count">{{ replied_count }}</div>
+        </div>
+
+        <div class="stat-box">
+            <div class="icon">📨</div>
+            <div class="label">Total</div>
+            <div class="count">{{ total_count }}</div>
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+
+<form method="GET" action="/admin/support">
+
+<div class="search-box">
+
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+<circle cx="11" cy="11" r="8"/>
+<path d="M21 21l-4.35-4.35"/>
+</svg>
+
+<input
+type="text"
+name="search"
+placeholder="Search username..."
+value="{{ request.args.get('search','') }}">
+
+<button type="submit">
+
+Search
+
+</button>
+
+</div>
+
+</form>
+
+
+
+<div class="tabs">
+
+<a href="/admin/support"
+class="{% if current_tab=='open' %}active{% endif %}">
+Pending
+</a>
+
+<a href="/admin/support?status=replied"
+class="{% if current_tab=='replied' %}active{% endif %}">
+Replied
+</a>
+
+</div>
+
+
+
+
+{% if messages %}
+
+{% for m in messages %}
+
+<div class="card">
+
+<div class="username">
+
+👤 {{ m["username"] }}
+
+</div>
+
+<div class="subject">
+
+Subject : {{ m["subject"] }}
+
+</div>
+
+<div class="status">
+
+Status :
+
+{% if m["status"]=="open" %}
+
+<span class="open">🟠 Open</span>
+
+{% else %}
+
+<span class="replied">🟢 Replied</span>
+
+{% endif %}
+
+</div>
+
+<div class="time">
+
+{{ m["created_at"] }}
+
+</div>
+
+<a
+href="/admin/support/{{ m['id'] }}"
+class="view">
+
+View
+
+</a>
+
+</div>
+
+{% endfor %}
+
+{% else %}
+
+<div class="empty">
+
+No Support Requests
+
+</div>
+
+{% endif %}
+
+</div>
+
+</body>
+
+</html>

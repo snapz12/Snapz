@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport"
+content="width=device-width,initial-scale=1.0">
+
+<title>Rate Snapz</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:sans-serif;
+}
+
+body{
+background:#000;
+color:#fff;
+}
+
+.container{
+max-width:500px;
+margin:auto;
+padding:20px;
+}
+
+.header{
+display:flex;
+align-items:center;
+gap:15px;
+font-size:22px;
+font-weight:bold;
+margin-bottom:35px;
+}
+
+.back{
+color:#fff;
+text-decoration:none;
+font-size:28px;
+}
+
+.title{
+text-align:center;
+font-size:28px;
+font-weight:bold;
+margin-bottom:10px;
+}
+
+.sub{
+text-align:center;
+color:#888;
+margin-bottom:35px;
+}
+
+.stars{
+display:flex;
+justify-content:center;
+gap:15px;
+margin-bottom:35px;
+}
+
+.star{
+width:38px;
+height:38px;
+cursor:pointer;
+stroke:#777;
+fill:none;
+transition:.2s;
+}
+
+.star.active{
+fill:#FFD700;
+stroke:#FFD700;
+}
+
+textarea{
+width:100%;
+height:130px;
+background:#111;
+border:none;
+outline:none;
+border-radius:14px;
+padding:15px;
+color:white;
+font-size:16px;
+resize:none;
+margin-bottom:25px;
+}
+
+button{
+width:100%;
+height:52px;
+border:none;
+border-radius:14px;
+background:#0095F6;
+color:white;
+font-size:17px;
+font-weight:bold;
+cursor:pointer;
+}
+
+.success{
+margin-top:20px;
+text-align:center;
+color:#35d07f;
+font-size:16px;
+font-weight:bold;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+
+<a href="/about_snapz"
+class="back">←</a>
+
+<span>Rate Snapz</span>
+
+</div>
+
+<div class="title">
+
+How do you like Snapz?
+
+</div>
+
+<div class="sub">
+
+Your feedback helps us improve.
+
+</div>
+
+<form method="POST">
+
+<div class="stars">
+
+{% for i in range(1,6) %}
+
+<svg
+class="star"
+data-value="{{ i }}"
+viewBox="0 0 24 24">
+
+<polygon
+points="12 2 15 9 22 9.5 17 14 18.5 21 12 17.5 5.5 21 7 14 2 9.5 9 9"/>
+
+</svg>
+
+{% endfor %}
+
+</div>
+
+<input
+type="hidden"
+name="rating"
+id="rating"
+required>
+
+<textarea
+name="feedback"
+placeholder="Write your feedback..."></textarea>
+
+<button>
+
+Submit Review
+
+</button>
+
+</form>
+
+{% if success %}
+
+<div class="success">
+
+✅ Thank you for your feedback.
+
+</div>
+
+{% endif %}
+
+</div>
+
+<script>
+
+let stars=document.querySelectorAll(".star");
+
+let rating=document.getElementById("rating");
+
+stars.forEach((star,index)=>{
+
+star.onclick=function(){
+
+rating.value=index+1;
+
+stars.forEach((s,i)=>{
+
+if(i<=index){
+
+s.classList.add("active");
+
+}else{
+
+s.classList.remove("active");
+
+}
+
+});
+
+};
+
+});
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>Login Activity</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:sans-serif;
+}
+
+body{
+background:#000;
+color:#fff;
+}
+
+.container{
+max-width:500px;
+margin:auto;
+padding:20px;
+}
+
+.header{
+display:flex;
+align-items:center;
+gap:15px;
+font-size:24px;
+font-weight:bold;
+margin-bottom:20px;
+}
+
+.back{
+text-decoration:none;
+color:white;
+font-size:28px;
+}
+
+.logout-all{
+width:100%;
+height:48px;
+margin-bottom:20px;
+border:none;
+border-radius:10px;
+background:#ff3b30;
+color:white;
+font-size:16px;
+font-weight:bold;
+cursor:pointer;
+}
+
+.device{
+background:#111;
+border:1px solid #222;
+border-radius:12px;
+padding:15px;
+margin-bottom:15px;
+}
+
+.title{
+font-size:17px;
+font-weight:bold;
+margin-bottom:8px;
+word-break:break-all;
+}
+
+.info{
+font-size:14px;
+color:#aaa;
+margin:4px 0;
+}
+
+.current{
+display:inline-block;
+margin-top:10px;
+padding:5px 10px;
+background:#16a34a;
+border-radius:20px;
+font-size:13px;
+font-weight:bold;
+}
+
+.empty{
+text-align:center;
+margin-top:80px;
+color:#777;
+font-size:18px;
+}
+
+.logout{
+width:100%;
+height:42px;
+margin-top:10px;
+background:#e53935;
+color:white;
+border:none;
+border-radius:10px;
+font-size:15px;
+font-weight:bold;
+cursor:pointer;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+
+<a href="/settings" class="back">←</a>
+
+<span>Login Activity</span>
+
+</div>
+
+<form action="/logout_other_devices" method="POST">
+
+<button class="logout-all">
+
+Log Out All Other Devices
+
+</button>
+
+</form>
+
+
+{% if devices %}
+
+{% for device in devices %}
+
+<div class="device">
+
+<div class="title">
+
+{{ device["device"] }}
+
+</div>
+
+<div class="info">
+
+IP : {{ device["ip_address"] }}
+
+</div>
+
+<div class="info">
+
+{{ device["login_time"] }}
+
+</div>
+
+{% if device["session_id"] != current_session %}
+
+<form
+action="/logout_device/{{ device['id'] }}"
+method="POST">
+
+<button class="logout">
+
+Log Out
+
+</button>
+
+</form>
+
+{% else %}
+
+<div class="current">
+
+Current Device
+
+</div>
+
+{% endif %}
+
+</div>
+
+{% endfor %}
+
+{% else %}
+
+<div class="empty">
+
+No Login Activity
+
+</div>
+
+{% endif %}
+
+</div>
+
+</body>
+</html>

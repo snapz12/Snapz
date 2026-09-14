@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Report User</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:Arial,sans-serif;
+}
+
+body{
+    background:#000;
+    color:#fff;
+    min-height:100vh;
+}
+
+.container{
+    width:100%;
+    max-width:520px;
+    margin:auto;
+    padding:20px;
+}
+
+.header{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    margin-bottom:28px;
+}
+
+.back{
+    color:#fff;
+    text-decoration:none;
+    font-size:28px;
+}
+
+.title{
+    font-size:22px;
+    font-weight:700;
+}
+
+.user-title{
+    font-size:17px;
+    font-weight:600;
+    margin-bottom:8px;
+}
+
+.subtitle{
+    color:#999;
+    font-size:14px;
+    line-height:20px;
+    margin-bottom:25px;
+}
+
+.reason{
+    display:flex;
+    align-items:center;
+    gap:13px;
+    width:100%;
+    padding:16px 12px;
+    margin-bottom:8px;
+    background:#111;
+    border:1px solid #242424;
+    border-radius:12px;
+    color:#fff;
+    cursor:pointer;
+    text-align:left;
+    font-size:15px;
+}
+
+.reason:hover{
+    background:#181818;
+}
+
+.reason input{
+    width:18px;
+    height:18px;
+    accent-color:#ff4081;
+    flex-shrink:0;
+}
+
+.complete{
+    width:100%;
+    border:0;
+    border-radius:12px;
+    padding:15px;
+    margin-top:18px;
+    background:linear-gradient(135deg,#ff3d81,#d81b60);
+    color:#fff;
+    font-size:16px;
+    font-weight:700;
+    cursor:pointer;
+}
+
+.error{
+    background:#241015;
+    border:1px solid #6b2030;
+    color:#ff8da9;
+    padding:12px;
+    border-radius:10px;
+    margin-bottom:15px;
+    font-size:14px;
+}
+
+.success{
+    text-align:center;
+    padding-top:70px;
+}
+
+.success-icon{
+    width:70px;
+    height:70px;
+    margin:0 auto 20px;
+    border-radius:50%;
+    background:#ff4081;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:35px;
+}
+
+.success h2{
+    font-size:23px;
+    margin-bottom:10px;
+}
+
+.success p{
+    color:#999;
+    line-height:21px;
+    font-size:14px;
+}
+
+.done{
+    display:block;
+    text-decoration:none;
+    text-align:center;
+    margin-top:28px;
+    padding:14px;
+    border-radius:12px;
+    background:#1b1b1b;
+    color:#fff;
+    font-weight:600;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+{% if submitted %}
+
+    <div class="header">
+        <a href="/profile/{{ reported_username }}" class="back">‹</a>
+        <div class="title">Report User</div>
+    </div>
+
+    <div class="success">
+
+        <div class="success-icon">✓</div>
+
+        <h2>Report successfully sent</h2>
+
+        <p>
+            Thanks for helping keep Snapz safe.
+            Your report has been submitted successfully.
+        </p>
+
+        <a class="done" href="/profile/{{ reported_username }}">
+            Done
+        </a>
+
+    </div>
+
+{% else %}
+
+    <div class="header">
+        <a href="/profile/{{ reported_username }}" class="back">‹</a>
+        <div class="title">Report User</div>
+    </div>
+
+    <div class="user-title">
+        Report @{{ reported_username }}
+    </div>
+
+    <div class="subtitle">
+        Select the reason that best describes why you are reporting this account.
+    </div>
+
+    {% if error %}
+    <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST">
+
+        <label class="reason">
+            <input type="radio" name="reason" value="Spam or unwanted content">
+            <span>Spam or unwanted content</span>
+        </label>
+
+        <label class="reason">
+            <input type="radio" name="reason" value="Harassment or bullying">
+            <span>Harassment or bullying</span>
+        </label>
+
+        <label class="reason">
+            <input type="radio" name="reason" value="Hate speech or symbols">
+            <span>Hate speech or symbols</span>
+        </label>
+
+        <label class="reason">
+            <input type="radio" name="reason" value="Violence or dangerous content">
+            <span>Violence or dangerous content</span>
+        </label>
+
+        <label class="reason">
+            <input type="radio" name="reason" value="Nudity or sexual content">
+            <span>Nudity or sexual content</span>
+        </label>
+
+        <label class="reason">
+            <input type="radio" name="reason" value="Scam or fraud">
+            <span>Scam or fraud</span>
+        </label>
+
+        <label class="reason">
+            <input type="radio" name="reason" value="Fake account or impersonation">
+            <span>Fake account or impersonation</span>
+        </label>
+
+        <label class="reason">
+            <input type="radio" name="reason" value="Something else">
+            <span>Something else</span>
+        </label>
+
+        <button class="complete" type="submit">
+            Complete Report
+        </button>
+
+    </form>
+
+{% endif %}
+
+</div>
+
+</body>
+</html>

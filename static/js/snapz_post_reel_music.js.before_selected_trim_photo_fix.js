@@ -1,0 +1,684 @@
+/* =========================================================
+   SNAPZ POST + REEL MUSIC SYSTEM
+   ========================================================= */
+
+(function () {
+
+    "use strict";
+
+    let currentTarget = null;
+    let musicList = [];
+    let selectedMusic = null;
+
+    let musicAudio = null;
+    let previewMediaElement = null;
+
+    let audioDuration = 0;
+    let selectedDuration = 30;
+    let maxTrimDuration = 30;
+    let trimStart = 0;
+    let isPlaying = false;
+
+    const POST_MAX_DURATION = 30;
+
+    /* =====================================================
+       OPEN MUSIC LIBRARY
+    ===================================================== */
+
+    window.openSnapzPostReelMusic = function (target) {
+
+        if (target !== "post" && target !== "reel") {
+            console.error("SNAPZ MUSIC: invalid target", target);
+            return;
+        }
+
+        currentTarget = target;
+        selectedMusic = null;
+
+        createLibraryPanel();
+
+        const panel = document.getElementById("snapzPostReelMusicPanel");
+        if (!panel) return;
+
+        panel.style.display = "block";
+        document.body.style.overflow = "hidden";
+
+        const title = document.getElementById("snapzPostReelMusicTitle");
+        if (title) title.textContent = "Add audio";
+
+        loadMusic();
+    };
+
+    /* =====================================================
+       CREATE MUSIC LIBRARY
+    ===================================================== */
+
+    function createLibraryPanel() {
+
+        if (document.getElementById("snapzPostReelMusicPanel")) return;
+
+        const panel = document.createElement("div");
+        panel.id = "snapzPostReelMusicPanel";
+
+        panel.style.cssText = `
+            display:none;
+            position:fixed;
+            inset:0;
+            z-index:1000000000;
+            background:#050505;
+            color:#fff;
+            font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow-y:auto;
+        `;
+
+        panel.innerHTML = `
+            <div style="position:sticky;top:0;z-index:10;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:#050505;border-bottom:1px solid #242424;">
+                <button type="button" id="snapzPostReelMusicBack" style="background:none;border:0;color:#fff;font-size:32px;cursor:pointer;">‹</button>
+                <b id="snapzPostReelMusicTitle" style="font-size:19px;">Add audio</b>
+                <div style="width:32px;"></div>
+            </div>
+
+            <div style="padding:14px 18px;">
+                <input id="snapzPostReelMusicSearch" type="search" placeholder="Search music..." autocomplete="off" style="width:100%;box-sizing:border-box;border:0;outline:none;border-radius:12px;background:#1d1d1d;color:#fff;padding:13px 15px;font-size:16px;">
+            </div>
+
+            <div id="snapzPostReelMusicList" style="padding:0 18px 80px;">
+                <div style="text-align:center;color:#777;padding:40px;">Loading music...</div>
+            </div>
+
+            <input id="snapzMusicFile" type="file" accept="audio/*" style="display:none;">
+
+            <div style="position:fixed;bottom:0;left:0;right:0;background:#050505;padding:12px 18px;border-top:1px solid #242424;z-index:20;">
+                <button type="button" id="snapzUploadMusicButton" onclick="document.getElementById('snapzMusicFile').click()" style="width:100%;border:0;border-radius:12px;background:#fff;color:#000;font-size:15px;font-weight:bold;padding:14px;cursor:pointer;">＋ Upload Music</button>
+                <div id="snapzMusicUploadStatus" style="display:none;margin-top:8px;text-align:center;color:#fff;font-size:12px;"></div>
+            </div>
+        `;
+
+        document.body.appendChild(panel);
+
+        document.getElementById("snapzPostReelMusicBack").addEventListener("click", closeLibrary);
+        document.getElementById("snapzPostReelMusicSearch").addEventListener("input", function () {
+            loadMusic(this.value.trim());
+        });
+    }
+
+    function closeLibrary() {
+        stopAudio();
+        const panel = document.getElementById("snapzPostReelMusicPanel");
+        if (panel) panel.style.display = "none";
+        document.body.style.overflow = "";
+    }
+
+    function loadMusic(search = "") {
+        const list = document.getElementById("snapzPostReelMusicList");
+        if (!list) return;
+
+        list.innerHTML = `<div style="text-align:center;color:#777;padding:40px;">Loading music...</div>`;
+
+        let url = "/music_library";
+        if (search) url += "?search=" + encodeURIComponent(search);
+
+        fetch(url, {
+            method: "GET",
+            credentials: "include",
+            headers: { "Accept": "application/json" }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (!Array.isArray(data)) throw new Error("Invalid response");
+            musicList = data;
+            renderMusic();
+        })
+        .catch(err => {
+            console.error("MUSIC LOAD ERROR:", err);
+            list.innerHTML = `<div style="text-align:center;color:#ff6b6b;padding:40px;">Music load failed</div>`;
+        });
+    }
+
+    function renderMusic() {
+        const list = document.getElementById("snapzPostReelMusicList");
+        if (!list || !musicList.length) {
+            if (list) list.innerHTML = `<div style="text-align:center;color:#777;padding:40px;">No music found</div>`;
+            return;
+        }
+
+        list.innerHTML = "";
+        musicList.forEach(music => {
+            const row = document.createElement("div");
+            row.style.cssText = `display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid #222;`;
+
+            const cover = document.createElement("div");
+            cover.style.cssText = `width:52px;height:52px;flex-shrink:0;border-radius:10px;overflow:hidden;background:linear-gradient(135deg,#833AB4,#E1306C,#F77737);display:flex;align-items:center;justify-content:center;font-size:25px;`;
+
+            const coverUrl = music.cover_url || music.cover || music.image || "";
+            if (coverUrl) {
+                const img = document.createElement("img");
+                img.src = coverUrl;
+                img.style.cssText = `width:100%;height:100%;object-fit:cover;`;
+                img.onerror = function() { this.remove(); };
+                cover.appendChild(img);
+            } else {
+                cover.textContent = "♪";
+            }
+
+            const info = document.createElement("div");
+            info.style.cssText = `flex:1;min-width:0;`;
+
+            const title = document.createElement("div");
+            title.textContent = music.title || music.name || "Unknown Track";
+            title.style.cssText = `font-size:16px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;`;
+
+            const by = document.createElement("div");
+            by.textContent = music.uploaded_by || music.artist || "Original Audio";
+            by.style.cssText = `margin-top:4px;color:#777;font-size:12px;`;
+
+            const button = document.createElement("button");
+            button.type = "button";
+            button.textContent = "Use";
+            button.style.cssText = `border:0;border-radius:20px;padding:9px 16px;background:#0095f6;color:#fff;font-weight:700;cursor:pointer;`;
+            
+            button.addEventListener("click", function(e) {
+                e.preventDefault();
+                chooseMusic(music);
+            });
+
+            info.appendChild(title);
+            info.appendChild(by);
+            row.appendChild(cover);
+            row.appendChild(info);
+            row.appendChild(button);
+            list.appendChild(row);
+        });
+    }
+
+    function chooseMusic(music) {
+        const audioUrl = music.audio_url || music.url || music.file_url || music.path || "";
+
+        selectedMusic = {
+            id: music.id || Date.now(),
+            title: music.title || music.name || "Audio Track",
+            artist: music.uploaded_by || music.artist || "Original Audio",
+            url: audioUrl,
+            cover: music.cover_url || music.cover || ""
+        };
+
+        closeLibrary();
+        openTrimScreen();
+    }
+
+    /* =====================================================
+       INSTAGRAM-STYLE TRIM SCREEN & OVERLAY
+    ===================================================== */
+
+    function openTrimScreen() {
+        createTrimPanel();
+
+        const trimPanel = document.getElementById("snapzTrimScreenPanel");
+        if (trimPanel) {
+            trimPanel.style.display = "flex";
+            document.body.style.overflow = "hidden";
+        }
+
+        setupMediaPreview();
+        initAudioTrack();
+    }
+
+    function createTrimPanel() {
+        if (document.getElementById("snapzTrimScreenPanel")) return;
+
+        const panel = document.createElement("div");
+        panel.id = "snapzTrimScreenPanel";
+        panel.style.cssText = `
+            display:none;
+            position:fixed;
+            inset:0;
+            z-index:1000000005;
+            background:#000;
+            color:#fff;
+            flex-direction:column;
+            justify-content:space-between;
+            font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            user-select:none;
+            -webkit-user-select:none;
+        `;
+
+        panel.innerHTML = `
+            <!-- Top Controls -->
+            <div style="position:absolute;top:15px;left:0;right:0;z-index:20;display:flex;justify-content:space-between;align-items:center;padding:0 20px;">
+                <button type="button" id="snapzTrimCancel" style="background:none;border:none;color:#fff;font-size:17px;font-weight:600;cursor:pointer;">Cancel</button>
+                <div style="display:flex;gap:12px;">
+                    <div style="width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;">✨</div>
+                    <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);"></div>
+                </div>
+                <button type="button" id="snapzTrimDone" style="background:none;border:none;color:#fff;font-size:17px;font-weight:700;cursor:pointer;">Done</button>
+            </div>
+
+            <!-- Media Preview Area -->
+            <div id="snapzTrimPreviewContainer" style="flex:1;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#000;">
+                <div id="snapzMediaHolder" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;position:relative;"></div>
+
+                <!-- Music Floating Sticker Badge -->
+                <div style="position:absolute;top:45%;left:50%;transform:translate(-50%, -50%);background:rgba(255,255,255,0.95);color:#000;padding:8px 16px;border-radius:8px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 25px rgba(0,0,0,0.4);max-width:80%;z-index:10;">
+                    <div style="width:24px;height:24px;border-radius:4px;background:#222;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;overflow:hidden;flex-shrink:0;">
+                        <span id="snapzStickerIcon">🎵</span>
+                    </div>
+                    <div style="overflow:hidden;white-space:nowrap;">
+                        <div id="snapzStickerTitle" style="font-weight:700;font-size:13px;text-overflow:ellipsis;overflow:hidden;">Song Title</div>
+                        <div id="snapzStickerArtist" style="font-size:11px;color:#666;text-overflow:ellipsis;overflow:hidden;">Artist</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Instagram Audio Trimmer Controls -->
+            <div style="padding:20px 16px calc(25px + env(safe-area-inset-bottom));background:linear-gradient(to top, rgba(0,0,0,0.95), transparent);">
+                <!-- Duration Badge & Play/Pause Row -->
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding:0 10px;">
+                    <div id="snapzDurationBadge" style="width:36px;height:36px;border-radius:50%;border:2px solid rgba(255,255,255,0.6);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:rgba(0,0,0,0.4);">30</div>
+                    
+                    <button type="button" id="snapzPlayPauseBtn" style="width:54px;height:54px;border-radius:50%;background:#fff;border:none;color:#000;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,0.3);">
+                        ▶
+                    </button>
+                    
+                    <div style="width:36px;"></div>
+                </div>
+
+                <!-- Waveform Slider Track -->
+                <div id="snapzWaveformTrack" style="position:relative;height:50px;width:100%;overflow:hidden;display:flex;align-items:center;cursor:grab;">
+                    <div id="snapzWaveformBars" style="display:flex;gap:3px;align-items:center;position:absolute;left:0;white-space:nowrap;transition:transform 0.1s ease-out;"></div>
+                    
+                    <!-- Fixed Selection Box (Instagram Center Frame) -->
+                    <div style="position:absolute;left:50%;top:0;bottom:0;width:140px;transform:translateX(-50%);border:2.5px solid #fff;border-image:linear-gradient(to bottom, #ff007f, #7f00ff) 1;border-radius:8px;pointer-events:none;box-shadow:0 0 15px rgba(255,0,127,0.4);"></div>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(panel);
+
+        document.getElementById("snapzTrimCancel").addEventListener("click", closeTrimScreen);
+        document.getElementById("snapzTrimDone").addEventListener("click", applyTrimSelection);
+        document.getElementById("snapzPlayPauseBtn").addEventListener("click", togglePlayback);
+
+        setupScroller();
+    }
+
+    /* =====================================================
+       MEDIA PREVIEW & AUTO MUTE
+    ===================================================== */
+
+    function setupMediaPreview() {
+        const holder = document.getElementById("snapzMediaHolder");
+        if (!holder) return;
+        holder.innerHTML = "";
+
+        // Find existing media tags or file input sources on main screen
+        let allVideos = document.querySelectorAll("video");
+        let allImages = document.querySelectorAll("img");
+        let fileInput = document.querySelector("input[type='file']");
+
+        let mediaSrc = "";
+        let isVideo = false;
+
+        // 1. Check active Video
+        allVideos.forEach(v => {
+            if (v.src && !v.closest("#snapzTrimScreenPanel")) {
+                mediaSrc = v.src;
+                isVideo = true;
+            } else {
+                let source = v.querySelector("source");
+                if (source && source.src && !v.closest("#snapzTrimScreenPanel")) {
+                    mediaSrc = source.src;
+                    isVideo = true;
+                }
+            }
+        });
+
+        // 2. Check active Image
+        if (!mediaSrc) {
+            allImages.forEach(img => {
+                if (img.src && !img.closest("#snapzTrimScreenPanel") && !img.closest("#snapzPostReelMusicPanel") && img.offsetWidth > 100) {
+                    mediaSrc = img.src;
+                }
+            });
+        }
+
+        // 3. Fallback: Read file direct from File Input
+        if (!mediaSrc && fileInput && fileInput.files && fileInput.files[0]) {
+            const file = fileInput.files[0];
+            mediaSrc = URL.createObjectURL(file);
+            isVideo = file.type.startsWith("video");
+        }
+
+        if (isVideo || currentTarget === "reel") {
+            previewMediaElement = document.createElement("video");
+            previewMediaElement.src = mediaSrc;
+            previewMediaElement.loop = true;
+            previewMediaElement.playsInline = true;
+            previewMediaElement.muted = true;
+            previewMediaElement.style.cssText = "width:100%;height:100%;object-fit:cover;border-radius:12px;";
+            holder.appendChild(previewMediaElement);
+
+            allVideos.forEach(v => { v.muted = true; });
+
+            previewMediaElement.onloadedmetadata = function() {
+                if (currentTarget === "reel" && previewMediaElement.duration) {
+                    maxTrimDuration = Math.round(previewMediaElement.duration);
+                    selectedDuration = maxTrimDuration;
+                    updateDurationBadge();
+                }
+            };
+        } else {
+            previewMediaElement = document.createElement("img");
+            previewMediaElement.src = mediaSrc;
+            previewMediaElement.style.cssText = "width:100%;height:100%;object-fit:cover;border-radius:12px;";
+            holder.appendChild(previewMediaElement);
+
+            maxTrimDuration = POST_MAX_DURATION;
+            selectedDuration = POST_MAX_DURATION;
+            updateDurationBadge();
+        }
+
+        const titleEl = document.getElementById("snapzStickerTitle");
+        const artistEl = document.getElementById("snapzStickerArtist");
+        if (titleEl) titleEl.textContent = selectedMusic.title;
+        if (artistEl) artistEl.textContent = selectedMusic.artist;
+    }
+
+    function updateDurationBadge() {
+        const badge = document.getElementById("snapzDurationBadge");
+        if (badge) badge.textContent = selectedDuration;
+    }
+
+    /* =====================================================
+       AUDIO PLAYBACK & WAVEFORM GENERATION
+    ===================================================== */
+
+    function initAudioTrack() {
+        if (musicAudio) {
+            musicAudio.pause();
+            musicAudio = null;
+        }
+
+        if (!selectedMusic.url) {
+            generateWaveform();
+            return;
+        }
+
+        musicAudio = new Audio(selectedMusic.url);
+        musicAudio.crossOrigin = "anonymous";
+
+        musicAudio.addEventListener("loadedmetadata", function () {
+            audioDuration = musicAudio.duration || 60;
+            generateWaveform();
+        });
+
+        musicAudio.addEventListener("timeupdate", function () {
+            if (musicAudio.currentTime >= trimStart + selectedDuration) {
+                musicAudio.currentTime = trimStart;
+            }
+        });
+
+        generateWaveform();
+    }
+
+    function generateWaveform() {
+        const container = document.getElementById("snapzWaveformBars");
+        if (!container) return;
+
+        container.innerHTML = "";
+        const totalBars = 100;
+
+        for (let i = 0; i < totalBars; i++) {
+            const bar = document.createElement("div");
+            const height = Math.floor(Math.random() * 32) + 8;
+            bar.style.cssText = `width:3px;height:${height}px;background:rgba(255,255,255,0.4);border-radius:2px;flex-shrink:0;`;
+            container.appendChild(bar);
+        }
+    }
+
+    /* =====================================================
+       PLAYBACK CONTROLS
+    ===================================================== */
+
+    function togglePlayback() {
+        if (isPlaying) {
+            pauseAudio();
+        } else {
+            playAudio();
+        }
+    }
+
+    function playAudio() {
+        if (musicAudio) {
+            musicAudio.currentTime = trimStart;
+            musicAudio.play().catch(e => console.log("Audio play error:", e));
+        }
+
+        if (previewMediaElement && previewMediaElement.tagName === "VIDEO") {
+            previewMediaElement.play().catch(e => console.log("Video play error:", e));
+        }
+
+        isPlaying = true;
+        const btn = document.getElementById("snapzPlayPauseBtn");
+        if (btn) btn.textContent = "⏸";
+    }
+
+    function pauseAudio() {
+        if (musicAudio) musicAudio.pause();
+        if (previewMediaElement && previewMediaElement.tagName === "VIDEO") previewMediaElement.pause();
+
+        isPlaying = false;
+        const btn = document.getElementById("snapzPlayPauseBtn");
+        if (btn) btn.textContent = "▶";
+    }
+
+    function stopAudio() {
+        pauseAudio();
+        if (musicAudio) {
+            musicAudio.currentTime = 0;
+            musicAudio = null;
+        }
+    }
+
+    /* =====================================================
+       DRAG / SCROLL SYSTEM
+    ===================================================== */
+
+    function setupScroller() {
+        const track = document.getElementById("snapzWaveformTrack");
+        const bars = document.getElementById("snapzWaveformBars");
+        if (!track || !bars) return;
+
+        let isDragging = false;
+        let startX = 0;
+        let currentX = 0;
+
+        const onStart = (e) => {
+            isDragging = true;
+            startX = (e.touches ? e.touches[0].clientX : e.clientX) - currentX;
+        };
+
+        const onMove = (e) => {
+            if (!isDragging) return;
+            const x = (e.touches ? e.touches[0].clientX : e.clientX) - startX;
+            if (x <= 0 && x >= -600) {
+                currentX = x;
+                bars.style.transform = `translateX(${currentX}px)`;
+                
+                if (audioDuration) {
+                    trimStart = Math.abs(currentX / 600) * (audioDuration - selectedDuration);
+                    if (trimStart < 0) trimStart = 0;
+                    if (isPlaying && musicAudio) {
+                        musicAudio.currentTime = trimStart;
+                    }
+                }
+            }
+        };
+
+        const onEnd = () => { isDragging = false; };
+
+        track.addEventListener("mousedown", onStart);
+        window.addEventListener("mousemove", onMove);
+        window.addEventListener("mouseup", onEnd);
+
+        track.addEventListener("touchstart", onStart);
+        window.addEventListener("touchmove", onMove);
+        window.addEventListener("touchend", onEnd);
+    }
+
+    /* =====================================================
+       FINALIZE TRIM SELECTION & UPDATE MAIN UI
+    ===================================================== */
+
+    function applyTrimSelection() {
+        stopAudio();
+
+        const selectedAudioData = {
+            id: selectedMusic.id,
+            title: selectedMusic.title,
+            artist: selectedMusic.artist,
+            url: selectedMusic.url,
+            startTime: Math.round(trimStart),
+            duration: selectedDuration
+        };
+
+        window.snapzSelectedAudio = selectedAudioData;
+
+        // Dynamic Text Update for 'Add audio' button
+        updateMainAddAudioBtnText(selectedMusic.title);
+
+        closeTrimScreen();
+    }
+
+    function updateMainAddAudioBtnText(songTitle) {
+        const allElements = document.querySelectorAll("*");
+        allElements.forEach(el => {
+            if (el.children.length === 0 && el.textContent.trim().toLowerCase() === "add audio") {
+                el.textContent = songTitle;
+            }
+        });
+    }
+
+    function closeTrimScreen() {
+        stopAudio();
+        const panel = document.getElementById("snapzTrimScreenPanel");
+        if (panel) panel.style.display = "none";
+        document.body.style.overflow = "";
+    }
+
+})();
+
+/* =====================================================
+   SNAPZ MUSIC UPLOAD WITH PROGRESS TRACKING
+===================================================== */
+
+document.addEventListener('change', function(event) {
+    if (event.target && event.target.id === 'snapzMusicFile') {
+        const file = event.target.files[0];
+        if (file) {
+            uploadMusicWithProgress(file);
+        }
+    }
+});
+
+function uploadMusicWithProgress(file) {
+    if (!file.type || !file.type.startsWith('audio/')) {
+        alert('Please select a valid audio file.');
+        return;
+    }
+
+    const button = document.getElementById('snapzUploadMusicButton');
+    const status = document.getElementById('snapzMusicUploadStatus');
+
+    if (button) {
+        button.disabled = true;
+        button.style.opacity = '0.6';
+        button.textContent = 'Uploading 0%...';
+    }
+
+    if (status) {
+        status.style.display = 'block';
+        status.textContent = 'Uploading file to server...';
+    }
+
+    const formData = new FormData();
+    formData.append('music', file);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/upload_music', true);
+    xhr.withCredentials = true;
+
+    xhr.upload.onprogress = function(e) {
+        if (e.lengthComputable) {
+            const percentComplete = Math.round((e.loaded / e.total) * 100);
+            if (button) {
+                button.textContent = 'Uploading ' + percentComplete + '%...';
+            }
+            if (status) {
+                status.textContent = 'Uploading: ' + percentComplete + '% completed';
+            }
+        }
+    };
+
+    xhr.onload = function() {
+        if (button) {
+            button.textContent = 'Processing...';
+        }
+        if (status) {
+            status.textContent = 'Processing uploaded music...';
+        }
+
+        try {
+            const res = JSON.parse(xhr.responseText);
+            if (xhr.status >= 200 && xhr.status < 300 && res.status === 'ok') {
+                if (status) status.textContent = 'Uploaded successfully!';
+
+                const newMusic = {
+                    id: res.id || Date.now(),
+                    title: res.title || file.name,
+                    artist: 'You',
+                    audio_url: res.audio_url || '',
+                    cover_url: res.cover_url || res.image_url || ''
+                };
+
+                if (typeof musicList !== 'undefined') {
+                    musicList.unshift(newMusic);
+                    if (typeof renderMusic === 'function') {
+                        renderMusic();
+                    }
+                }
+
+                const fileInput = document.getElementById('snapzMusicFile');
+                if (fileInput) fileInput.value = '';
+
+                setTimeout(function() {
+                    if (status) status.style.display = 'none';
+                }, 1500);
+            } else {
+                throw new Error(res.message || 'Server upload failed');
+            }
+        } catch (err) {
+            console.error('UPLOAD PARSE ERROR:', err);
+            if (status) status.textContent = 'Upload failed: ' + err.message;
+            alert('Upload failed: ' + err.message);
+        } finally {
+            if (button) {
+                button.disabled = false;
+                button.style.opacity = '1';
+                button.textContent = '＋ Upload Music';
+            }
+        }
+    };
+
+    xhr.onerror = function() {
+        console.error('NETWORK ERROR DURING UPLOAD');
+        if (status) status.textContent = 'Network error during upload';
+        alert('Network error during upload');
+        if (button) {
+            button.disabled = false;
+            button.style.opacity = '1';
+            button.textContent = '＋ Upload Music';
+        }
+    };
+
+    xhr.send(formData);
+}

@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Story Viewers</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+html,
+body{
+    margin:0;
+    padding:0;
+    width:100%;
+    min-height:100%;
+    background:#000;
+    color:#fff;
+    font-family:Arial,sans-serif;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+.viewers-header{
+
+    height:60px;
+
+    display:flex;
+    align-items:center;
+
+    padding:0 15px;
+
+    border-bottom:1px solid #222;
+
+}
+
+.back-button{
+
+    width:40px;
+    height:40px;
+
+    border:0;
+    background:none;
+
+    color:#fff;
+
+    font-size:28px;
+
+    cursor:pointer;
+
+}
+
+.viewers-title{
+
+    flex:1;
+
+    text-align:center;
+
+    font-size:18px;
+
+    font-weight:bold;
+
+    margin-right:40px;
+
+}
+
+
+/* =========================
+   STORY INFO
+========================= */
+
+.story-info{
+
+    padding:18px 15px;
+
+    border-bottom:1px solid #222;
+
+}
+
+.story-info-title{
+
+    font-size:17px;
+
+    font-weight:bold;
+
+}
+
+.story-info-count{
+
+    margin-top:5px;
+
+    color:#aaa;
+
+    font-size:14px;
+
+}
+
+
+/* =========================
+   VIEWER LIST
+========================= */
+
+.viewer-list{
+
+    width:100%;
+
+}
+
+.viewer-item{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    padding:12px 15px;
+
+    border-bottom:1px solid #1c1c1c;
+
+}
+
+.viewer-avatar{
+
+    width:45px;
+    height:45px;
+
+    border-radius:50%;
+
+    object-fit:cover;
+
+    background:#222;
+
+}
+
+.viewer-name{
+
+    font-size:15px;
+
+    font-weight:bold;
+
+}
+
+.viewer-time{
+
+    margin-top:4px;
+
+    color:#888;
+
+    font-size:12px;
+
+}
+
+
+/* =========================
+   EMPTY
+========================= */
+
+.no-viewers{
+
+    text-align:center;
+
+    color:#777;
+
+    padding:60px 20px;
+
+    font-size:15px;
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- =========================
+     HEADER
+========================= -->
+
+<div class="viewers-header">
+
+    <button
+        class="back-button"
+        onclick="history.back()"
+    >
+        ‹
+    </button>
+
+    <div class="viewers-title">
+        Story Viewers
+    </div>
+
+</div>
+
+
+<!-- =========================
+     STORY INFO
+========================= -->
+
+<div class="story-info">
+
+    <div
+        class="story-info-title"
+        id="storyTitle"
+    >
+        Story Viewers
+    </div>
+
+    <div
+        class="story-info-count"
+        id="viewerCount"
+    >
+        0 Views
+    </div>
+
+</div>
+
+
+<!-- =========================
+     VIEWER LIST
+========================= -->
+
+<div
+    class="viewer-list"
+    id="viewerList"
+>
+
+    <div class="no-viewers">
+        Loading...
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================
+   STORY ID
+========================= */
+
+const params =
+    new URLSearchParams(
+        window.location.search
+    );
+
+const storyId =
+    params.get("story_id");
+
+
+console.log(
+    "STORY ID =",
+    storyId
+);
+
+
+/* =========================
+   LOAD VIEWERS
+========================= */
+
+function loadStoryViewers(){
+
+    if(!storyId){
+
+        document.getElementById(
+            "viewerList"
+        ).innerHTML = `
+            <div class="no-viewers">
+                Story ID not found
+            </div>
+        `;
+
+        return;
+    }
+
+
+    fetch(
+        "/story_views/" + storyId
+    )
+
+    .then(function(response){
+
+        if(!response.ok){
+
+            throw new Error(
+                "HTTP " + response.status
+            );
+
+        }
+
+        return response.json();
+
+    })
+
+    .then(function(data){
+
+        console.log(
+            "STORY VIEWERS =",
+            data
+        );
+
+
+        const list =
+            document.getElementById(
+                "viewerList"
+            );
+
+        const count =
+            document.getElementById(
+                "viewerCount"
+            );
+
+
+        if(!Array.isArray(data)){
+
+            list.innerHTML = `
+                <div class="no-viewers">
+                    No viewers found
+                </div>
+            `;
+
+            count.textContent =
+                "0 Views";
+
+            return;
+
+        }
+
+
+        count.textContent =
+            data.length +
+            (
+                data.length === 1
+                ? " View"
+                : " Views"
+            );
+
+
+        if(data.length === 0){
+
+            list.innerHTML = `
+                <div class="no-viewers">
+                    No viewers yet
+                </div>
+            `;
+
+            return;
+
+        }
+
+
+        let html = "";
+
+
+        data.forEach(function(viewer){
+
+            let username =
+                viewer.username ||
+                viewer.user ||
+                viewer.viewer ||
+                viewer.name ||
+                "Unknown";
+
+
+            let profilePic =
+                viewer.profile_pic ||
+                viewer.profile_photo ||
+                viewer.avatar ||
+                "/static/images/default.jpg";
+
+
+            let viewedAt =
+                viewer.viewed_at ||
+                viewer.created_at ||
+                "";
+
+
+            html += `
+
+                <div class="viewer-item">
+
+                    <img
+                        class="viewer-avatar"
+                        src="${profilePic}"
+                        onerror="
+                            this.src='/static/images/default.jpg'
+                        "
+                    >
+
+                    <div>
+
+                        <div class="viewer-name">
+                            ${username}
+                        </div>
+
+                        ${
+                            viewedAt
+                            ? `
+                            <div class="viewer-time">
+                                ${viewedAt}
+                            </div>
+                            `
+                            : ""
+                        }
+
+                    </div>
+
+                </div>
+
+            `;
+
+        });
+
+
+        list.innerHTML =
+            html;
+
+    })
+
+    .catch(function(error){
+
+        console.error(
+            "VIEWERS ERROR =",
+            error
+        );
+
+
+        document.getElementById(
+            "viewerList"
+        ).innerHTML = `
+            <div class="no-viewers">
+                Viewers load nahi ho paaye
+            </div>
+        `;
+
+    });
+
+}
+
+
+/* =========================
+   START
+========================= */
+
+loadStoryViewers();
+
+</script>
+
+
+</body>
+
+</html>

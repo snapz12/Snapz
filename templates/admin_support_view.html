@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>Support Request</title>
+
+<style>
+
+body{
+margin:0;
+background:#000;
+color:#fff;
+font-family:sans-serif;
+}
+
+.container{
+max-width:550px;
+margin:auto;
+padding:20px;
+}
+
+.header{
+display:flex;
+align-items:center;
+gap:15px;
+margin-bottom:25px;
+font-size:22px;
+font-weight:bold;
+}
+
+.chat-history{
+    height:450px;
+    overflow-y:auto;
+    margin:20px 0;
+    display:flex;
+    flex-direction:column;
+}
+
+.chat{
+background:#111;
+padding:15px;
+border-radius:12px;
+margin-bottom:12px;
+}
+.back{
+color:#fff;
+text-decoration:none;
+font-size:28px;
+}
+
+.card{
+background:#111;
+padding:18px;
+border-radius:15px;
+margin-bottom:18px;
+}
+
+.label{
+font-size:14px;
+color:#888;
+margin-bottom:6px;
+}
+
+.value{
+font-size:16px;
+line-height:26px;
+word-break:break-word;
+}
+
+.reply-title{
+margin-top:25px;
+margin-bottom:10px;
+font-size:18px;
+font-weight:bold;
+}
+
+textarea{
+width:100%;
+height:140px;
+background:#181818;
+color:#fff;
+border:none;
+border-radius:12px;
+padding:15px;
+font-size:16px;
+resize:none;
+outline:none;
+box-sizing:border-box;
+}
+
+button{
+width:100%;
+height:50px;
+margin-top:18px;
+border:none;
+border-radius:12px;
+background:#0095F6;
+color:#fff;
+font-size:17px;
+font-weight:bold;
+cursor:pointer;
+}
+
+img{
+width:100%;
+border-radius:12px;
+margin-top:10px;
+}
+
+.old-reply{
+background:#062b18;
+padding:15px;
+border-radius:12px;
+margin-top:20px;
+}
+
+.chat{
+background:#111;
+padding:15px;
+border-radius:12px;
+margin-bottom:12px;
+}
+
+.sender{
+font-weight:bold;
+color:#0095f6;
+margin-bottom:8px;
+}
+
+.message{
+line-height:1.5;
+}
+
+.time{
+font-size:12px;
+color:#888;
+margin-top:8px;
+}
+
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+
+<a href="/admin/support"
+class="back">←</a>
+
+<span>Support Request</span>
+
+</div>
+
+<div class="card">
+
+<div class="label">
+
+Username
+
+</div>
+
+<div class="value">
+
+{{ message["username"] }}
+
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="label">
+
+Subject
+
+</div>
+
+<div class="value">
+
+{{ message["subject"] }}
+
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="label">
+
+Message
+
+</div>
+
+<div class="value">
+
+{{ message["message"] }}
+
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="label">
+
+Status
+
+</div>
+
+<div class="value">
+
+{% if message["status"]=="replied" %}
+
+🟢 Replied
+
+{% else %}
+
+🟠 Open
+
+{% endif %}
+
+</div>
+
+</div>
+
+
+
+{% if message["image"] %}
+
+<div class="card">
+
+<div class="label">
+
+Screenshot
+
+</div>
+
+<a
+href="/static/support/{{ message['image'] }}"
+target="_blank">
+
+<img
+src="/static/support/{{ message['image'] }}">
+
+</a>
+
+</div>
+
+{% endif %}
+
+{% if message["admin_reply"] %}
+
+<div class="old-reply">
+
+<b>Your Previous Reply</b>
+
+<br><br>
+
+{{ message["admin_reply"] }}
+
+</div>
+
+{% endif %}
+
+{% if message["replied_at"] %}
+
+<div class="card">
+
+<div class="label">
+
+Replied At
+
+</div>
+
+<div class="value">
+
+{{ message["replied_at"] }}
+
+</div>
+
+</div>
+
+{% endif %}
+
+
+<div class="chat-history">
+
+{% for msg in chat %}
+
+<div class="chat">
+
+<div class="sender">
+
+{{ msg["sender"] }}
+
+</div>
+
+<div class="message">
+
+{{ msg["message"] }}
+
+</div>
+
+<div class="time">
+
+{{ msg["created_at"] }}
+
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+
+
+
+<form method="POST">
+
+<textarea
+name="reply"
+placeholder="Type your reply..."
+required></textarea>
+
+<button type="submit">
+Send Reply
+</button>
+
+</form>
+
+</div>
+
+<script>
+
+(function () {
+
+    function scrollChatToBottom() {
+
+        const chat = document.querySelector(".chat-history");
+
+        if (!chat) {
+            return;
+        }
+
+        // Chat box ko bottom par le jao
+        chat.scrollTop = chat.scrollHeight;
+
+        // Agar browser main page ko upar le gaya ho,
+        // to page ko bhi bottom position par rakho
+        window.scrollTo({
+            top: document.documentElement.scrollHeight,
+            behavior: "instant"
+        });
+    }
+
+
+    // Page completely load hone ke baad
+    window.addEventListener("load", function () {
+
+        scrollChatToBottom();
+
+        setTimeout(scrollChatToBottom, 100);
+        setTimeout(scrollChatToBottom, 300);
+        setTimeout(scrollChatToBottom, 500);
+
+    });
+
+
+    // Form submit hone se pehle flag save karo
+    const form = document.querySelector('form[method="POST"]');
+
+    if (form) {
+
+        form.addEventListener("submit", function () {
+
+            sessionStorage.setItem(
+                "support_scroll_bottom",
+                "yes"
+            );
+
+        });
+
+    }
+
+
+    // Redirect ke baad page dobara load hone par
+    // chat ko bottom par force karo
+    if (
+        sessionStorage.getItem("support_scroll_bottom")
+        === "yes"
+    ) {
+
+        sessionStorage.removeItem(
+            "support_scroll_bottom"
+        );
+
+        setTimeout(scrollChatToBottom, 50);
+        setTimeout(scrollChatToBottom, 150);
+        setTimeout(scrollChatToBottom, 400);
+        setTimeout(scrollChatToBottom, 800);
+
+    }
+
+})();
+
+</script>
+
+
+</body>
+</html>

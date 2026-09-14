@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
+
+<title>Hidden</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    background:#000;
+    color:#fff;
+    font-family:Arial,sans-serif;
+}
+
+/* HEADER */
+
+.header{
+    height:60px;
+    display:flex;
+    align-items:center;
+    border-bottom:1px solid #222;
+    padding:0 15px;
+    position:sticky;
+    top:0;
+    background:#000;
+    z-index:10;
+}
+
+.back{
+    font-size:30px;
+    color:white;
+    text-decoration:none;
+    margin-right:18px;
+}
+
+.title{
+    font-size:20px;
+    font-weight:600;
+}
+
+/* TABS */
+
+.tabs{
+    display:flex;
+    height:52px;
+    border-bottom:1px solid #222;
+}
+
+.tab{
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#777;
+    font-size:15px;
+    cursor:pointer;
+}
+
+.tab.active{
+    color:white;
+    border-bottom:2px solid white;
+}
+
+/* GRID */
+
+.section{
+    display:none;
+}
+
+.section.active{
+    display:block;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:2px;
+}
+
+.grid-item{
+    width:100%;
+    aspect-ratio:1/1;
+    object-fit:cover;
+    display:block;
+    cursor:pointer;
+    background:#111;
+}
+
+.empty{
+    text-align:center;
+    color:#777;
+    padding:60px 20px;
+}
+
+/* REEL */
+
+.reel-box{
+    position:relative;
+    width:100%;
+    aspect-ratio:1/1;
+    background:#111;
+    overflow:hidden;
+}
+
+.reel-box video{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.reel-icon{
+    position:absolute;
+    right:8px;
+    top:8px;
+    font-size:18px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- HEADER -->
+
+<div class="header">
+
+    <a href="/profile/{{ username }}"
+       class="back">
+        ‹
+    </a>
+
+    <div class="title">
+        Hidden
+    </div>
+
+</div>
+
+
+<!-- TABS -->
+
+<div class="tabs">
+
+    <div
+        class="tab active"
+        id="postsTab"
+        onclick="showSection('posts')">
+        Posts
+    </div>
+
+    <div
+        class="tab"
+        id="reelsTab"
+        onclick="showSection('reels')">
+        Reels
+    </div>
+
+</div>
+
+
+<!-- ================= POSTS ================= -->
+
+<div
+    id="posts"
+    class="section active">
+
+    {% if posts %}
+
+    <div class="grid">
+
+        {% for post in posts %}
+
+        <img
+            class="grid-item"
+            src="{% if (post[2]|string).startswith('http') %}{{ post[2] }}{% else %}/static/uploads/{{ post[2] }}{% endif %}"
+            onclick="openHiddenPost(this)"
+              data-post-id="{{ post[0] }}"
+              data-media="{% if (post[2]|string).startswith('http') %}{{ post[2] }}{% else %}/static/uploads/{{ post[2] }}{% endif %}"
+        >
+
+        {% endfor %}
+
+    </div>
+
+    {% else %}
+
+    <div class="empty">
+        No hidden posts
+    </div>
+
+    {% endif %}
+
+</div>
+
+
+<!-- ================= REELS ================= -->
+
+<div
+    id="reels"
+    class="section">
+
+    {% if reels %}
+
+    <div class="grid">
+
+        {% for reel in reels %}
+
+        <div
+              class="reel-box"
+              data-reel-id="{{ reel[0] }}"
+              data-reel-src="{% if (reel[2]|string).startswith('http') %}{{ reel[2] }}{% else %}/static/uploads/{{ reel[2] }}{% endif %}"
+              onclick="openHiddenReel(this)">
+
+              <video
+                  src="{% if (reel[2]|string).startswith('http') %}{{ reel[2] }}{% else %}/static/uploads/{{ reel[2] }}{% endif %}"
+                  muted
+                  playsinline
+                  preload="metadata">
+              </video>
+
+              <div class="reel-icon">
+                  ▶
+              </div>
+
+          </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% else %}
+
+    <div class="empty">
+        No hidden reels
+    </div>
+
+    {% endif %}
+
+</div>
+
+
+<script>
+
+function showSection(section){
+
+    const posts =
+        document.getElementById("posts");
+
+    const reels =
+        document.getElementById("reels");
+
+    const postsTab =
+        document.getElementById("postsTab");
+
+    const reelsTab =
+        document.getElementById("reelsTab");
+
+
+    if(section === "posts"){
+
+        posts.classList.add("active");
+        reels.classList.remove("active");
+
+        postsTab.classList.add("active");
+        reelsTab.classList.remove("active");
+
+    }else{
+
+        reels.classList.add("active");
+        posts.classList.remove("active");
+
+        reelsTab.classList.add("active");
+        postsTab.classList.remove("active");
+
+    }
+
+}
+
+
+
+
+function openHiddenReel(el){
+
+    const id = el.getAttribute("data-reel-id");
+    const src = el.getAttribute("data-reel-src");
+
+    if(!id || !src){
+        console.log("Hidden reel data missing", id, src);
+        return;
+    }
+
+    window.hiddenCurrentReelId = id;
+    window.hiddenCurrentType = "reel";
+
+    const viewer = document.getElementById("hiddenReelViewer");
+    const video = document.getElementById("hiddenViewerVideo");
+    const menu = document.getElementById("hiddenReelMenu");
+
+    if(!viewer || !video){
+        console.log("Hidden reel viewer not found");
+        return;
+    }
+
+    video.src = src;
+
+    if(menu){
+        menu.style.display = "none";
+    }
+
+    viewer.style.display = "flex";
+    document.body.style.overflow = "hidden";
+
+    video.load();
+    video.play().catch(function(){
+        console.log("Autoplay blocked");
+    });
+}
+
+</script>
+
+
+
+
+
+
+
+<!-- ================= HIDDEN REEL FULL SCREEN VIEWER ================= -->
+
+<div id="hiddenReelViewer"
+     style="
+        display:none;
+        position:fixed;
+        inset:0;
+        width:100%;
+        height:100%;
+        background:#000;
+        z-index:99999998;
+        align-items:center;
+        justify-content:center;
+     ">
+
+    <!-- CLOSE -->
+    <button
+        type="button"
+        onclick="closeHiddenReel()"
+        aria-label="Close"
+        style="
+            position:absolute;
+            top:15px;
+            left:15px;
+            width:46px;
+            height:46px;
+            border:0;
+            border-radius:50%;
+            background:rgba(0,0,0,.5);
+            color:white;
+            z-index:50;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            cursor:pointer;
+        ">
+
+        <svg
+            width="25"
+            height="25"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="white"
+            stroke-width="2.4"
+            stroke-linecap="round">
+
+            <path d="M18 6L6 18"/>
+            <path d="M6 6L18 18"/>
+
+        </svg>
+
+    </button>
+
+
+    <!-- THREE DOT -->
+    <button
+        type="button"
+        onclick="openHiddenReelMenu()"
+        aria-label="Menu"
+        style="
+            position:absolute;
+            top:15px;
+            right:15px;
+            width:46px;
+            height:46px;
+            border:0;
+            border-radius:50%;
+            background:rgba(0,0,0,.5);
+            color:white;
+            z-index:60;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:28px;
+            line-height:1;
+            cursor:pointer;
+        ">⋮</button>
+
+
+    <!-- VIDEO -->
+    <video
+        id="hiddenViewerVideo"
+        src=""
+        controls
+        playsinline
+        style="
+            display:block;
+            width:100%;
+            height:100%;
+            object-fit:contain;
+            background:#000;
+        ">
+    </video>
+
+
+    <!-- REEL MENU -->
+    <div
+        id="hiddenReelMenu"
+        style="
+display:none;
+position:absolute;
+top:62px;
+right:12px;
+width:110px;
+background:#1c1c1c;
+border-radius:9px;
+padding:3px 0;
+z-index:70;
+box-shadow:0 4px 15px rgba(0,0,0,.45);
+
+        ">
+
+        <button
+            type="button"
+            onclick="unhideCurrentReel()"
+            style="
+width:100%;
+border:0;
+background:none;
+color:white;
+padding:9px 12px;
+text-align:left;
+font-size:14px;
+cursor:pointer;
+
+            ">
+            Unhide Reel
+        </button>
+
+          <button
+              type="button"
+              onclick="deleteCurrentHiddenReel()"
+              style="
+                  width:100%;
+                  border:0;
+                  background:none;
+                  color:#ff4d4d;
+                  padding:9px 12px;
+                  text-align:left;
+                  font-size:14px;
+                  cursor:pointer;
+              ">
+              Delete
+          </button>
+
+    </div>
+
+</div>
+
+
+<!-- ================= HIDDEN PHOTO FULL SCREEN VIEWER ================= -->
+
+<div id="hiddenPhotoViewer"
+     style="
+        display:none;
+        position:fixed;
+        inset:0;
+        width:100%;
+        height:100%;
+        background:#000;
+        z-index:99999999;
+        align-items:center;
+        justify-content:center;
+     ">
+
+    <button
+        type="button"
+        onclick="closeHiddenPhoto()"
+        aria-label="Close"
+        style="
+            position:absolute;
+            top:15px;
+            left:15px;
+            width:46px;
+            height:46px;
+            border:0;
+            border-radius:50%;
+            background:rgba(0,0,0,.5);
+            color:white;
+            z-index:20;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+        ">
+
+        <svg
+            width="25"
+            height="25"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="white"
+            stroke-width="2.4"
+            stroke-linecap="round">
+
+            <path d="M18 6L6 18"/>
+            <path d="M6 6L18 18"/>
+
+        </svg>
+
+    </button>
+
+    
+      <!-- THREE DOT BUTTON -->
+      <button
+          type="button"
+          onclick="openHiddenMenu()"
+          aria-label="Menu"
+          style="
+              position:absolute;
+              top:15px;
+              right:15px;
+              width:46px;
+              height:46px;
+              border:0;
+              border-radius:50%;
+              background:rgba(0,0,0,.5);
+              color:white;
+              z-index:40;
+              display:flex;
+              align-items:center;
+              justify-content:center;
+              font-size:28px;
+              line-height:1;
+              cursor:pointer;
+          ">⋮</button>
+
+<img
+        id="hiddenViewerImage"
+        src=""
+        style="
+            display:block;
+            max-width:100%;
+            max-height:100%;
+            width:auto;
+            height:auto;
+            object-fit:contain;
+        "
+    >
+
+
+      <!-- HIDDEN PHOTO MENU -->
+      <div id="hiddenMenu"
+           style="
+display:none;
+position:absolute;
+top:62px;
+right:12px;
+width:110px;
+background:#1c1c1c;
+border-radius:9px;
+padding:3px 0;
+z-index:70;
+box-shadow:0 4px 15px rgba(0,0,0,.45);
+
+           ">
+
+          <button
+              type="button"
+              onclick="unhideCurrentPost()"
+              style="
+width:100%;
+border:0;
+background:none;
+color:white;
+padding:9px 12px;
+text-align:left;
+font-size:14px;
+cursor:pointer;
+
+              ">
+              Unhide
+          </button>
+
+      
+            <button
+                type="button"
+                onclick="deleteCurrentHiddenPost()"
+                style="
+width:100%;
+border:0;
+background:none;
+color:#ff4d4d;
+padding:9px 12px;
+text-align:left;
+font-size:14px;
+cursor:pointer;
+
+                ">
+                Delete
+            </button>
+
+</div>
+
+</div>
+
+
+
+<script>
+
+
+function openHiddenReelMenu(){
+
+    const menu = document.getElementById("hiddenReelMenu");
+
+    if(!menu){
+        return;
+    }
+
+    if(menu.style.display === "block"){
+        menu.style.display = "none";
+    }else{
+        menu.style.display = "block";
+    }
+}
+
+
+function closeHiddenReel(){
+
+    const viewer =
+        document.getElementById("hiddenReelViewer");
+
+    const video =
+        document.getElementById("hiddenViewerVideo");
+
+    const menu =
+        document.getElementById("hiddenReelMenu");
+
+    if(video){
+
+        video.pause();
+
+        video.removeAttribute("src");
+
+        video.load();
+    }
+
+    if(menu){
+        menu.style.display = "none";
+    }
+
+    if(viewer){
+        viewer.style.display = "none";
+    }
+
+    document.body.style.overflow = "";
+}
+
+
+function deleteCurrentHiddenReel(){
+
+    const id = window.hiddenCurrentReelId;
+
+    if(!id){
+        console.log("Hidden reel ID missing");
+        return;
+    }
+
+    if(!confirm("Delete this reel permanently?")){
+        return;
+    }
+
+    fetch("/delete_hidden_reel/" + id, {
+        method:"POST"
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        if(data.status === "deleted" || data.status === "ok"){
+
+            closeHiddenReel();
+
+            window.location.reload();
+
+        }else{
+
+            alert(data.message || "Delete failed");
+
+        }
+
+    })
+    .catch(function(error){
+
+        console.log("Delete reel error:", error);
+        alert("Delete failed");
+
+    });
+}
+
+function unhideCurrentReel(){
+
+    const id = window.hiddenCurrentReelId;
+
+    if(!id){
+        console.log("Hidden reel ID missing");
+        return;
+    }
+
+    fetch("/unhide_reel/" + id, {
+        method:"POST"
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        if(data.status === "unhidden" || data.status === "ok"){
+
+            closeHiddenReel();
+
+            window.location.reload();
+
+        }else{
+
+            console.log(
+                "Unhide reel failed:",
+                data
+            );
+
+        }
+
+    })
+    .catch(function(error){
+
+        console.log(
+            "Unhide reel error:",
+            error
+        );
+
+    });
+}
+
+
+function openHiddenPost(el){
+
+    const src = el.getAttribute("src");
+    const postId = el.getAttribute("data-post-id");
+
+    if(!src){
+        console.log("Hidden photo source missing");
+        return;
+    }
+
+    if(!postId){
+        console.log("Hidden post ID missing");
+        return;
+    }
+
+    const viewer = document.getElementById("hiddenPhotoViewer");
+    const image = document.getElementById("hiddenViewerImage");
+    const menu = document.getElementById("hiddenMenu");
+
+    if(!viewer || !image){
+        console.log("Hidden viewer not found");
+        return;
+    }
+
+    // Current hidden post save karo
+    window.hiddenCurrentPostId = postId;
+    window.hiddenCurrentType = "post";
+
+    image.src = src;
+
+    // Menu har baar closed rahe
+    if(menu){
+        menu.style.display = "none";
+    }
+
+    viewer.style.display = "flex";
+
+    document.body.style.overflow = "hidden";
+}
+
+function deleteCurrentHiddenPost(){
+
+    const id = window.hiddenCurrentPostId;
+
+    if(!id){
+        console.log("Hidden post ID missing");
+        return;
+    }
+
+    if(!confirm("Delete this post permanently?")){
+        return;
+    }
+
+    fetch("/delete_post/" + id, {
+        method:"POST"
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        if(data.status === "deleted" || data.status === "ok"){
+
+            closeHiddenPhoto();
+
+            window.location.reload();
+
+        }else{
+
+            alert(data.message || "Delete failed");
+
+        }
+
+    })
+    .catch(function(error){
+
+        console.log("Delete post error:", error);
+        alert("Delete failed");
+
+    });
+}
+
+function openHiddenMenu(){
+
+    const menu = document.getElementById("hiddenMenu");
+
+    if(!menu){
+        return;
+    }
+
+    if(menu.style.display === "block"){
+        menu.style.display = "none";
+    }else{
+        menu.style.display = "block";
+    }
+}
+
+
+function unhideCurrentPost(){
+
+    const id = window.hiddenCurrentPostId;
+
+    if(!id){
+        console.log("Hidden post ID missing");
+        return;
+    }
+
+    fetch("/unhide_post/" + id, {
+        method:"POST"
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        if(data.status === "unhidden"){
+
+            // Viewer close
+            closeHiddenPhoto();
+
+            // Hidden grid se item remove
+            const item = document.querySelector(
+                '.grid-item[data-post-id="' + id + '"]'
+            );
+
+            if(item){
+                item.remove();
+            }
+
+            // Database ke according page refresh
+            setTimeout(function(){
+                window.location.reload();
+            }, 150);
+
+        }else{
+
+            console.log("Unhide failed:", data);
+
+        }
+
+    })
+    .catch(error => {
+        console.error("Unhide error:", error);
+    });
+}
+
+
+function closeHiddenPhoto(){
+
+    const viewer = document.getElementById("hiddenPhotoViewer");
+    const image = document.getElementById("hiddenViewerImage");
+
+    if(image){
+        image.src = "";
+    }
+
+    if(viewer){
+        viewer.style.display = "none";
+    }
+
+    document.body.style.overflow = "";
+}
+
+
+document.addEventListener("keydown", function(e){
+
+    if(e.key === "Escape"){
+        closeHiddenPhoto();
+    }
+
+});
+
+
+document.addEventListener("click", function(e){
+
+    const menu = document.getElementById("hiddenMenu");
+
+    if(!menu){
+        return;
+    }
+
+    const clickedMenu = menu.contains(e.target);
+    const clickedButton = e.target.closest(
+        'button[onclick="openHiddenMenu()"]'
+    );
+
+    if(!clickedMenu && !clickedButton){
+        menu.style.display = "none";
+    }
+
+});
+</script>
+
+</body>
+</html>

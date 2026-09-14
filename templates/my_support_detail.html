@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Support Conversation</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:sans-serif;
+}
+
+body{
+background:#000;
+color:#fff;
+height:100vh;
+overflow:hidden;
+}
+
+.container{
+    display:flex;
+    flex-direction:column;
+    height:100dvh;
+    max-width:500px;
+    margin:auto;
+}
+
+form{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px;
+    background:#000;
+    border-top:1px solid #222;
+    flex-shrink:0;
+}
+
+
+.header{
+height:65px;
+display:flex;
+align-items:center;
+gap:15px;
+padding:0 15px;
+border-bottom:1px solid #222;
+background:#000;
+flex-shrink:0;
+}
+
+.back{
+text-decoration:none;
+color:#fff;
+font-size:32px;
+font-weight:bold;
+}
+
+.header-info{
+display:flex;
+flex-direction:column;
+}
+
+.header-title{
+font-size:18px;
+font-weight:bold;
+}
+
+.header-status{
+font-size:12px;
+color:#888;
+}
+
+.chat-area{
+    flex:1;
+    overflow-y:auto;
+    padding:15px;
+}
+
+.chat{
+display:flex;
+width:100%;
+}
+
+.chat.me{
+justify-content:flex-end;
+}
+
+.chat.other{
+justify-content:flex-start;
+}
+
+.bubble{
+max-width:75%;
+padding:10px 14px;
+border-radius:18px;
+word-break:break-word;
+}
+
+.chat.me .bubble{
+background:#0095f6;
+border-bottom-right-radius:5px;
+}
+
+.chat.other .bubble{
+background:#202020;
+border-bottom-left-radius:5px;
+}
+
+.sender{
+font-size:12px;
+font-weight:bold;
+margin-bottom:5px;
+color:#9fd3ff;
+}
+
+.chat.me .sender{
+color:#fff;
+}
+
+.message{
+font-size:15px;
+line-height:1.4;
+white-space:pre-wrap;
+}
+
+.time{
+font-size:11px;
+color:#cfcfcf;
+text-align:right;
+margin-top:6px;
+}
+
+.chat.other .time{
+color:#999;
+}
+
+.input-area{
+display:flex;
+align-items:center;
+gap:10px;
+padding:10px;
+border-top:1px solid #222;
+background:#000;
+flex-shrink:0;
+}
+
+.input-area textarea{
+flex:1;
+height:46px;
+max-height:120px;
+background:#1a1a1a;
+color:#fff;
+border:none;
+outline:none;
+border-radius:25px;
+padding:12px 16px;
+font-size:15px;
+resize:none;
+}
+
+.send-btn{
+width:46px;
+height:46px;
+border:none;
+border-radius:50%;
+background:#0095f6;
+color:#fff;
+font-size:20px;
+cursor:pointer;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1 style="color:red;font-size:40px">
+THIS IS NEW SUPPORT PAGE
+</h1>
+
+<div class="container">
+
+<div class="header">
+
+<a
+href="/my_support"
+class="back">
+
+←
+
+</a>
+
+<div class="header-info">
+
+<div class="header-title">
+
+Snapz Support
+
+</div>
+
+<div class="header-status">
+
+Support Conversation
+
+</div>
+
+</div>
+
+</div>
+
+<div class="chat-area">
+
+<div style="color:red;font-size:20px">
+Messages: {{ chat|length }}
+</div>
+
+{% for msg in chat %}
+
+<div style="color:yellow">
+{{ msg["sender"] }} : {{ msg["message"] }}
+</div>
+
+
+<div class="chat {% if msg['sender']==session['username'] %}me{% else %}other{% endif %}">
+
+    <div class="bubble">
+
+        <div class="sender">
+            {{ msg["sender"] }}
+        </div>
+
+        <div class="message">
+            {{ msg["message"] }}
+        </div>
+
+<div class="time">
+
+{{ msg["created_at"] }}
+
+{% if msg["sender"]==session["username"] %}
+
+{% if msg["seen"] %}
+
+&nbsp; ✓✓ Seen
+
+{% else %}
+
+&nbsp; ✓ Sent
+
+{% endif %}
+
+{% endif %}
+
+</div>
+
+    </div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+<form method="POST">
+
+<div class="input-area">
+
+<textarea
+name="message"
+placeholder="Message..."
+required></textarea>
+
+<button
+type="submit"
+class="send-btn">
+
+<svg
+width="20"
+height="20"
+viewBox="0 0 24 24"
+fill="none"
+xmlns="http://www.w3.org/2000/svg">
+
+<path
+d="M22 2L11 13"
+stroke="white"
+stroke-width="2"
+stroke-linecap="round"
+stroke-linejoin="round"/>
+
+<path
+d="M22 2L15 22L11 13L2 9L22 2Z"
+stroke="white"
+stroke-width="2"
+stroke-linecap="round"
+stroke-linejoin="round"/>
+
+</svg>
+
+</button>
+
+</div>
+
+</form>
+
+</div>
+
+<script>
+
+const textarea =
+document.querySelector("textarea");
+
+textarea.addEventListener(
+"input",
+function(){
+
+this.style.height="46px";
+
+this.style.height=
+this.scrollHeight+"px";
+
+});
+
+
+
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const chat = document.querySelector(".chat-area");
+
+    if (chat) {
+        requestAnimationFrame(() => {
+            chat.scrollTop = chat.scrollHeight;
+        });
+
+        setTimeout(() => {
+            chat.scrollTop = chat.scrollHeight;
+        }, 100);
+    }
+});
+</script>
+
+</body>
+
+</html>

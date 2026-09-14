@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport"
+content="width=device-width,initial-scale=1.0">
+
+<title>Check for Updates</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:sans-serif;
+}
+
+body{
+background:#000;
+color:#fff;
+}
+
+.container{
+max-width:500px;
+margin:auto;
+padding:20px;
+}
+
+.header{
+display:flex;
+align-items:center;
+gap:15px;
+font-size:22px;
+font-weight:bold;
+margin-bottom:40px;
+}
+
+.back{
+color:white;
+text-decoration:none;
+font-size:28px;
+}
+
+.icon{
+display:flex;
+justify-content:center;
+margin-top:30px;
+}
+
+.version{
+text-align:center;
+margin-top:25px;
+font-size:18px;
+}
+
+.latest{
+text-align:center;
+margin-top:12px;
+color:#888;
+}
+
+.status{
+text-align:center;
+margin-top:30px;
+font-size:17px;
+color:#35d07f;
+font-weight:bold;
+}
+
+.button{
+
+margin-top:40px;
+
+width:100%;
+
+height:52px;
+
+border:none;
+
+border-radius:14px;
+
+background:#0095f6;
+
+color:white;
+
+font-size:17px;
+
+font-weight:bold;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+
+<a href="/about_snapz"
+class="back">←</a>
+
+<span>Check for Updates</span>
+
+</div>
+
+<div class="icon">
+
+<svg width="90"
+height="90"
+viewBox="0 0 24 24"
+fill="none"
+stroke="#0095f6"
+stroke-width="2.2">
+
+<path d="M21 12a9 9 0 1 1-2.64-6.36"/>
+
+<polyline points="21 3 21 9 15 9"/>
+
+</svg>
+
+</div>
+
+<div class="version">
+
+Current Version
+
+<br><br>
+
+<b>{{ current }}</b>
+
+</div>
+
+<div class="latest">
+
+Latest Version
+
+<br><br>
+
+<b>{{ latest }}</b>
+
+</div>
+
+<div class="status">
+
+✅ You're using the latest version.
+
+</div>
+
+<button class="button">
+
+Check Again
+
+</button>
+
+</div>
+
+</body>
+</html>

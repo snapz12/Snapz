@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>Comment Privacy</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:sans-serif;
+}
+
+body{
+background:#000;
+color:#fff;
+}
+
+.container{
+max-width:500px;
+margin:auto;
+}
+
+.header{
+display:flex;
+align-items:center;
+gap:15px;
+padding:20px;
+font-size:28px;
+font-weight:bold;
+border-bottom:1px solid #222;
+}
+
+.back{
+text-decoration:none;
+color:white;
+font-size:30px;
+}
+
+form{
+margin-top:10px;
+}
+
+label{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:20px;
+font-size:19px;
+border-bottom:1px solid #222;
+cursor:pointer;
+}
+
+input[type=radio]{
+width:22px;
+height:22px;
+accent-color:red;
+}
+
+.save{
+width:90%;
+height:50px;
+margin:30px auto;
+display:block;
+background:red;
+color:white;
+border:none;
+border-radius:12px;
+font-size:17px;
+font-weight:bold;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+
+<a href="/privacy" class="back">←</a>
+
+<span>Comment Privacy</span>
+
+</div>
+
+<form method="POST">
+
+<label>
+
+Everyone
+
+<input
+type="radio"
+name="privacy"
+value="everyone"
+
+{% if privacy=="everyone" %}
+checked
+{% endif %}
+
+>
+
+</label>
+
+<label>
+
+Followers Only
+
+<input
+type="radio"
+name="privacy"
+value="followers"
+
+{% if privacy=="followers" %}
+checked
+{% endif %}
+
+>
+
+</label>
+
+<label>
+
+Nobody
+
+<input
+type="radio"
+name="privacy"
+value="nobody"
+
+{% if privacy=="nobody" %}
+checked
+{% endif %}
+
+>
+
+</label>
+
+<button class="save">
+
+Save
+
+</button>
+
+</form>
+
+</div>
+
+</body>
+</html>

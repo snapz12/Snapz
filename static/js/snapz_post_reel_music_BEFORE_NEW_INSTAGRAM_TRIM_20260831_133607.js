@@ -1,0 +1,658 @@
+/* =========================================================
+   SNAPZ POST + REEL MUSIC SYSTEM
+   =========================================================
+   STORY MUSIC IS NOT USED HERE.
+   STORY MUSIC FUNCTIONS / PANEL ARE NOT TOUCHED.
+
+   POST:
+   - Maximum 30 seconds
+   - Independent trim
+
+   REEL:
+   - Uses actual Reel duration
+   - Reel preview on trim screen
+   - Music duration follows Reel duration
+   ========================================================= */
+
+(function () {
+
+    "use strict";
+
+    let currentTarget = null;
+    let musicList = [];
+    let selectedMusic = null;
+
+    let musicAudio = null;
+    let reelVideo = null;
+
+    let musicDuration = 0;
+    let trimStart = 0;
+    let trimEnd = 0;
+
+    const POST_MAX_DURATION = 30;
+
+    /* =====================================================
+       OPEN MUSIC LIBRARY
+    ===================================================== */
+
+    window.openSnapzPostReelMusic = function (target) {
+
+        if (target !== "post" && target !== "reel") {
+            console.error(
+                "SNAPZ MUSIC: invalid target",
+                target
+            );
+            return;
+        }
+
+        currentTarget = target;
+        selectedMusic = null;
+
+        createLibraryPanel();
+
+        const panel =
+            document.getElementById(
+                "snapzPostReelMusicPanel"
+            );
+
+        if (!panel) {
+            return;
+        }
+
+        panel.style.display = "block";
+
+        document.body.style.overflow = "hidden";
+
+        const title =
+            document.getElementById(
+                "snapzPostReelMusicTitle"
+            );
+
+        if (title) {
+            title.textContent =
+                target === "post"
+                    ? "Add audio"
+                    : "Add audio";
+        }
+
+        loadMusic();
+
+    };
+
+
+    /* =====================================================
+       CREATE MUSIC LIBRARY
+    ===================================================== */
+
+    function createLibraryPanel() {
+
+        if (
+            document.getElementById(
+                "snapzPostReelMusicPanel"
+            )
+        ) {
+            return;
+        }
+
+        const panel =
+            document.createElement("div");
+
+        panel.id =
+            "snapzPostReelMusicPanel";
+
+        panel.style.cssText = `
+            display:none;
+            position:fixed;
+            inset:0;
+            z-index:1000000000;
+            background:#050505;
+            color:#fff;
+            font-family:Arial,sans-serif;
+            overflow-y:auto;
+        `;
+
+        panel.innerHTML = `
+
+            <div style="
+                position:sticky;
+                top:0;
+                z-index:10;
+                height:64px;
+                display:flex;
+                align-items:center;
+                justify-content:space-between;
+                padding:0 18px;
+                background:#050505;
+                border-bottom:1px solid #242424;
+            ">
+
+                <button
+                    type="button"
+                    id="snapzPostReelMusicBack"
+                    style="
+                        background:none;
+                        border:0;
+                        color:#fff;
+                        font-size:32px;
+                        cursor:pointer;
+                    "
+                >‹</button>
+
+                <b
+                    id="snapzPostReelMusicTitle"
+                    style="
+                        font-size:19px;
+                    "
+                >
+                    Add audio
+                </b>
+
+                <div style="width:32px;"></div>
+
+            </div>
+
+            <div style="
+                padding:14px 18px;
+            ">
+
+                <input
+                    id="snapzPostReelMusicSearch"
+                    type="search"
+                    placeholder="Search music..."
+                    autocomplete="off"
+                    style="
+                        width:100%;
+                        box-sizing:border-box;
+                        border:0;
+                        outline:none;
+                        border-radius:12px;
+                        background:#1d1d1d;
+                        color:#fff;
+                        padding:13px 15px;
+                        font-size:16px;
+                    "
+                >
+
+            </div>
+
+            <div
+                id="snapzPostReelMusicList"
+                style="
+                    padding:0 18px 30px;
+                "
+            >
+                <div style="
+                    text-align:center;
+                    color:#777;
+                    padding:40px;
+                ">
+                    Loading music...
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(panel);
+
+
+        document
+            .getElementById(
+                "snapzPostReelMusicBack"
+            )
+            .addEventListener(
+                "click",
+                closeLibrary
+            );
+
+
+        document
+            .getElementById(
+                "snapzPostReelMusicSearch"
+            )
+            .addEventListener(
+                "input",
+                function () {
+
+                    loadMusic(
+                        this.value.trim()
+                    );
+
+                }
+            );
+
+    }
+
+
+    /* =====================================================
+       CLOSE LIBRARY
+    ===================================================== */
+
+    function closeLibrary() {
+
+        stopAudio();
+
+        const panel =
+            document.getElementById(
+                "snapzPostReelMusicPanel"
+            );
+
+        if (panel) {
+            panel.style.display = "none";
+        }
+
+        document.body.style.overflow = "";
+
+    }
+
+
+    /* =====================================================
+       LOAD MUSIC
+    ===================================================== */
+
+    function loadMusic(search = "") {
+
+        const list =
+            document.getElementById(
+                "snapzPostReelMusicList"
+            );
+
+        if (!list) {
+            return;
+        }
+
+        list.innerHTML = `
+            <div style="
+                text-align:center;
+                color:#777;
+                padding:40px;
+            ">
+                Loading music...
+            </div>
+        `;
+
+        let url =
+            "/music_library";
+
+        if (search) {
+            url +=
+                "?search=" +
+                encodeURIComponent(search);
+        }
+
+        fetch(
+            url,
+            {
+                method:"GET",
+                credentials:"include",
+                headers:{
+                    "Accept":
+                        "application/json"
+                }
+            }
+        )
+        .then(function (response) {
+
+            if (!response.ok) {
+                throw new Error(
+                    "HTTP " +
+                    response.status
+                );
+            }
+
+            return response.json();
+
+        })
+        .then(function (data) {
+
+            if (!Array.isArray(data)) {
+                throw new Error(
+                    "Invalid music response"
+                );
+            }
+
+            musicList = data;
+
+            renderMusic();
+
+        })
+        .catch(function (error) {
+
+            console.error(
+                "POST/REEL MUSIC ERROR:",
+                error
+            );
+
+            list.innerHTML = `
+                <div style="
+                    text-align:center;
+                    color:#ff6b6b;
+                    padding:40px;
+                ">
+                    Music load failed
+                </div>
+            `;
+
+        });
+
+    }
+
+
+    /* =====================================================
+       RENDER MUSIC
+    ===================================================== */
+
+    function renderMusic() {
+
+        const list =
+            document.getElementById(
+                "snapzPostReelMusicList"
+            );
+
+        if (!list) {
+            return;
+        }
+
+        if (!musicList.length) {
+
+            list.innerHTML = `
+                <div style="
+                    text-align:center;
+                    color:#777;
+                    padding:40px;
+                ">
+                    No music found
+                </div>
+            `;
+
+            return;
+        }
+
+        list.innerHTML = "";
+
+        musicList.forEach(
+            function (music) {
+
+                const row =
+                    document.createElement(
+                        "div"
+                    );
+
+                row.style.cssText = `
+                    display:flex;
+                    align-items:center;
+                    gap:12px;
+                    padding:14px 0;
+                    border-bottom:1px solid #222;
+                `;
+
+
+                const cover =
+                    document.createElement(
+                        "div"
+                    );
+
+                cover.style.cssText = `
+                    width:52px;
+                    height:52px;
+                    flex-shrink:0;
+                    border-radius:10px;
+                    overflow:hidden;
+                    background:linear-gradient(
+                        135deg,
+                        #833AB4,
+                        #E1306C,
+                        #F77737
+                    );
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                    font-size:25px;
+                `;
+
+
+                if (music.cover_url) {
+
+                    const img =
+                        document.createElement(
+                            "img"
+                        );
+
+                    img.src =
+                        music.cover_url;
+
+                    img.style.cssText = `
+                        width:100%;
+                        height:100%;
+                        object-fit:cover;
+                    `;
+
+                    img.onerror =
+                        function () {
+                            this.remove();
+                        };
+
+                    cover.appendChild(img);
+
+                } else {
+
+                    cover.textContent = "♪";
+
+                }
+
+
+                const info =
+                    document.createElement(
+                        "div"
+                    );
+
+                info.style.cssText = `
+                    flex:1;
+                    min-width:0;
+                `;
+
+
+                const title =
+                    document.createElement(
+                        "div"
+                    );
+
+                title.textContent =
+                    music.title ||
+                    "Unknown";
+
+                title.style.cssText = `
+                    font-size:16px;
+                    font-weight:700;
+                    white-space:nowrap;
+                    overflow:hidden;
+                    text-overflow:ellipsis;
+                `;
+
+
+                const by =
+                    document.createElement(
+                        "div"
+                    );
+
+                by.textContent =
+                    music.uploaded_by ||
+                    "";
+
+                by.style.cssText = `
+                    margin-top:4px;
+                    color:#777;
+                    font-size:12px;
+                `;
+
+
+                const button =
+                    document.createElement(
+                        "button"
+                    );
+
+                button.type =
+                    "button";
+
+                button.textContent =
+                    "Use";
+
+                button.style.cssText = `
+                    border:0;
+                    border-radius:20px;
+                    padding:9px 16px;
+                    background:#0095f6;
+                    color:#fff;
+                    font-weight:700;
+                    cursor:pointer;
+                `;
+
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        chooseMusic(
+                            music
+                        );
+
+                    }
+                );
+
+
+                info.appendChild(title);
+                info.appendChild(by);
+
+                row.appendChild(cover);
+                row.appendChild(info);
+                row.appendChild(button);
+
+                list.appendChild(row);
+
+            }
+        );
+
+    }
+
+
+    /* =====================================================
+       CHOOSE MUSIC
+    ===================================================== */
+
+    function chooseMusic(music) {
+
+        if (
+            !music ||
+            !music.audio_url
+        ) {
+
+            alert(
+                "Music URL nahi mila."
+            );
+
+            return;
+        }
+
+        selectedMusic = {
+            id:
+                music.id,
+
+            title:
+                music.title || "",
+
+            url:
+                music.audio_url,
+
+            cover:
+                music.cover_url || ""
+        };
+
+
+        prepareTrimScreen();
+
+    }
+
+
+    /* =====================================================
+       PREPARE TRIM SCREEN
+    ===================================================== */
+
+    function prepareTrimScreen() {
+
+        stopAudio();
+
+        if (currentTarget === "reel") {
+
+            prepareReelTrim();
+
+        } else {
+
+            preparePostTrim();
+
+        }
+
+    }
+
+
+    
+
+
+
+
+    /* =====================================================
+       RESTORE POST MUSIC
+    ===================================================== */
+
+    window.getSnapzPostMusic =
+        function () {
+
+            try {
+
+                const data =
+                    sessionStorage.getItem(
+                        "snapz_post_music"
+                    );
+
+                return data
+                    ? JSON.parse(data)
+                    : null;
+
+            } catch (e) {
+
+                return null;
+
+            }
+
+        };
+
+
+    /* =====================================================
+       RESTORE REEL MUSIC
+    ===================================================== */
+
+    window.getSnapzReelMusic =
+        function () {
+
+            try {
+
+                const data =
+                    sessionStorage.getItem(
+                        "snapz_reel_music"
+                    );
+
+                return data
+                    ? JSON.parse(data)
+                    : null;
+
+            } catch (e) {
+
+                return null;
+
+            }
+
+        };
+
+
+    console.log(
+        "SNAPZ POST + REEL MUSIC SYSTEM READY"
+    );
+
+})();

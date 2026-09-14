@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>Archived Story</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:sans-serif;
+}
+
+body{
+background:#000;
+color:white;
+}
+
+.container{
+max-width:500px;
+margin:auto;
+}
+
+.story img{
+width:100%;
+height:70vh;
+object-fit:cover;
+background:#111;
+}
+
+.info{
+padding:15px;
+}
+
+.date{
+color:#999;
+font-size:14px;
+margin-bottom:10px;
+}
+
+.caption{
+font-size:17px;
+margin-bottom:25px;
+word-break:break-word;
+}
+
+.buttons{
+display:flex;
+gap:10px;
+}
+
+.btn{
+flex:1;
+height:48px;
+border:none;
+border-radius:10px;
+font-size:16px;
+font-weight:bold;
+cursor:pointer;
+}
+
+.share{
+background:#0095f6;
+color:white;
+}
+
+.delete{
+background:#e53935;
+color:white;
+}
+
+.back{
+display:inline-block;
+margin:15px;
+color:white;
+text-decoration:none;
+font-size:24px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<a href="/story_archive" class="back">←</a>
+
+<div class="container">
+
+<div class="story">
+
+<img src="{{ story['image'] }}">
+
+</div>
+
+<div class="info">
+
+<div class="date">
+
+{{ story['created_at'] }}
+
+</div>
+
+<div class="caption">
+
+{{ story['caption'] }}
+
+</div>
+
+<div class="buttons">
+
+<form
+action="/share_archive_story/{{ story['id'] }}"
+method="POST"
+style="flex:1;">
+
+<button
+class="btn share">
+
+Share Again
+
+</button>
+
+</form>
+
+<form
+action="/delete_archive_story/{{ story['id'] }}"
+method="POST"
+style="flex:1;">
+
+<button
+class="btn delete">
+
+Delete
+
+</button>
+
+</form>
+
+</div>
+
+</div>
+
+</div>
+
+</body>
+</html>

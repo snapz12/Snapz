@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>About Snapz</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:sans-serif;
+}
+
+body{
+background:#000;
+color:#fff;
+}
+
+.container{
+max-width:500px;
+margin:auto;
+padding:20px;
+}
+
+.header{
+display:flex;
+align-items:center;
+gap:15px;
+margin-bottom:30px;
+font-size:22px;
+font-weight:bold;
+}
+
+.left{
+display:flex;
+align-items:center;
+gap:14px;
+}
+
+.left svg{
+width:22px;
+height:22px;
+stroke:#fff;
+flex-shrink:0;
+}
+
+.back{
+text-decoration:none;
+color:white;
+font-size:28px;
+}
+
+.logo{
+text-align:center;
+margin:30px 0;
+}
+
+.logo img{
+width:90px;
+height:90px;
+border-radius:22px;
+}
+
+.appname{
+font-size:28px;
+font-weight:bold;
+margin-top:10px;
+}
+
+.version{
+color:#888;
+margin-top:8px;
+}
+
+.card{
+
+background:#111;
+
+padding:18px;
+
+border-radius:15px;
+
+margin-top:25px;
+
+line-height:28px;
+
+}
+
+.item{
+
+display:flex;
+
+justify-content:space-between;
+
+padding:18px 0;
+
+border-bottom:1px solid #222;
+
+}
+
+.item:last-child{
+
+border:none;
+
+}
+
+.right{
+
+color:#888;
+
+}
+
+.footer{
+
+text-align:center;
+
+margin-top:40px;
+
+color:#666;
+
+font-size:14px;
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+
+<a href="/settings" class="back">←</a>
+
+<span>About Snapz</span>
+
+</div>
+
+<div class="logo">
+
+<img src="/static/images/snapz_logo.png">
+
+<div class="appname">
+
+Snapz
+
+</div>
+
+<div class="card">
+
+<div class="card">
+
+    <a class="item" href="/whats_new">
+
+        <span class="left">
+
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <path d="M12 5V19"/>
+                <path d="M5 12H19"/>
+            </svg>
+
+            What's New
+
+        </span>
+
+        <span class="right">›</span>
+
+    </a>
+
+    <a class="item" href="/check_update">
+
+        <span class="left">
+
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <path d="M21 12a9 9 0 1 1-2.64-6.36"/>
+                <polyline points="21 3 21 9 15 9"/>
+            </svg>
+
+            Check for Updates
+
+        </span>
+
+        <span class="right">›</span>
+
+    </a>
+
+    <a class="item" href="/rate_snapz">
+
+        <span class="left">
+
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <polygon points="12 2 15 9 22 9.5 17 14 18.5 21 12 17.5 5.5 21 7 14 2 9.5 9 9"/>
+            </svg>
+
+            Rate Snapz
+
+        </span>
+
+        <span class="right">›</span>
+
+    </a>
+
+    <a class="item" href="/privacy_policy">
+
+        <span class="left">
+
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <path d="M12 2L20 6V11C20 16 16.5 20.5 12 22C7.5 20.5 4 16 4 11V6L12 2Z"/>
+            </svg>
+
+            Privacy Policy
+
+        </span>
+
+        <span class="right">›</span>
+
+    </a>
+
+    <a class="item" href="/terms">
+
+        <span class="left">
+
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <path d="M6 2H15L20 7V22H6Z"/>
+                <path d="M15 2V7H20"/>
+            </svg>
+
+            Terms of Service
+
+        </span>
+
+        <span class="right">›</span>
+
+    </a>
+
+    <a class="item" href="/licenses">
+
+        <span class="left">
+
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+                <path d="M6.5 2H20V22H6.5A2.5 2.5 0 0 1 4 19.5V4.5A2.5 2.5 0 0 1 6.5 2Z"/>
+            </svg>
+
+            Open Source Licenses
+
+        </span>
+
+        <span class="right">›</span>
+
+    </a>
+
+</div>
+
+<div class="version">
+
+Version 1.0.0
+
+</div>
+
+</div>
+
+<div class="card">
+
+<div class="item">
+
+<span>Developer</span>
+
+<span class="right">ShoZan</span>
+
+</div>
+
+<div class="item">
+
+<span>Platform</span>
+
+<span class="right">Flask + SQLite</span>
+
+</div>
+
+<div class="item">
+
+<span>Release</span>
+
+<span class="right">2026</span>
+
+</div>
+
+<div class="item">
+
+<span>Build</span>
+
+<span class="right">100</span>
+
+</div>
+
+</div>
+
+<div class="footer">
+
+© 2026 Snapz
+
+<br>
+
+Capture the vibe.
+
+</div>
+
+</div>
+
+</body>
+</html>

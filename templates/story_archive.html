@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>Story Archive</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:sans-serif;
+}
+
+body{
+background:#000;
+color:white;
+}
+
+.container{
+max-width:500px;
+margin:auto;
+padding:15px;
+}
+
+.header{
+display:flex;
+align-items:center;
+gap:15px;
+margin-bottom:20px;
+font-size:24px;
+font-weight:bold;
+}
+
+.back{
+text-decoration:none;
+color:white;
+font-size:28px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:8px;
+}
+
+.story{
+position:relative;
+}
+
+.story img{
+width:100%;
+aspect-ratio:9/16;
+object-fit:cover;
+border-radius:10px;
+}
+
+.date{
+position:absolute;
+bottom:5px;
+left:5px;
+background:rgba(0,0,0,.6);
+padding:3px 6px;
+border-radius:5px;
+font-size:11px;
+}
+
+.empty{
+text-align:center;
+margin-top:80px;
+color:#888;
+font-size:18px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+<a href="/profile" class="back">←</a>
+<span>Story Archive</span>
+</div>
+
+{% if stories %}
+
+<div class="grid">
+
+{% for story in stories %}
+
+<div class="story">
+
+<a href="/story_archive/{{ story['id'] }}">
+    <img src="{{ story['image'] }}">
+</a>
+
+<div class="date">
+
+{{ story['created_at'] }}
+
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+{% else %}
+
+<div class="empty">
+
+No archived stories
+
+</div>
+
+{% endif %}
+
+</div>
+
+</body>
+</html>

@@ -127,6 +127,32 @@
             }
         }
     </style>
+
+<style>
+.controls .control {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.control svg {
+    width: 25px;
+    height: 25px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.control.end svg {
+    transform: rotate(-25deg);
+}
+
+.control.off {
+    opacity: 0.55;
+}
+</style>
 </head>
 
 <body>
@@ -156,27 +182,56 @@
         <button
             id="micButton"
             class="control"
-            onclick="toggleMic()">
-            🎤
+            onclick="toggleMic()"
+            aria-label="Microphone">
+
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3Z"/>
+                <path d="M5 11a7 7 0 0 0 14 0"/>
+                <path d="M12 18v3"/>
+                <path d="M8 21h8"/>
+            </svg>
+
         </button>
 
         <button
             id="cameraButton"
             class="control"
-            onclick="toggleCamera()">
-            📷
+            onclick="toggleCamera()"
+            aria-label="Camera">
+
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M15 8h4l3 3v2l-3 3h-4Z"/>
+                <rect x="2" y="7" width="13" height="10" rx="2"/>
+            </svg>
+
         </button>
 
         <button
+            id="switchCameraButton"
             class="control"
-            onclick="switchCamera()">
-            🔄
+            onclick="switchCamera()"
+            aria-label="Switch camera">
+
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M7 7h10l2 3h2"/>
+                <path d="M17 4l3 3-3 3"/>
+                <path d="M17 17H7l-2-3H3"/>
+                <path d="M7 20l-3-3 3-3"/>
+            </svg>
+
         </button>
 
         <button
+            id="endCallButton"
             class="control end"
-            onclick="endVideoCall()">
-            ☎
+            onclick="endVideoCall()"
+            aria-label="End call">
+
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M6.6 10.8a15.5 15.5 0 0 0 6.6 6.6l2.2-2.2a1.5 1.5 0 0 1 1.6-.35l2.7 1.1a1.5 1.5 0 0 1 .9 1.4v2.1a1.5 1.5 0 0 1-1.6 1.5C10.7 20.3 3.7 13.3 3.4 4.9A1.5 1.5 0 0 1 4.9 3.3H7a1.5 1.5 0 0 1 1.4.9l1.1 2.7a1.5 1.5 0 0 1-.35 1.6Z"/>
+            </svg>
+
         </button>
 
     </div>
@@ -262,19 +317,46 @@ function createPeerConnection(){
 
     pc.ontrack = function(event){
 
+        console.log(
+            "REMOTE TRACK:",
+            event.track
+                ? event.track.kind
+                : "unknown"
+        );
+
         if(event.streams && event.streams[0]){
 
             remoteVideo.srcObject =
                 event.streams[0];
 
-            remoteVideo.play().catch(()=>{});
+        }
+        else if(event.track){
 
-            setStatus("Connected");
+            const stream =
+                remoteVideo.srcObject ||
+                new MediaStream();
+
+            stream.addTrack(
+                event.track
+            );
+
+            remoteVideo.srcObject =
+                stream;
 
         }
 
-    };
+        remoteVideo.play().catch(error=>{
 
+            console.warn(
+                "REMOTE VIDEO PLAY WARNING:",
+                error
+            );
+
+        });
+
+        setStatus("Connected");
+
+    };
 
     pc.onconnectionstatechange = function(){
 
@@ -350,6 +432,14 @@ function createPeerConnection(){
 async function startLocalMedia(){
 
     if(localStream){
+
+        localVideo.srcObject = localStream;
+
+        localVideo.muted = true;
+        localVideo.playsInline = true;
+
+        localVideo.play().catch(()=>{});
+
         return localStream;
     }
 
@@ -367,7 +457,9 @@ async function startLocalMedia(){
                 },
 
                 video:{
-                    facingMode:currentFacingMode,
+                    facingMode:{
+                        ideal:currentFacingMode
+                    },
                     width:{
                         ideal:1280
                     },
@@ -382,30 +474,53 @@ async function startLocalMedia(){
 
             });
 
+        localVideo.srcObject = localStream;
 
-        localVideo.srcObject =
-            localStream;
+        localVideo.muted = true;
+        localVideo.playsInline = true;
 
-        localVideo.play().catch(()=>{});
+        await localVideo.play().catch(error=>{
 
+            console.warn(
+                "LOCAL VIDEO PLAY WARNING:",
+                error
+            );
+
+        });
 
         const peer =
             createPeerConnection();
-
 
         localStream
             .getTracks()
             .forEach(track=>{
 
-                peer.addTrack(
-                    track,
-                    localStream
-                );
+                const exists =
+                    peer.getSenders().some(
+                        sender =>
+                            sender.track &&
+                            sender.track.id === track.id
+                    );
+
+                if(!exists){
+
+                    peer.addTrack(
+                        track,
+                        localStream
+                    );
+
+                }
 
             });
 
+        console.log(
+            "LOCAL MEDIA READY:",
+            localStream.getTracks().map(
+                track => track.kind
+            )
+        );
 
-        setStatus("Waiting for connection...");
+        setStatus("Camera ready");
 
         return localStream;
 
@@ -426,7 +541,6 @@ async function startLocalMedia(){
     }
 
 }
-
 
 async function flushCandidates(){
 
@@ -553,6 +667,8 @@ socket.on("video-call-ready", async function(data){
     );
 
     try{
+
+        setStatus("Starting camera...");
 
         await startLocalMedia();
 
@@ -792,29 +908,46 @@ async function initializeCall(){
 
 
         /*
-         * OUTGOING:
-         * Stay fullscreen and wait until the
-         * receiver accepts the call.
+         * OUTGOING VIDEO CALL
+         *
+         * Open fullscreen immediately.
+         * Start camera/mic immediately so the
+         * caller can see their own preview.
+         * Wait for receiver to accept before
+         * creating the WebRTC offer.
          */
+
         if(outgoingVideoCall){
 
-            setStatus(
-                "Waiting for receiver..."
-            );
+            setStatus("Starting camera...");
+
+            await startLocalMedia();
+
+            setStatus("Waiting for receiver...");
 
             return;
         }
 
 
         /*
-         * INCOMING:
-         * Start camera/mic only after Accept,
-         * then tell caller this fullscreen page
-         * is ready for the WebRTC offer.
+         * INCOMING VIDEO CALL
+         *
+         * Accept already happened in chat.html.
+         * This fullscreen page now starts camera/mic
+         * and tells the caller that we are ready.
          */
+
         if(incomingVideoCall){
 
+            setStatus("Starting camera...");
+
             await startLocalMedia();
+
+            videoCallReady = true;
+
+            console.log(
+                "INCOMING CAMERA READY"
+            );
 
             setStatus("Connecting...");
 
@@ -829,13 +962,17 @@ async function initializeCall(){
 
 
         /*
-         * Fallback.
+         * FALLBACK
          */
+
         await startLocalMedia();
+
+        setStatus("Connecting...");
 
         if(me < otherUser){
 
             outgoingVideoCall = true;
+
             videoCallReady = true;
 
             await makeOffer();
@@ -850,188 +987,227 @@ async function initializeCall(){
             error
         );
 
-        setStatus("Connection failed");
+        console.error(
+            "MEDIA ERROR NAME:",
+            error && error.name
+        );
+
+        console.error(
+            "MEDIA ERROR MESSAGE:",
+            error && error.message
+        );
+
+        setStatus("Camera unavailable");
 
     }
 
 }
 
-
 function toggleMic(){
 
-    if(!localStream){
-        return;
-    }
+    if(callEnded || !localStream) return;
 
-    const track =
-        localStream.getAudioTracks()[0];
+    const tracks = localStream.getAudioTracks();
 
-    if(!track){
-        return;
-    }
+    if(!tracks.length) return;
 
-    track.enabled =
-        !track.enabled;
+    const enabled = tracks[0].enabled;
 
+    tracks.forEach(function(track){
+        track.enabled = !enabled;
+    });
 
-    const button =
-        document.getElementById(
-            "micButton"
-        );
+    const button = document.getElementById("micButton");
 
-    button.classList.toggle(
-        "active",
-        !track.enabled
-    );
+    if(!button) return;
 
+    button.classList.toggle("off", enabled);
+
+    button.innerHTML = enabled ? `
+        <svg width="25" height="25" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="2" width="6" height="12" rx="3"></rect>
+            <path d="M5 11a7 7 0 0 0 14 0"></path>
+            <path d="M12 18v4"></path>
+            <path d="M8 22h8"></path>
+            <path d="M4 4l16 16"></path>
+        </svg>
+    ` : `
+        <svg width="25" height="25" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="2" width="6" height="12" rx="3"></rect>
+            <path d="M5 11a7 7 0 0 0 14 0"></path>
+            <path d="M12 18v4"></path>
+            <path d="M8 22h8"></path>
+        </svg>
+    `;
 }
 
 
 function toggleCamera(){
 
-    if(!localStream){
-        return;
-    }
+    if(callEnded || !localStream) return;
 
-    const track =
-        localStream.getVideoTracks()[0];
+    const tracks = localStream.getVideoTracks();
 
-    if(!track){
-        return;
-    }
+    if(!tracks.length) return;
 
-    track.enabled =
-        !track.enabled;
+    const enabled = tracks[0].enabled;
 
+    tracks.forEach(function(track){
+        track.enabled = !enabled;
+    });
 
-    const button =
-        document.getElementById(
-            "cameraButton"
-        );
+    const button = document.getElementById("cameraButton");
 
-    button.classList.toggle(
-        "active",
-        !track.enabled
-    );
+    if(!button) return;
 
+    button.classList.toggle("off", enabled);
+
+    button.innerHTML = enabled ? `
+        <svg width="25" height="25" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 8h4l3 3v2l-3 3h-4z"></path>
+            <rect x="2" y="6" width="13" height="12" rx="2"></rect>
+            <path d="M4 4l16 16"></path>
+        </svg>
+    ` : `
+        <svg width="25" height="25" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 8h4l3 3v2l-3 3h-4z"></path>
+            <rect x="2" y="6" width="13" height="12" rx="2"></rect>
+        </svg>
+    `;
 }
 
 
 async function switchCamera(){
 
-    if(!localStream){
-        return;
-    }
+    if(callEnded || !localStream) return;
 
-    const videoTrack =
+    const oldTrack =
         localStream.getVideoTracks()[0];
 
-    if(!videoTrack){
-        return;
-    }
+    if(!oldTrack) return;
+
+    const oldFacingMode = currentFacingMode;
 
     currentFacingMode =
         currentFacingMode === "user"
-        ? "environment"
-        : "user";
-
+            ? "environment"
+            : "user";
 
     try{
 
         const newStream =
-            await navigator.mediaDevices
-            .getUserMedia({
-
+            await navigator.mediaDevices.getUserMedia({
                 audio:false,
-
                 video:{
                     facingMode:{
-                        exact:
-                            currentFacingMode
+                        ideal:currentFacingMode
                     }
                 }
-
             });
-
 
         const newTrack =
             newStream.getVideoTracks()[0];
 
-
-        const sender =
-            pc
-            ? pc.getSenders().find(
-                s =>
-                    s.track &&
-                    s.track.kind === "video"
-            )
-            : null;
-
-
-        if(sender){
-
-            await sender.replaceTrack(
-                newTrack
-            );
-
+        if(!newTrack){
+            throw new Error("New camera track unavailable");
         }
 
+        if(pc){
 
-        videoTrack.stop();
+            const sender =
+                pc.getSenders().find(function(sender){
+                    return sender.track &&
+                           sender.track.kind === "video";
+                });
 
+            if(sender){
+                await sender.replaceTrack(newTrack);
+            }
+        }
 
-        localStream.removeTrack(
-            videoTrack
+        oldTrack.stop();
+
+        localStream.removeTrack(oldTrack);
+        localStream.addTrack(newTrack);
+
+        document.getElementById(
+            "localVideo"
+        ).srcObject = localStream;
+
+        console.log(
+            "Camera switched:",
+            currentFacingMode
         );
-
-        localStream.addTrack(
-            newTrack
-        );
-
-
-        localVideo.srcObject =
-            localStream;
-
-        localVideo.play().catch(()=>{});
-
 
     }
     catch(error){
 
+        currentFacingMode = oldFacingMode;
+
         console.error(
-            "CAMERA SWITCH ERROR:",
+            "SWITCH CAMERA ERROR:",
             error
         );
-
     }
-
 }
 
 
 function endVideoCall(){
 
-    if(callEnded){
-        return;
-    }
+    if(callEnded) return;
+
+    console.log("ENDING VIDEO CALL");
 
     callEnded = true;
 
+    try{
 
-    socket.emit("end-call",{
+        socket.emit("end-call",{
+            to:otherUser,
+            from:me,
+            type:"video"
+        });
 
-        from:me,
-        to:otherUser,
-        type:"video"
+    }
+    catch(error){
 
-    });
-
+        console.error(
+            "END CALL SOCKET ERROR:",
+            error
+        );
+    }
 
     cleanupCall();
 
+    const button =
+        document.getElementById("endCallButton");
+
+    if(button){
+        button.disabled = true;
+    }
+
+    setStatus("Call ended");
+
+    setTimeout(function(){
+
+        window.location.replace(
+            "/chat/" +
+            encodeURIComponent(otherUser)
+        );
+
+    },400);
 }
 
 
-  function cleanupCall(){
+function cleanupCall(){
 
       callEnded = true;
 

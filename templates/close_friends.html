@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>Close Friends</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:sans-serif;
+}
+
+body{
+background:#000;
+color:#fff;
+}
+
+.container{
+max-width:500px;
+margin:auto;
+}
+
+.header{
+display:flex;
+align-items:center;
+gap:15px;
+padding:20px;
+border-bottom:1px solid #222;
+font-size:25px;
+font-weight:bold;
+}
+
+.back{
+text-decoration:none;
+color:white;
+font-size:30px;
+}
+
+.search{
+width:92%;
+height:48px;
+margin:15px auto;
+display:block;
+background:#111;
+border:none;
+outline:none;
+border-radius:12px;
+padding:0 15px;
+color:white;
+font-size:16px;
+}
+
+.user{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:15px 20px;
+border-bottom:1px solid #222;
+}
+
+.left{
+font-size:17px;
+font-weight:bold;
+}
+
+button{
+background:#16a34a;
+color:white;
+border:none;
+padding:8px 18px;
+border-radius:10px;
+font-size:15px;
+font-weight:bold;
+cursor:pointer;
+}
+
+.selected{
+background:#555;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="header">
+
+<a href="/privacy" class="back">←</a>
+
+<span>Close Friends</span>
+
+</div>
+
+<input
+id="search"
+class="search"
+placeholder="Search...">
+
+{% for user in following %}
+
+<div class="user">
+
+<div class="left">
+
+{{ user }}
+
+</div>
+
+<button
+class="{% if user in selected %}selected{% endif %}"
+onclick="toggleFriend('{{ user }}',this)">
+
+{% if user in selected %}
+✓ Added
+{% else %}
+Add
+{% endif %}
+
+</button>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+<script>
+
+function toggleFriend(username,btn){
+
+fetch("/toggle_close_friend/"+username,{
+method:"POST"
+})
+
+.then(r=>r.json())
+
+.then(data=>{
+
+if(data.status=="added"){
+
+btn.innerHTML="✓ Added";
+btn.classList.add("selected");
+
+}
+
+else{
+
+btn.innerHTML="Add";
+btn.classList.remove("selected");
+
+}
+
+});
+
+}
+
+document.getElementById("search").onkeyup=function(){
+
+let value=this.value.toLowerCase();
+
+document.querySelectorAll(".user").forEach(function(item){
+
+item.style.display=
+item.innerText.toLowerCase().includes(value)
+?
+"flex"
+:
+"none";
+
+});
+
+}
+
+</script>
+
+</body>
+</html>

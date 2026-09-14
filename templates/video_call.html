@@ -199,6 +199,10 @@ let pendingCandidates = [];
 let currentFacingMode = "user";
 let callEnded = false;
 
+let outgoingVideoCall = false;
+let incomingVideoCall = false;
+let videoCallReady = false;
+
 const configuration = {
 
     iceServers: [
@@ -463,6 +467,14 @@ async function makeOffer(){
         return;
     }
 
+    if(!outgoingVideoCall){
+        return;
+    }
+
+    if(!videoCallReady){
+        return;
+    }
+
     try{
 
         const peer =
@@ -488,6 +500,7 @@ async function makeOffer(){
 
             from:me,
             to:otherUser,
+            type:"video",
 
             offer:{
                 type:offer.type,
@@ -504,12 +517,66 @@ async function makeOffer(){
             error
         );
 
+        setStatus("Connection failed");
+
     }
 
 }
 
 
+
+socket.on("video-call-ready", async function(data){
+
+    if(callEnded){
+        return;
+    }
+
+    if(!outgoingVideoCall){
+        return;
+    }
+
+    if(
+        !data ||
+        data.from !== otherUser
+    ){
+        return;
+    }
+
+    if(videoCallReady){
+        return;
+    }
+
+    videoCallReady = true;
+
+    console.log(
+        "RECEIVER FULLSCREEN READY"
+    );
+
+    try{
+
+        await startLocalMedia();
+
+        await makeOffer();
+
+    }
+    catch(error){
+
+        console.error(
+            "VIDEO CALL READY ERROR:",
+            error
+        );
+
+        setStatus("Connection failed");
+
+    }
+
+});
+
 socket.on("offer", async function(data){
+
+    if(callEnded){
+        return;
+    }
 
     if(data.from !== otherUser){
         return;
@@ -581,6 +648,10 @@ socket.on("offer", async function(data){
 
 socket.on("answer", async function(data){
 
+    if(callEnded){
+        return;
+    }
+
     if(data.from !== otherUser){
         return;
     }
@@ -618,6 +689,10 @@ socket.on("answer", async function(data){
 
 
 socket.on("ice-candidate", async function(data){
+
+    if(callEnded){
+        return;
+    }
 
     if(data.from !== otherUser){
         return;
@@ -676,6 +751,25 @@ socket.on("call-ended", function(data){
         return;
     }
 
+    console.log("REMOTE CALL ENDED");
+
+    cleanupCall();
+
+});
+
+
+socket.on("call-rejected", function(data){
+
+    if(
+        data &&
+        data.from &&
+        data.from !== otherUser
+    ){
+        return;
+    }
+
+    console.log("REMOTE CALL REJECTED");
+
     cleanupCall();
 
 });
@@ -685,15 +779,64 @@ async function initializeCall(){
 
     try{
 
-        await startLocalMedia();
+        const params =
+            new URLSearchParams(
+                window.location.search
+            );
+
+        outgoingVideoCall =
+            params.get("outgoing") === "1";
+
+        incomingVideoCall =
+            params.get("incoming") === "1";
+
 
         /*
-         * Only one side creates the offer.
-         * This prevents both phones from creating
-         * simultaneous offers.
+         * OUTGOING:
+         * Stay fullscreen and wait until the
+         * receiver accepts the call.
          */
+        if(outgoingVideoCall){
+
+            setStatus(
+                "Waiting for receiver..."
+            );
+
+            return;
+        }
+
+
+        /*
+         * INCOMING:
+         * Start camera/mic only after Accept,
+         * then tell caller this fullscreen page
+         * is ready for the WebRTC offer.
+         */
+        if(incomingVideoCall){
+
+            await startLocalMedia();
+
+            setStatus("Connecting...");
+
+            socket.emit("video-call-ready",{
+                from:me,
+                to:otherUser,
+                type:"video"
+            });
+
+            return;
+        }
+
+
+        /*
+         * Fallback.
+         */
+        await startLocalMedia();
 
         if(me < otherUser){
+
+            outgoingVideoCall = true;
+            videoCallReady = true;
 
             await makeOffer();
 
@@ -706,6 +849,8 @@ async function initializeCall(){
             "CALL INITIALIZATION ERROR:",
             error
         );
+
+        setStatus("Connection failed");
 
     }
 
@@ -886,43 +1031,99 @@ function endVideoCall(){
 }
 
 
-function cleanupCall(){
+  function cleanupCall(){
 
-    callEnded = true;
-
-
-    if(pc){
-
-        pc.ontrack = null;
-        pc.onicecandidate = null;
-
-        try{
-            pc.close();
-        }
-        catch(e){}
-
-        pc = null;
-
-    }
+      callEnded = true;
 
 
-    if(localStream){
+      /* STOP PEER CONNECTION */
 
-        localStream
-        .getTracks()
-        .forEach(
-            track=>track.stop()
-        );
+      if(pc){
 
-        localStream = null;
+          pc.ontrack = null;
+          pc.onicecandidate = null;
+          pc.onconnectionstatechange = null;
+          pc.oniceconnectionstatechange = null;
 
-    }
+          try{
+              pc.getSenders().forEach(
+                  sender=>{
+                      try{
+                          if(sender.track){
+                              sender.track.stop();
+                          }
+                      }
+                      catch(e){}
+                  }
+              );
+          }
+          catch(e){}
+
+          try{
+              pc.close();
+          }
+          catch(e){}
+
+          pc = null;
+
+      }
 
 
-    remoteVideo.srcObject = null;
-    localVideo.srcObject = null;
+      /* STOP LOCAL MEDIA */
 
-}
+      if(localStream){
+
+          localStream
+          .getTracks()
+          .forEach(
+              track=>{
+                  try{
+                      track.stop();
+                  }
+                  catch(e){}
+              }
+          );
+
+          localStream = null;
+
+      }
+
+
+      /* STOP REMOTE MEDIA */
+
+      if(remoteVideo){
+
+          try{
+              remoteVideo.pause();
+          }
+          catch(e){}
+
+          remoteVideo.srcObject = null;
+
+      }
+
+
+      /* STOP LOCAL PREVIEW */
+
+      if(localVideo){
+
+          try{
+              localVideo.pause();
+          }
+          catch(e){}
+
+          localVideo.srcObject = null;
+
+      }
+
+
+      /* CLEAR OLD ICE */
+
+      pendingCandidates = [];
+      remoteDescriptionReady = false;
+
+  }
+
 
 
 /*

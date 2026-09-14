@@ -695,16 +695,31 @@ onerror="this.onerror=null;this.src='/static/images/default.jpg';">
 
     <div class="call-box">
 
+        <div id="callingIcon" class="snapz-call-icon">
+
+            <svg viewBox="0 0 24 24"
+                 width="34"
+                 height="34"
+                 fill="none"
+                 xmlns="http://www.w3.org/2000/svg">
+
+                <path
+                    d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.3 21 3 13.7 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.24.2 2.45.57 3.57a1 1 0 0 1-.24 1.02l-2.21 2.2z"
+                    fill="currentColor"/>
+
+            </svg>
+
+        </div>
+
         <h2>Calling...</h2>
 
         <p id="callingType">Voice Call</p>
 
         <p id="callTimer">00:00</p>
 
-<button class="cancel-btn" onclick="cancelCall()">
-    Cancel
-</button>
-
+        <button class="cancel-btn" onclick="cancelCall()">
+            Cancel
+        </button>
 
     </div>
 
@@ -715,18 +730,33 @@ onerror="this.onerror=null;this.src='/static/images/default.jpg';">
 
     <div class="call-box">
 
+        <div id="incomingCallIcon" class="snapz-call-icon">
+
+            <svg viewBox="0 0 24 24"
+                 width="34"
+                 height="34"
+                 fill="none"
+                 xmlns="http://www.w3.org/2000/svg">
+
+                <path
+                    d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.3 21 3 13.7 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.24.2 2.45.57 3.57a1 1 0 0 1-.24 1.02l-2.21 2.2z"
+                    fill="currentColor"/>
+
+            </svg>
+
+        </div>
+
         <h2>Incoming Call</h2>
 
         <p id="incomingCallType">Voice Call</p>
 
-<button class="accept-btn" onclick="acceptCall()">
-    Accept
-</button>
+        <button class="accept-btn" onclick="acceptCall()">
+            Accept
+        </button>
 
-<button class="reject-btn" onclick="rejectCall()">
-    Reject
-</button>
-
+        <button class="reject-btn" onclick="rejectCall()">
+            Reject
+        </button>
 
     </div>
 
@@ -1640,17 +1670,109 @@ socket.on("connect", function(){
 
 });
 
+function setCallPopupIcon(elementId, type){
+
+    const el = document.getElementById(elementId);
+
+    if(!el) return;
+
+    if(type === "video"){
+
+        el.innerHTML = `
+            <svg viewBox="0 0 24 24"
+                 width="34"
+                 height="34"
+                 fill="none"
+                 xmlns="http://www.w3.org/2000/svg">
+
+                <path
+                    d="M3 7a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v2.2l5-3v9.6l-5-3V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
+                    fill="currentColor"/>
+
+            </svg>
+        `;
+
+    }else{
+
+        el.innerHTML = `
+            <svg viewBox="0 0 24 24"
+                 width="34"
+                 height="34"
+                 fill="none"
+                 xmlns="http://www.w3.org/2000/svg">
+
+                <path
+                    d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.3 21 3 13.7 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.24.2 2.45.57 3.57a1 1 0 0 1-.24 1.02l-2.21 2.2z"
+                    fill="currentColor"/>
+
+            </svg>
+        `;
+
+    }
+
+}
+
+
+let lastVideoOffer = null;
+
+
 async function startCall(type){
 
-const ok = await startLocalMedia(type);
+    if(type === "video"){
 
-if(!ok) return;
+        document.getElementById("callingType").innerHTML="Video Call";
+
+        setCallPopupIcon("callingIcon", "video");
+
+        document.getElementById("callPopup").style.display="flex";
+
+        /*
+         * Create the ringing call record first.
+         * The dedicated video_call page will handle
+         * camera, microphone and WebRTC signaling.
+         */
+        socket.emit("call-user",{
+            to:"{{ chat_with }}",
+            from:"{{ session['username'] }}",
+            type:"video"
+        });
+
+        ringTimeout = setTimeout(function(){
+
+            socket.emit("missed-call",{
+                from:"{{ session['username'] }}",
+                to:"{{ chat_with }}",
+                type:"video"
+            });
+
+            cancelCall();
+
+        },30000);
+
+        window.location.replace(
+            "/video_call/" +
+            encodeURIComponent("{{ chat_with }}") +
+            "?outgoing=1"
+        );
+
+        return;
+    }
+
+
+    /*
+     * Existing Voice Call flow remains unchanged.
+     */
+    const ok = await startLocalMedia(type);
+
+    if(!ok) return;
 
     if(type==="video"){
         document.getElementById("callingType").innerHTML="Video Call";
     }else{
         document.getElementById("callingType").innerHTML="Voice Call";
     }
+
+    setCallPopupIcon("callingIcon", type);
 
     document.getElementById("callPopup").style.display="flex";
 
@@ -1659,43 +1781,35 @@ if(!ok) return;
         from:"{{ session['username'] }}",
         type:type
     });
-createPeer();
 
-const offer = await peerConnection.createOffer();
+    createPeer();
 
-await peerConnection.setLocalDescription(offer);
+    const offer = await peerConnection.createOffer();
 
-socket.emit("offer",{
-    to:"{{ chat_with }}",
-    from:"{{ session['username'] }}",
-    offer:offer
+    await peerConnection.setLocalDescription(offer);
+
+    socket.emit("offer",{
+        to:"{{ chat_with }}",
+        from:"{{ session['username'] }}",
+        offer:offer,
+        type:type
+    });
+
+    ringTimeout = setTimeout(function(){
+
+        socket.emit("missed-call",{
+            from:"{{ session['username'] }}",
+            to:"{{ chat_with }}",
+            type:type
+        });
+
+        cancelCall();
+
+    },30000);
+
+}
 
 
-});
-
-
-
-
-
-
-
-ringTimeout = setTimeout(function(){  
-  
-    socket.emit("missed-call",{  
-  
-        from:"{{ session['username'] }}",  
-  
-        to:"{{ chat_with }}",  
-  
-        type:type  
-  
-    });  
-  
-    cancelCall();  
-  
-},30000);  
-
-}  
 
 socket.on("incoming-call", async function(data){
 
@@ -1708,6 +1822,8 @@ socket.on("incoming-call", async function(data){
     }else{
         document.getElementById("incomingCallType").innerHTML="Voice Call";
     }
+
+    setCallPopupIcon("incomingCallIcon", data.type);
 
     document.getElementById("incomingCallPopup").style.display="flex";
 });
@@ -1863,6 +1979,32 @@ socket.emit("answer",{
 
 
 }
+
+socket.on("video-call-ready",function(data){
+
+    if(
+        !data ||
+        data.from !== "{{ chat_with }}"
+    ){
+        return;
+    }
+
+    if(!lastVideoOffer){
+        console.log("VIDEO READY BUT NO OFFER AVAILABLE");
+        return;
+    }
+
+    console.log("VIDEO CALL FULLSCREEN READY - RESENDING OFFER");
+
+    socket.emit("offer",{
+        to:"{{ chat_with }}",
+        from:"{{ session['username'] }}",
+        offer:lastVideoOffer,
+        type:"video"
+    });
+
+});
+
 
 socket.on("call-answered",function(){
 

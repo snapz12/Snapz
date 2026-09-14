@@ -1391,6 +1391,17 @@ def chat(username):
     )
 
 
+
+@app.route("/video_call/<username>")
+def video_call(username):
+    if "username" not in session:
+        return redirect("/login")
+
+    return render_template(
+        "video_call.html",
+        chat_with=username
+    )
+
 @app.route("/chat_messages/<username>")
 def chat_messages(username):
 
@@ -5487,116 +5498,131 @@ def save_system_message(sender, receiver, text):
 @socketio.on("end-call")
 def end_call(data):
 
+    caller = data.get("from")
+    receiver = data.get("to")
+    call_type = data.get("type", "video")
+
+    if not caller or not receiver:
+        return
+
+
     conn = sqlite3.connect("snapz.db")
     cur = conn.cursor()
 
 
+    # Find the latest active call in either direction.
     cur.execute("""
-    SELECT status
-    FROM calls
-    WHERE caller=? AND receiver=?
-    ORDER BY id DESC
-    LIMIT 1
+        SELECT id, caller, receiver, call_type, status, started_at
+        FROM calls
+        WHERE
+            (
+                caller=? AND receiver=?
+            )
+            OR
+            (
+                caller=? AND receiver=?
+            )
+        ORDER BY id DESC
+        LIMIT 1
     """, (
-        data["from"],
-        data["to"]
+        caller,
+        receiver,
+        receiver,
+        caller
     ))
 
     row = cur.fetchone()
 
-    if row and row[0] == "missed":
-        conn.close()
-        return
+
+    if row:
+
+        call_id = row[0]
+        db_call_type = row[3] or call_type
+        status = row[4]
+        started_at = row[5]
 
 
+        # Do not change an already missed/rejected call.
+        if status not in ("missed", "ended"):
 
-    cur.execute("""
-    UPDATE calls
-    SET
-        status='ended',
-        ended_at=datetime('now','localtime')
-    WHERE id=(
-        SELECT id
-        FROM calls
-        WHERE caller=? AND receiver=? AND status='answered'
-        ORDER BY id DESC
-        LIMIT 1
-    )
-    """,(
-        data["from"],
-        data["to"]
-    ))
+            cur.execute("""
+                UPDATE calls
+                SET
+                    status='ended',
+                    ended_at=datetime('now','localtime')
+                WHERE id=?
+            """, (call_id,))
 
-    conn.commit()
-
-    cur.execute("""
-    SELECT
-    CAST(
-    (strftime('%s',ended_at)-strftime('%s',started_at))
-    AS INTEGER)
-    FROM calls
-    WHERE status='ended'
-    ORDER BY id DESC
-    LIMIT 1
-    """)
-
-    seconds = cur.fetchone()[0] or 0
-
-    minutes = seconds // 60
-    sec = seconds % 60
-
-    duration = f"{minutes} min {sec} sec"
+            conn.commit()
 
 
+            # Calculate duration only for an answered call.
+            if status == "answered" and started_at:
 
-    cur.execute("""
-    SELECT
-    caller,
-    receiver,
-    call_type
-    FROM calls
-    ORDER BY id DESC
-    LIMIT 1
-    """)
+                cur.execute("""
+                    SELECT CAST(
+                        strftime('%s', ended_at)
+                        -
+                        strftime('%s', started_at)
+                        AS INTEGER
+                    )
+                    FROM calls
+                    WHERE id=?
+                """, (call_id,))
 
-    call = cur.fetchone()
+                result = cur.fetchone()
+                seconds = (result[0] or 0) if result else 0
 
-    if call:
+            else:
+                seconds = 0
 
-        if call[2] == "voice":
 
-            save_system_message(
-                call[0],
-                call[1],
-                f"📞 Voice Call\n{duration}"
-            )
+            minutes = seconds // 60
+            sec = seconds % 60
+            duration = f"{minutes} min {sec} sec"
 
-            save_system_message(
-                call[1],
-                call[0],
-                f"📞 Voice Call\n{duration}"
-            )
 
-        else:
+            if db_call_type == "voice":
 
-            save_system_message(
-                call[0],
-                call[1],
-                f"📹 Video Call\n{duration}"
-            )
+                save_system_message(
+                    row[1],
+                    row[2],
+                    f"📞 Voice Call\n{duration}"
+                )
 
-            save_system_message(
-                call[1],
-                call[0],
-                f"📹 Video Call\n{duration}"
-            )
+                save_system_message(
+                    row[2],
+                    row[1],
+                    f"📞 Voice Call\n{duration}"
+                )
+
+            else:
+
+                save_system_message(
+                    row[1],
+                    row[2],
+                    f"📹 Video Call\n{duration}"
+                )
+
+                save_system_message(
+                    row[2],
+                    row[1],
+                    f"📹 Video Call\n{duration}"
+                )
 
     conn.close()
 
+
+    # Always notify the other phone so its WebRTC session
+    # can immediately run cleanupCall().
     emit(
         "call-ended",
-        data,
-        room=data["to"]
+        {
+            "from": caller,
+            "to": receiver,
+            "type": call_type
+        },
+        room=receiver
     )
 
 
@@ -5687,6 +5713,15 @@ def missed_call(data):
     )
 
 
+@socketio.on("video-call-ready")
+def video_call_ready(data):
+    emit(
+        "video-call-ready",
+        data,
+        room=data["to"]
+    )
+
+
 @socketio.on("offer")
 def offer(data):
     emit("offer", data, room=data["to"])
@@ -5705,33 +5740,79 @@ def ice_candidate(data):
 @socketio.on("reject-call")
 def reject_call(data):
 
+    caller = data.get("from")
+    receiver = data.get("to")
+    call_type = data.get("type", "video")
+
+    if not caller or not receiver:
+        return
+
+
     conn = sqlite3.connect("snapz.db")
     cur = conn.cursor()
 
+
     cur.execute("""
-        UPDATE calls
-        SET status='missed',
-            ended_at=datetime('now','localtime')
-        WHERE id=(
-            SELECT id
-            FROM calls
-            WHERE caller=? AND receiver=?
-            ORDER BY id DESC
-            LIMIT 1
-        )
-    """,(
-        data["from"],
-        data["to"]
+        SELECT id, caller, receiver, call_type, status
+        FROM calls
+        WHERE
+            (
+                caller=? AND receiver=?
+            )
+            OR
+            (
+                caller=? AND receiver=?
+            )
+        ORDER BY id DESC
+        LIMIT 1
+    """, (
+        caller,
+        receiver,
+        receiver,
+        caller
     ))
 
-    conn.commit()
+    row = cur.fetchone()
+
+
+    if row and row[4] not in ("missed", "ended"):
+
+        cur.execute("""
+            UPDATE calls
+            SET
+                status='missed',
+                ended_at=datetime('now','localtime')
+            WHERE id=?
+        """, (row[0],))
+
+        conn.commit()
+
+
     conn.close()
+
+
+    # Notify both sides so either side can immediately
+    # terminate any active WebRTC resources.
+    emit(
+        "call-rejected",
+        {
+            "from": caller,
+            "to": receiver,
+            "type": call_type
+        },
+        room=receiver
+    )
 
     emit(
         "call-rejected",
-        data,
-        room=data["from"]
+        {
+            "from": caller,
+            "to": receiver,
+            "type": call_type
+        },
+        room=caller
     )
+
 
 @app.route("/menu")
 def menu():

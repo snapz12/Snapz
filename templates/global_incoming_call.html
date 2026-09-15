@@ -1,0 +1,1035 @@
+<style>
+#snapzGlobalIncomingCall{
+    position:fixed;
+    inset:0;
+    z-index:999999;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:rgba(0,0,0,.72);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+}
+
+#snapzGlobalIncomingCall .snapz-global-call-box{
+    width:min(88vw,360px);
+    padding:28px 22px 22px;
+    border-radius:26px;
+    background:#fff;
+    text-align:center;
+    box-shadow:0 20px 70px rgba(0,0,0,.35);
+    animation:snapzGlobalCallIn .22s ease-out;
+}
+
+#snapzGlobalIncomingCall .snapz-global-call-icon{
+    width:72px;
+    height:72px;
+    margin:0 auto 16px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#fff;
+    background:linear-gradient(135deg,#ff3d81,#ff6b9d);
+}
+
+#snapzGlobalIncomingCall h2{
+    margin:0 0 7px;
+    font-size:22px;
+    color:#222;
+}
+
+#snapzGlobalIncomingCall p{
+    margin:0 0 22px;
+    font-size:15px;
+    color:#777;
+}
+
+.snapz-global-call-buttons{
+    display:flex;
+    gap:12px;
+}
+
+.snapz-global-call-buttons button{
+    flex:1;
+    border:0;
+    padding:13px 10px;
+    border-radius:14px;
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+}
+
+#snapzGlobalAcceptCall{
+    color:#fff;
+    background:#20b965;
+}
+
+#snapzGlobalRejectCall,
+#snapzGlobalEndCall{
+    color:#fff;
+    background:#e53935;
+}
+
+#snapzGlobalEndCall{
+    display:none;
+}
+
+@keyframes snapzGlobalCallIn{
+    from{
+        opacity:0;
+        transform:scale(.92) translateY(12px);
+    }
+    to{
+        opacity:1;
+        transform:scale(1) translateY(0);
+    }
+}
+</style>
+
+
+<div id="snapzGlobalIncomingCall">
+
+    <div class="snapz-global-call-box">
+
+        <div
+            id="snapzGlobalIncomingCallIcon"
+            class="snapz-global-call-icon"
+        ></div>
+
+        <h2 id="snapzGlobalIncomingCallTitle">
+            Incoming Call
+        </h2>
+
+        <p id="snapzGlobalIncomingCallType">
+            Voice Call
+        </p>
+
+        <div class="snapz-global-call-buttons">
+
+            <button
+                id="snapzGlobalAcceptCall"
+                type="button"
+            >
+                Accept
+            </button>
+
+            <button
+                id="snapzGlobalRejectCall"
+                type="button"
+            >
+                Reject
+            </button>
+
+            <button
+                id="snapzGlobalEndCall"
+                type="button"
+            >
+                End Call
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+<script>
+(function(){
+
+    if(window.snapzGlobalIncomingCallLoaded){
+        return;
+    }
+
+    window.snapzGlobalIncomingCallLoaded = true;
+
+
+    const globalCallSocket = io();
+
+
+    let globalCaller = "";
+    let globalCallType = "";
+
+    let globalRingTimeout = null;
+
+    let globalLocalStream = null;
+    let globalPeerConnection = null;
+
+    let globalPendingOffer = null;
+    let globalPendingCandidates = [];
+
+    let globalCallActive = false;
+
+
+    const popup = document.getElementById(
+        "snapzGlobalIncomingCall"
+    );
+
+    const titleText = document.getElementById(
+        "snapzGlobalIncomingCallTitle"
+    );
+
+    const typeText = document.getElementById(
+        "snapzGlobalIncomingCallType"
+    );
+
+    const icon = document.getElementById(
+        "snapzGlobalIncomingCallIcon"
+    );
+
+    const acceptButton = document.getElementById(
+        "snapzGlobalAcceptCall"
+    );
+
+    const rejectButton = document.getElementById(
+        "snapzGlobalRejectCall"
+    );
+
+    const endButton = document.getElementById(
+        "snapzGlobalEndCall"
+    );
+
+
+    if(
+        !popup ||
+        !typeText ||
+        !icon ||
+        !acceptButton ||
+        !rejectButton ||
+        !endButton
+    ){
+        return;
+    }
+
+
+    function setIcon(type){
+
+        if(type === "video"){
+
+            icon.innerHTML = `
+                <svg
+                    viewBox="0 0 24 24"
+                    width="34"
+                    height="34"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <path
+                        d="M3 7a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v2.2l5-3v9.6l-5-3V17a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
+                        fill="currentColor"
+                    />
+                </svg>
+            `;
+
+        }else{
+
+            icon.innerHTML = `
+                <svg
+                    viewBox="0 0 24 24"
+                    width="34"
+                    height="34"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <path
+                        d="M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1C10.3 21 3 13.7 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.24.2 2.45.57 3.57a1 1 0 0 1-.24 1.02l-2.21 2.2z"
+                        fill="currentColor"
+                    />
+                </svg>
+            `;
+
+        }
+
+    }
+
+
+    function showIncomingCall(data){
+
+        if(!data || !data.from){
+            return;
+        }
+
+
+        globalCaller = data.from;
+
+        globalCallType =
+            data.type === "video"
+                ? "video"
+                : "voice";
+
+
+        globalCallActive = false;
+
+        globalPendingOffer = null;
+        globalPendingCandidates = [];
+
+
+        titleText.innerHTML = "Incoming Call";
+
+        typeText.innerHTML =
+            globalCallType === "video"
+                ? "Video Call"
+                : "Voice Call";
+
+
+        setIcon(globalCallType);
+
+
+        acceptButton.style.display = "block";
+        rejectButton.style.display = "block";
+        endButton.style.display = "none";
+
+
+        popup.style.display = "flex";
+
+
+        clearTimeout(globalRingTimeout);
+
+
+        globalRingTimeout = setTimeout(function(){
+
+            if(!globalCaller){
+                return;
+            }
+
+
+            globalCallSocket.emit("missed-call",{
+                from:globalCaller,
+                to:"{{ session['username'] }}",
+                type:globalCallType
+            });
+
+
+            cleanupGlobalCall();
+
+        },30000);
+
+    }
+
+
+    function hidePopup(){
+
+        clearTimeout(globalRingTimeout);
+
+        popup.style.display = "none";
+
+    }
+
+
+    function cleanupGlobalCall(){
+
+        clearTimeout(globalRingTimeout);
+
+
+        if(globalPeerConnection){
+
+            try{
+                globalPeerConnection.close();
+            }catch(e){}
+
+            globalPeerConnection = null;
+
+        }
+
+
+        if(globalLocalStream){
+
+            globalLocalStream
+                .getTracks()
+                .forEach(function(track){
+                    try{
+                        track.stop();
+                    }catch(e){}
+                });
+
+            globalLocalStream = null;
+
+        }
+
+
+        globalPendingOffer = null;
+        globalPendingCandidates = [];
+
+        globalCallActive = false;
+
+
+        globalCaller = "";
+        globalCallType = "";
+
+
+        acceptButton.style.display = "block";
+        rejectButton.style.display = "block";
+        endButton.style.display = "none";
+
+
+        titleText.innerHTML = "Incoming Call";
+        typeText.innerHTML = "Voice Call";
+
+
+        hidePopup();
+
+    }
+
+
+    async function startGlobalAudio(){
+
+        try{
+
+            globalLocalStream =
+                await navigator.mediaDevices.getUserMedia({
+                    audio:true,
+                    video:false
+                });
+
+            return true;
+
+        }catch(error){
+
+            console.error(
+                "GLOBAL AUDIO MEDIA ERROR:",
+                error
+            );
+
+            alert(
+                "Microphone permission denied"
+            );
+
+            return false;
+
+        }
+
+    }
+
+
+    function createGlobalAudioPeer(){
+
+        if(globalPeerConnection){
+            return;
+        }
+
+
+        globalPeerConnection =
+            new RTCPeerConnection({
+
+                iceServers:[
+                    {
+                        urls:"stun:stun.l.google.com:19302"
+                    }
+                ]
+
+            });
+
+
+        globalLocalStream
+            .getTracks()
+            .forEach(function(track){
+
+                globalPeerConnection.addTrack(
+                    track,
+                    globalLocalStream
+                );
+
+            });
+
+
+        globalPeerConnection.onicecandidate =
+            function(event){
+
+                if(!event.candidate){
+                    return;
+                }
+
+                if(!globalCaller){
+                    return;
+                }
+
+
+                globalCallSocket.emit(
+                    "ice-candidate",
+                    {
+                        to:globalCaller,
+                        from:"{{ session['username'] }}",
+                        candidate:event.candidate
+                    }
+                );
+
+            };
+
+
+        globalPeerConnection.ontrack =
+            function(event){
+
+                let audio =
+                    document.getElementById(
+                        "snapzGlobalRemoteAudio"
+                    );
+
+
+                if(!audio){
+
+                    audio =
+                        document.createElement("audio");
+
+                    audio.id =
+                        "snapzGlobalRemoteAudio";
+
+                    audio.autoplay = true;
+                    audio.playsInline = true;
+
+                    document.body.appendChild(audio);
+
+                }
+
+
+                audio.srcObject =
+                    event.streams[0];
+
+
+                const playPromise =
+                    audio.play();
+
+                if(playPromise){
+
+                    playPromise.catch(function(error){
+
+                        console.log(
+                            "Remote audio autoplay blocked:",
+                            error
+                        );
+
+                    });
+
+                }
+
+            };
+
+
+        globalPeerConnection.onconnectionstatechange =
+            function(){
+
+                console.log(
+                    "GLOBAL AUDIO CONNECTION:",
+                    globalPeerConnection
+                        .connectionState
+                );
+
+
+                if(
+                    globalPeerConnection.connectionState ===
+                    "failed"
+                ){
+
+                    console.log(
+                        "GLOBAL AUDIO CONNECTION FAILED"
+                    );
+
+                }
+
+            };
+
+    }
+
+
+    async function flushGlobalCandidates(){
+
+        if(
+            !globalPeerConnection ||
+            !globalPendingCandidates.length
+        ){
+            return;
+        }
+
+
+        const candidates =
+            globalPendingCandidates.slice();
+
+        globalPendingCandidates = [];
+
+
+        for(
+            const candidate of candidates
+        ){
+
+            try{
+
+                await globalPeerConnection.addIceCandidate(
+                    new RTCIceCandidate(candidate)
+                );
+
+            }catch(error){
+
+                console.error(
+                    "GLOBAL ICE ERROR:",
+                    error
+                );
+
+            }
+
+        }
+
+    }
+
+
+    async function acceptGlobalAudio(){
+
+        if(!globalCaller){
+            return;
+        }
+
+
+        const caller = globalCaller;
+
+
+        const mediaOK =
+            await startGlobalAudio();
+
+
+        if(!mediaOK){
+            return;
+        }
+
+
+        createGlobalAudioPeer();
+
+
+        globalCallActive = true;
+
+
+        clearTimeout(globalRingTimeout);
+
+
+        titleText.innerHTML =
+            "Audio Call";
+
+
+        typeText.innerHTML =
+            "Connected";
+
+
+        acceptButton.style.display = "none";
+        rejectButton.style.display = "none";
+        endButton.style.display = "block";
+
+
+        popup.style.display = "flex";
+
+
+        globalCallSocket.emit(
+            "answer-call",
+            {
+                from:caller,
+                to:"{{ session['username'] }}"
+            }
+        );
+
+
+        if(globalPendingOffer){
+
+            try{
+
+                await globalPeerConnection
+                    .setRemoteDescription(
+                        new RTCSessionDescription(
+                            globalPendingOffer
+                        )
+                    );
+
+
+                await flushGlobalCandidates();
+
+
+                const answer =
+                    await globalPeerConnection
+                        .createAnswer();
+
+
+                await globalPeerConnection
+                    .setLocalDescription(answer);
+
+
+                globalCallSocket.emit(
+                    "answer",
+                    {
+                        to:caller,
+                        from:"{{ session['username'] }}",
+                        answer:answer,
+                        type:"voice"
+                    }
+                );
+
+
+                console.log(
+                    "GLOBAL AUDIO ANSWER SENT"
+                );
+
+            }catch(error){
+
+                console.error(
+                    "GLOBAL AUDIO ANSWER ERROR:",
+                    error
+                );
+
+            }
+
+        }
+
+    }
+
+
+    globalCallSocket.on(
+        "connect",
+        function(){
+
+            console.log(
+                "GLOBAL CALL SOCKET CONNECTED:",
+                globalCallSocket.id
+            );
+
+
+            globalCallSocket.emit(
+                "join",
+                {
+                    username:"{{ session['username'] }}"
+                }
+            );
+
+        }
+    );
+
+
+    globalCallSocket.on(
+        "incoming-call",
+        function(data){
+
+            console.log(
+                "GLOBAL INCOMING CALL:",
+                data
+            );
+
+
+            showIncomingCall(data);
+
+        }
+    );
+
+
+    /*
+     * IMPORTANT:
+     * Caller ka offer global socket par bhi aa sakta hai.
+     * Isko Accept se pehle store karna zaroori hai.
+     */
+
+    globalCallSocket.on(
+        "offer",
+        function(data){
+
+            console.log(
+                "GLOBAL CALL OFFER:",
+                data
+            );
+
+
+            if(!data || !data.from){
+                return;
+            }
+
+
+            if(
+                globalCaller &&
+                data.from !== globalCaller
+            ){
+                return;
+            }
+
+
+            globalCaller =
+                data.from;
+
+
+            globalPendingOffer =
+                data.offer;
+
+
+            if(
+                globalCallType === "voice" &&
+                globalCallActive &&
+                globalPeerConnection
+            ){
+
+                globalPeerConnection
+                    .setRemoteDescription(
+                        new RTCSessionDescription(
+                            data.offer
+                        )
+                    )
+                    .then(async function(){
+
+                        await flushGlobalCandidates();
+
+                        const answer =
+                            await globalPeerConnection
+                                .createAnswer();
+
+                        await globalPeerConnection
+                            .setLocalDescription(answer);
+
+
+                        globalCallSocket.emit(
+                            "answer",
+                            {
+                                to:globalCaller,
+                                from:"{{ session['username'] }}",
+                                answer:answer,
+                                type:"voice"
+                            }
+                        );
+
+                    })
+                    .catch(function(error){
+
+                        console.error(
+                            "GLOBAL OFFER ERROR:",
+                            error
+                        );
+
+                    });
+
+            }
+
+        }
+    );
+
+
+    globalCallSocket.on(
+        "ice-candidate",
+        function(data){
+
+            if(!data || !data.candidate){
+                return;
+            }
+
+
+            if(
+                globalCaller &&
+                data.from &&
+                data.from !== globalCaller
+            ){
+                return;
+            }
+
+
+            if(
+                !globalPeerConnection ||
+                !globalPeerConnection.remoteDescription
+            ){
+
+                globalPendingCandidates.push(
+                    data.candidate
+                );
+
+                return;
+
+            }
+
+
+            globalPeerConnection
+                .addIceCandidate(
+                    new RTCIceCandidate(
+                        data.candidate
+                    )
+                )
+                .catch(function(error){
+
+                    console.error(
+                        "GLOBAL ICE ADD ERROR:",
+                        error
+                    );
+
+                });
+
+        }
+    );
+
+
+    globalCallSocket.on(
+        "call-rejected",
+        function(data){
+
+            if(!data){
+                return;
+            }
+
+
+            if(
+                globalCaller &&
+                (
+                    data.from === globalCaller ||
+                    data.to === globalCaller
+                )
+            ){
+
+                cleanupGlobalCall();
+
+            }
+
+        }
+    );
+
+
+    globalCallSocket.on(
+        "call-ended",
+        function(data){
+
+            if(
+                data &&
+                globalCaller &&
+                data.from &&
+                data.from !== globalCaller
+            ){
+                return;
+            }
+
+
+            console.log(
+                "GLOBAL CALL ENDED"
+            );
+
+
+            cleanupGlobalCall();
+
+        }
+    );
+
+
+    rejectButton.onclick =
+        function(){
+
+            if(!globalCaller){
+
+                cleanupGlobalCall();
+
+                return;
+
+            }
+
+
+            const caller =
+                globalCaller;
+
+            const type =
+                globalCallType || "voice";
+
+
+            globalCallSocket.emit(
+                "reject-call",
+                {
+                    from:caller,
+                    to:"{{ session['username'] }}",
+                    type:type
+                }
+            );
+
+
+            cleanupGlobalCall();
+
+        };
+
+
+    endButton.onclick =
+        function(){
+
+            if(!globalCaller){
+
+                cleanupGlobalCall();
+
+                return;
+
+            }
+
+
+            const caller =
+                globalCaller;
+
+            const type =
+                globalCallType || "voice";
+
+
+            globalCallSocket.emit(
+                "end-call",
+                {
+                    from:"{{ session['username'] }}",
+                    to:caller,
+                    type:type
+                }
+            );
+
+
+            cleanupGlobalCall();
+
+        };
+
+
+    acceptButton.onclick =
+        async function(){
+
+            if(!globalCaller){
+                return;
+            }
+
+
+            const caller =
+                globalCaller;
+
+            const type =
+                globalCallType || "video";
+
+
+            clearTimeout(globalRingTimeout);
+
+
+            /*
+             * VIDEO:
+             * Existing fullscreen video-call system remains untouched.
+             */
+
+            if(type === "video"){
+
+                globalCallSocket.emit(
+                    "answer-call",
+                    {
+                        from:caller,
+                        to:"{{ session['username'] }}"
+                    }
+                );
+
+
+                popup.style.display = "none";
+
+
+                window.location.replace(
+                    "/video_call/" +
+                    encodeURIComponent(caller) +
+                    "?incoming=1"
+                );
+
+
+                return;
+
+            }
+
+
+            /*
+             * VOICE:
+             * Handle WebRTC directly here.
+             */
+
+            await acceptGlobalAudio();
+
+        };
+
+
+})();
+</script>

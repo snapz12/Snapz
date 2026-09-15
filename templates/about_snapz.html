@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>About Snapz</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont,
+                         "Segoe UI", sans-serif;
+            background: #fff;
+            color: #111;
+        }
+
+        .header {
+            height: 58px;
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            border-bottom: 1px solid #eee;
+            position: relative;
+        }
+
+        .back {
+            text-decoration: none;
+            color: inherit;
+            font-size: 30px;
+            line-height: 1;
+            width: 40px;
+        }
+
+        .title {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+
+        /* SNAPZ BRAND */
+
+        .brand {
+            text-align: center;
+            padding: 38px 20px 30px;
+        }
+
+.logo {
+    width: 85px;
+    height: 85px;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.snapz-logo {
+    width: 78px;
+    height: 78px;
+    object-fit: contain;
+    display: block;
+}
+
+        .brand-name {
+            margin-top: 16px;
+            font-size: 26px;
+            font-weight: 700;
+        }
+
+        .tagline {
+            margin-top: 5px;
+            color: #777;
+            font-size: 14px;
+        }
+
+        .version {
+            margin-top: 9px;
+            font-size: 13px;
+            color: #999;
+        }
+
+
+        /* MENU */
+
+        .section {
+            margin-top: 8px;
+            border-top: 1px solid #eee;
+        }
+
+        .item {
+            min-height: 62px;
+            padding: 0 18px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            text-decoration: none;
+            color: inherit;
+
+            border-bottom: 1px solid #eee;
+        }
+
+        .item:active {
+            background: #f7f7f7;
+        }
+
+        .left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .left svg {
+            width: 22px;
+            height: 22px;
+
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+
+            flex-shrink: 0;
+        }
+
+        .item-text {
+            font-size: 15px;
+        }
+
+        .arrow {
+            font-size: 25px;
+            color: #999;
+            font-weight: 300;
+        }
+
+
+        /* FOOTER */
+
+        .footer {
+            text-align: center;
+            padding: 35px 20px 45px;
+            color: #999;
+            font-size: 12px;
+        }
+
+        .footer strong {
+            color: #777;
+            font-weight: 500;
+        }
+
+
+        /* DARK MODE */
+
+        @media (prefers-color-scheme: dark) {
+
+            body {
+                background: #000;
+                color: #f5f5f5;
+            }
+
+            .header {
+                border-bottom-color: #222;
+            }
+
+            .section {
+                border-top-color: #222;
+            }
+
+            .item {
+                border-bottom-color: #222;
+            }
+
+            .item:active {
+                background: #111;
+            }
+
+            .tagline {
+                color: #999;
+            }
+
+            .version {
+                color: #777;
+            }
+
+            .arrow {
+                color: #777;
+            }
+
+            .footer {
+                color: #666;
+            }
+
+            .footer strong {
+                color: #888;
+            }
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <a href="/settings" class="back">
+            ←
+        </a>
+
+        <div class="title">
+            About Snapz
+        </div>
+
+    </div>
+
+
+    <!-- BRAND -->
+
+    <div class="brand">
+
+        <div class="logo">
+
+            <!-- Snapz Camera SVG -->
+
+<img
+    src="{{ url_for('static', filename='images/snapz_logo.png') }}"
+    alt="Snapz"
+    class="snapz-logo"
+>
+
+        </div>
+
+
+        <div class="brand-name">
+            Snapz
+        </div>
+
+        <div class="tagline">
+            Capture the vibe.
+        </div>
+
+        <div class="version">
+            Version 1.0.0
+        </div>
+
+    </div>
+
+
+    <!-- ABOUT MENU -->
+
+    <div class="section">
+
+
+        <!-- What's New -->
+
+        <a class="item" href="/whats_new">
+
+            <div class="left">
+
+                <svg viewBox="0 0 24 24">
+
+                    <path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z"/>
+
+                    <path d="M19 4v4"/>
+                    <path d="M21 6h-4"/>
+
+                </svg>
+
+                <span class="item-text">
+                    What's New
+                </span>
+
+            </div>
+
+            <span class="arrow">›</span>
+
+        </a>
+
+
+        <!-- Privacy Policy -->
+
+        <a class="item" href="/privacy">
+
+            <div class="left">
+
+                <svg viewBox="0 0 24 24">
+
+                    <rect
+                        x="5"
+                        y="10"
+                        width="14"
+                        height="11"
+                        rx="2"
+                    />
+
+                    <path d="M8 10V7a4 4 0 0 1 8 0v3"/>
+
+                    <circle
+                        cx="12"
+                        cy="15"
+                        r="1"
+                    />
+
+                </svg>
+
+                <span class="item-text">
+                    Privacy Policy
+                </span>
+
+            </div>
+
+            <span class="arrow">›</span>
+
+        </a>
+
+
+        <!-- Terms -->
+
+        <a class="item" href="/terms">
+
+            <div class="left">
+
+                <svg viewBox="0 0 24 24">
+
+                    <path d="M6 3h9l3 3v15H6z"/>
+
+                    <path d="M15 3v4h4"/>
+
+                    <path d="M9 12h6"/>
+                    <path d="M9 16h6"/>
+
+                </svg>
+
+                <span class="item-text">
+                    Terms of Service
+                </span>
+
+            </div>
+
+            <span class="arrow">›</span>
+
+        </a>
+
+
+        <!-- Community Guidelines -->
+
+        <a class="item" href="/community_guidelines">
+
+            <div class="left">
+
+                <svg viewBox="0 0 24 24">
+
+                    <circle
+                        cx="12"
+                        cy="12"
+                        r="9"
+                    />
+
+                    <path d="M8 12l2.5 2.5L16 9"/>
+
+                </svg>
+
+                <span class="item-text">
+                    Community Guidelines
+                </span>
+
+            </div>
+
+            <span class="arrow">›</span>
+
+        </a>
+
+
+        <!-- Open Source -->
+
+        <a class="item" href="/licenses">
+
+            <div class="left">
+
+                <svg viewBox="0 0 24 24">
+
+                    <path d="m8 8-4 4 4 4"/>
+                    <path d="m16 8 4 4-4 4"/>
+                    <path d="m14 5-4 14"/>
+
+                </svg>
+
+                <span class="item-text">
+                    Open Source Licenses
+                </span>
+
+            </div>
+
+            <span class="arrow">›</span>
+
+        </a>
+
+
+        <!-- Help -->
+
+        <a class="item" href="/help_center">
+
+            <div class="left">
+
+                <svg viewBox="0 0 24 24">
+
+                    <circle
+                        cx="12"
+                        cy="12"
+                        r="9"
+                    />
+
+                    <path
+                        d="M9.5 9a2.5 2.5 0 1 1 4.4 1.6c-.9.9-1.9 1.2-1.9 2.4"
+                    />
+
+                    <circle
+                        cx="12"
+                        cy="16.5"
+                        r=".8"
+                    />
+
+                </svg>
+
+                <span class="item-text">
+                    Help Center
+                </span>
+
+            </div>
+
+            <span class="arrow">›</span>
+
+        </a>
+
+
+        <!-- Report Problem -->
+
+        <a class="item" href="/report_problem">
+
+            <div class="left">
+
+                <svg viewBox="0 0 24 24">
+
+                    <path d="M12 3 2.8 20h18.4L12 3z"/>
+
+                    <path d="M12 9v5"/>
+
+                    <circle
+                        cx="12"
+                        cy="17"
+                        r=".8"
+                    />
+
+                </svg>
+
+                <span class="item-text">
+                    Report a Problem
+                </span>
+
+            </div>
+
+            <span class="arrow">›</span>
+
+        </a>
+
+
+    </div>
+
+
+    <!-- FOOTER -->
+
+    <div class="footer">
+
+        <div>
+            Made with care by <strong>Snapz</strong>
+        </div>
+
+        <div style="margin-top:7px;">
+            © 2026 Snapz. All rights reserved.
+        </div>
+
+    </div>
+
+
+{% include 'global_incoming_call.html' %}
+</body>
+</html>

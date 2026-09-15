@@ -1731,11 +1731,17 @@ async function startCall(type){
          * The dedicated video_call page will handle
          * camera, microphone and WebRTC signaling.
          */
+        console.log("VIDEO CALL BUTTON CLICKED");
+        console.log("SOCKET CONNECTED:", socket.connected);
+        console.log("SOCKET ID:", socket.id);
+
         socket.emit("call-user",{
             to:"{{ chat_with }}",
             from:"{{ session['username'] }}",
             type:"video"
         });
+
+        console.log("CALL-USER EVENT EMITTED");
 
         /*
          * Let Socket.IO deliver call-user before

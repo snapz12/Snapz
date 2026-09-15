@@ -1934,49 +1934,69 @@ socket.emit("end-call",{
 
 async function acceptCall(){
 
-clearTimeout(ringTimeout);
+    clearTimeout(ringTimeout);
+
+    const acceptedCaller = currentCaller;
+
+    const incomingType =
+        document.getElementById("incomingCallType").innerHTML.trim();
 
     document.getElementById("incomingCallPopup").style.display="none";
 
+    /*
+     * INCOMING VIDEO CALL
+     * Open the same fullscreen live-video page
+     * used by the outgoing video call.
+     */
+    if(incomingType === "Video Call"){
+
+        console.log(
+            "ACCEPTED INCOMING VIDEO CALL:",
+            acceptedCaller
+        );
+
+        socket.emit("answer-call",{
+            from: acceptedCaller,
+            to: "{{ session['username'] }}"
+        });
+
+        window.location.replace(
+            "/video_call/" +
+            encodeURIComponent(acceptedCaller) +
+            "?incoming=1"
+        );
+
+        return;
+    }
+
+    /*
+     * EXISTING VOICE CALL FLOW
+     * remains unchanged.
+     */
     document.getElementById("callPopup").style.display="flex";
 
-callSeconds = 0;
-startTimer();
+    callSeconds = 0;
+    startTimer();
 
-if(!peerConnection){
-    createPeer();
-}
+    if(!peerConnection){
+        createPeer();
+    }
 
+    socket.emit("answer-call",{
+        from: acceptedCaller,
+        to: "{{ session['username'] }}"
+    });
 
-socket.on("call-rejected",function(){
+    const answer =
+        await peerConnection.createAnswer();
 
-    stopTimer();
+    await peerConnection.setLocalDescription(answer);
 
-    document.getElementById("callPopup").style.display="none";
-
-    alert("Call declined");
-
-});
-
-
-
-socket.emit("answer-call",{
-    from: currentCaller,
-    to: "{{ session['username'] }}"
-});
-
-
-
-const answer = await peerConnection.createAnswer();
-
-await peerConnection.setLocalDescription(answer);
-
-socket.emit("answer",{
-    to: currentCaller,
-    from:"{{ session['username'] }}",
-    answer:answer
-});
-
+    socket.emit("answer",{
+        to: acceptedCaller,
+        from:"{{ session['username'] }}",
+        answer:answer
+    });
 
 }
 

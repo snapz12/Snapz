@@ -902,6 +902,17 @@ socket.on("call-rejected", function(data){
 
     cleanupCall();
 
+    setStatus("Call rejected");
+
+    setTimeout(function(){
+
+        window.location.replace(
+            "/chat/" +
+            encodeURIComponent(otherUser)
+        );
+
+    },400);
+
 });
 
 

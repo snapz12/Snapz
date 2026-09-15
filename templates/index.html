@@ -2003,6 +2003,12 @@ console.log(document.getElementById("createBtn"));
 document.getElementById("createBtn").onclick = function() {
 
 console.log("Create Clicked");
+
+// Stop Home Feed Post Music when Create opens
+if (typeof window.snapzStopPostMusic === "function") {
+    window.snapzStopPostMusic();
+}
+
     let camera = document.getElementById("cameraPage");
     camera.style.display = "block";
     document.body.style.overflow = "hidden";

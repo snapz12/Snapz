@@ -684,7 +684,7 @@ def home():
 
     cur.execute(
         """
-        SELECT id, username, image, audio, music_start, music_end, media_type
+        SELECT id, username, image, audio, music_start, music_end, media_type, caption
         FROM stories
         WHERE username=?
         AND datetime(created_at) >= datetime('now','-1 day')
@@ -706,15 +706,15 @@ def home():
             row[3],
             row[4],
             row[5],
-            row[6]
-
+            row[6],
+            row[7]
         )
 
     my_story_file = row[2] if row else None
 
 
     cur.execute("""
-        SELECT id, username, image, audio, music_start, music_end, media_type
+        SELECT id, username, image, audio, music_start, music_end, media_type, caption
         FROM stories
         WHERE datetime(created_at) >= datetime('now','-1 day')
         ORDER BY username, id DESC
@@ -728,7 +728,7 @@ def home():
     ]
 
     cur.execute("""
-        SELECT id,username,image
+        SELECT id,username,image,audio,music_start,music_end,media_type,caption
         FROM stories
         WHERE username!=?
         ORDER BY id DESC
@@ -745,7 +745,7 @@ def home():
 
 
     cur.execute("""
-        SELECT id, username, image, audio, music_start, music_end, media_type
+        SELECT id, username, image, audio, music_start, music_end, media_type, caption
         FROM stories
         WHERE datetime(created_at) >= datetime('now','-1 day')
         ORDER BY username, id DESC

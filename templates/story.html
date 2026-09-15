@@ -317,6 +317,23 @@
 }
 
 
+#simpleStoryCaption{
+    position:absolute;
+    left:20px;
+    right:20px;
+    bottom:35px;
+    z-index:2147483648;
+    display:none;
+    color:white;
+    text-align:center;
+    font-size:17px;
+    line-height:1.4;
+    font-weight:500;
+    text-shadow:0 2px 8px rgba(0,0,0,0.85);
+    pointer-events:none;
+    word-break:break-word;
+}
+
 #simpleStoryImage,
 #simpleStoryVideo{
     display:none;
@@ -440,7 +457,8 @@
             '{{ my_story[1] }}',
             '{{ my_story[3] or "" }}',
             '{{ my_story[4] or 0 }}',
-            '{{ my_story[5] or 0 }}'
+            '{{ my_story[5] or 0 }}',
+            '{{ my_story[7] or "" }}'
         )"
     >
 
@@ -521,7 +539,8 @@
         '{{ story[1] }}',
         '{{ story[3] or "" }}',
         '{{ story[4] or 0 }}',
-        '{{ story[5] or 0 }}'
+        '{{ story[5] or 0 }}',
+        '{{ story[7] or "" }}'
     )"
 >
 
@@ -661,6 +680,8 @@
         controls
         playsinline
     ></video>
+
+    <div id="simpleStoryCaption"></div>
 
 </div>
 
@@ -818,7 +839,7 @@ let simpleStoryTimer = null;
    OPEN STORY
 ========================= */
 
-function simpleOpenStory(storyId, mediaUrl, username,audioUrl,musicStart,musicEnd){
+function simpleOpenStory(storyId, mediaUrl, username,audioUrl,musicStart,musicEnd,caption){
 
     /*
        Purana timer clear karo
@@ -1056,6 +1077,28 @@ console.log(
         document.getElementById(
             "simpleStoryVideo"
         );
+
+      const captionElement =
+          document.getElementById(
+              "simpleStoryCaption"
+          );
+
+      /* =========================
+         STORY CAPTION
+      ========================= */
+
+      if(captionElement){
+
+          const storyCaption =
+              String(caption || "").trim();
+
+          captionElement.textContent =
+              storyCaption;
+
+          captionElement.style.display =
+              storyCaption ? "block" : "none";
+      }
+
 
 
     if(
@@ -1503,7 +1546,8 @@ function simplenextStory(){
                 story[1],
                 story[3],
                 story[4],
-                story[5]
+                story[5],
+                story[7]
             );
 
         }
@@ -1581,7 +1625,8 @@ function simplenextStory(){
                 story[1],
                 story[3],
                 story[4],
-                story[5]
+                story[5],
+                story[7]
             );
 
         }
@@ -1628,7 +1673,8 @@ simpleOpenStory(
     story[1],
     story[3],
     story[4],
-    story[5]
+    story[5],
+    story[7]
 );
 
         return;
@@ -1677,7 +1723,8 @@ simpleOpenStory(
     story[1],
     story[3],
     story[4],
-    story[5]
+    story[5],
+    story[7]
 );
 
         }

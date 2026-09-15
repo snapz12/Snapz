@@ -1637,7 +1637,7 @@ touch-action:none;">
     class="music-icon-btn"
     type="button"
     aria-label="Add Music"
-    onclick="openSnapzStoryMusic()"
+    onclick="openSnapzPostReelMusic('story')"
 >
     <svg viewBox="0 0 24 24" aria-hidden="true">
         <path d="M9 18V5l10-2v13"></path>
@@ -2129,7 +2129,11 @@ function resetMediaView() {
         previewVid.pause();
         previewVid.style.display = "none";
     }
-    selectedFile = null;
+    // Story Editor ke selected media ko clear mat karo
+    if (mode !== "story") {
+        selectedFile = null;
+    }
+    
     document.getElementById("timer").innerHTML = "00:00";
     recording = false;
 }
@@ -3923,10 +3927,37 @@ if (mode === "post") {
     );
 }
 
-    formData.append(
-        "caption",
-        document.getElementById("caption").value.trim()
-    );
+      // STORY uses Story Editor caption.
+      // POST/REEL keep existing caption system unchanged.
+      let uploadCaption = "";
+
+      if (mode === "story") {
+          const storyCaptionInput =
+              document.getElementById("storyTextInput");
+
+          const storyCaptionLayer =
+              document.getElementById("storyTextLayer");
+
+          uploadCaption =
+              (
+                  storyCaptionInput?.value ||
+                  storyCaptionLayer?.textContent ||
+                  ""
+              ).trim();
+      } else {
+          uploadCaption =
+              document.getElementById("caption").value.trim();
+      }
+
+      formData.append(
+          "caption",
+          uploadCaption
+      );
+
+      console.log(
+          "FINAL UPLOAD CAPTION =",
+          uploadCaption
+      );
 
     formData.append("type", mode);
 
@@ -4315,102 +4346,78 @@ if (mode === "post") {
       }
 
 
+        /* =========================
+           STORY MUSIC
+           USE SHARED POST/REEL MUSIC SELECTION
+        ========================= */
+
+        if (mode === "story") {
+
+            const selectedStoryAudio =
+                window.snapzSelectedAudio;
+
+            if (
+                selectedStoryAudio &&
+                selectedStoryAudio.url
+            ) {
+
+                const musicStart =
+                    Number(
+                        selectedStoryAudio.startTime || 0
+                    );
+
+                const musicDuration =
+                    Number(
+                        selectedStoryAudio.duration || 0
+                    );
+
+                const musicEnd =
+                    musicStart + musicDuration;
+
+                formData.append(
+                    "music_url",
+                    selectedStoryAudio.url
+                );
+
+                formData.append(
+                    "music_start",
+                    String(musicStart)
+                );
+
+                formData.append(
+                    "music_end",
+                    String(musicEnd)
+                );
+
+                formData.append(
+                    "music_duration",
+                    String(musicDuration)
+                );
+
+                formData.append(
+                    "music_id",
+                    String(
+                        selectedStoryAudio.id || ""
+                    )
+                );
+
+                console.log(
+                    "STORY MUSIC UPLOAD DATA =",
+                    selectedStoryAudio
+                );
+
+            } else {
+
+                console.log(
+                    "NO STORY MUSIC SELECTED"
+                );
+            }
+        }
+
       /* =========================
-         FRESH STORY MUSIC
-      ========================= */
+         UPLOAD START
 
-      if (mode === "story") {
-
-          const savedMusic =
-              sessionStorage.getItem(
-                  "snapz_story_music_fresh"
-              );
-
-          if (savedMusic) {
-
-              try {
-
-                  const musicData =
-                      JSON.parse(
-                          savedMusic
-                      );
-
-                  if (
-                      musicData &&
-                      musicData.url
-                  ) {
-
-                      formData.append(
-                          "music_url",
-                          musicData.url
-                      );
-
-                      formData.append(
-                          "music_start",
-                          String(
-                              Number(
-                                  musicData.start || 0
-                              )
-                          )
-                      );
-
-                      formData.append(
-                          "music_end",
-                          String(
-                              Number(
-                                  musicData.end || 0
-                              )
-                          )
-                      );
-
-                      formData.append(
-                          "music_duration",
-                          String(
-                              Number(
-                                  musicData.duration || 0
-                              )
-                          )
-                      );
-
-                      formData.append(
-                          "music_id",
-                          String(
-                              musicData.id || ""
-                          )
-                      );
-
-                      console.log(
-                          "FRESH STORY MUSIC UPLOAD DATA =",
-                          musicData
-                      );
-
-                  }
-
-              } catch (error) {
-
-                  console.error(
-                      "FRESH STORY MUSIC DATA ERROR =",
-                      error
-                  );
-
-              }
-
-          } else {
-
-              console.log(
-                  "NO FRESH STORY MUSIC SELECTED"
-              );
-
-          }
-
-      }
-
-
-
-    /* =========================
-       UPLOAD START
-    ========================= */
-
+           ========================= */
     console.log(
         "UPLOAD STARTED"
     );
@@ -4419,6 +4426,43 @@ if (mode === "post") {
     xhr.send(formData);
 }
 
+
+function closeStoryEditor(){
+    const editor = document.getElementById("storyEditor");
+
+    if (editor) {
+        editor.style.display = "none";
+    }
+
+    const img = document.getElementById("storyImage");
+    const vid = document.getElementById("storyVideo");
+
+    if (img) {
+        img.src = "";
+        img.style.display = "none";
+    }
+
+    if (vid) {
+        vid.pause();
+        vid.src = "";
+        vid.style.display = "none";
+    }
+
+    const textInput = document.getElementById("storyTextInput");
+    const textLayer = document.getElementById("storyTextLayer");
+
+    if (textInput) {
+        textInput.style.display = "none";
+    }
+
+    if (textLayer) {
+        textLayer.style.display = "none";
+    }
+
+    document.body.style.overflow = "auto";
+
+    console.log("STORY EDITOR CLOSED");
+}
 
 function openStoryEditor(){
 
@@ -4446,6 +4490,13 @@ function openStoryEditor(){
 
     if (editorTools) {
         editorTools.style.display = "flex";
+        editorTools.style.position = "absolute";
+        editorTools.style.top = "90px";
+        editorTools.style.right = "20px";
+        editorTools.style.flexDirection = "column";
+        editorTools.style.alignItems = "center";
+        editorTools.style.gap = "12px";
+        editorTools.style.zIndex = "999999";
     }
 
     if (img) {

@@ -27,7 +27,11 @@
 
     window.openSnapzPostReelMusic = function (target) {
 
-        if (target !== "post" && target !== "reel") {
+        if (
+            target !== "post" &&
+            target !== "reel" &&
+            target !== "story"
+        ) {
             console.error("SNAPZ MUSIC: invalid target", target);
             return;
         }
@@ -354,7 +358,43 @@
             );
         }
 
-        // 2. Fallback: Check active Video
+        // 2. STORY: use the currently selected Story media
+        if (
+            !mediaSrc &&
+            currentTarget === "story"
+        ) {
+            try {
+                const storyFile =
+                    (typeof selectedFile !== "undefined")
+                        ? selectedFile
+                        : null;
+
+                if (storyFile) {
+                    mediaSrc =
+                        URL.createObjectURL(
+                            storyFile
+                        );
+
+                    isVideo =
+                        storyFile.type &&
+                        storyFile.type.startsWith(
+                            "video"
+                        );
+
+                    console.log(
+                        "SNAPZ STORY TRIM MEDIA =",
+                        storyFile.name
+                    );
+                }
+            } catch (e) {
+                console.log(
+                    "SNAPZ STORY TRIM MEDIA ERROR =",
+                    e
+                );
+            }
+        }
+
+        // 3. Fallback: Check active Video
         if (!mediaSrc) {
             allVideos.forEach(v => {
                 if (v.src && !v.closest("#snapzTrimScreenPanel")) {
@@ -374,7 +414,7 @@
             });
         }
 
-        // 3. Fallback: Check active Image
+        // 4. Fallback: Check active Image
         if (!mediaSrc) {
             allImages.forEach(img => {
                 if (
@@ -388,7 +428,7 @@
             });
         }
 
-        // 4. Final fallback: Read file direct from File Input
+        // 5. Final fallback: Read file direct from File Input
         if (
             !mediaSrc &&
             fileInput &&

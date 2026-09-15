@@ -7947,6 +7947,13 @@ document.addEventListener("DOMContentLoaded", function() {
             stopMusic(activeMusic);
         }
 
+        // Respect manual mute until page refresh or manual unmute
+        if(music.dataset.snapzManualMuted === "1"){
+            activeMusic = null;
+            stopMusic(music);
+            return;
+        }
+
         activeMusic = music;
 
         const start = Number(music.dataset.start || 0);
@@ -8314,10 +8321,16 @@ window.snapzTogglePostMusic = function(button) {
             music.currentTime = 0;
         }
 
+        // Remember manual mute for this post until page refresh
+        music.dataset.snapzManualMuted = "1";
+
         button.dataset.musicOn = "0";
         button.setAttribute("aria-label", "Turn music on");
 
     } else {
+
+        // Manual unmute clears the mute lock
+        delete music.dataset.snapzManualMuted;
 
         if (typeof window.snapzPlayPostMusic === "function") {
             window.snapzPlayPostMusic(post);

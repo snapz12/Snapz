@@ -7711,22 +7711,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 snapzCropState.lastY = snapzCropState.y;
             }
         } else {
-            // Swipe Carousel logic when adjustment mode is OFF
-            if (e.changedTouches.length === 1) {
-                let touchEndX = e.changedTouches[0].clientX;
-                let diffX = touchStartX - touchEndX;
-                let maxFiles = (typeof selectedFiles !== "undefined" && selectedFiles) ? selectedFiles.length : 1;
-
-                if (Math.abs(diffX) > 50) {
-                    if (diffX > 0 && window.postEditCurrentIndex < maxFiles - 1) {
-                        snapzSwitchAdjustPhoto(window.postEditCurrentIndex + 1);
-                        if (typeof renderPostPreview === "function") renderPostPreview();
-                    } else if (diffX < 0 && window.postEditCurrentIndex > 0) {
-                        snapzSwitchAdjustPhoto(window.postEditCurrentIndex - 1);
-                        if (typeof renderPostPreview === "function") renderPostPreview();
-                    }
-                }
-            }
+            // OLD CAROUSEL SWIPE DISABLED.
+            // Unified multi-photo swipe engine handles navigation.
         }
     });
 });

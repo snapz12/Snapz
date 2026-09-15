@@ -872,6 +872,17 @@ socket.on("call-ended", function(data){
 
     cleanupCall();
 
+    setStatus("Call ended");
+
+    setTimeout(function(){
+
+        window.location.replace(
+            "/chat/" +
+            encodeURIComponent(otherUser)
+        );
+
+    },400);
+
 });
 
 

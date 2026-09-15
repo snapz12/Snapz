@@ -1737,23 +1737,19 @@ async function startCall(type){
             type:"video"
         });
 
-        ringTimeout = setTimeout(function(){
+        /*
+         * Let Socket.IO deliver call-user before
+         * navigating to the fullscreen video page.
+         */
+        setTimeout(function(){
 
-            socket.emit("missed-call",{
-                from:"{{ session['username'] }}",
-                to:"{{ chat_with }}",
-                type:"video"
-            });
+            window.location.replace(
+                "/video_call/" +
+                encodeURIComponent("{{ chat_with }}") +
+                "?outgoing=1"
+            );
 
-            cancelCall();
-
-        },30000);
-
-        window.location.replace(
-            "/video_call/" +
-            encodeURIComponent("{{ chat_with }}") +
-            "?outgoing=1"
-        );
+        }, 500);
 
         return;
     }

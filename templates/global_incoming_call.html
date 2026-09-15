@@ -267,12 +267,12 @@
         globalPendingCandidates = [];
 
 
-        titleText.innerHTML = "Incoming Call";
+        titleText.innerHTML = String(globalCaller) + " is calling";
 
         typeText.innerHTML =
             globalCallType === "video"
-                ? "Video Call"
-                : "Voice Call";
+                ? "Incoming Video Call"
+                : "Incoming Voice Call";
 
 
         setIcon(globalCallType);

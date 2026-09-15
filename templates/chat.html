@@ -2061,6 +2061,51 @@ if (audio) {
 
 });
 
+socket.on("call-rejected",function(data){
+
+    if(
+        data &&
+        data.from &&
+        data.from !== currentCaller &&
+        data.from !== "{{ chat_with }}"
+    ){
+        return;
+    }
+
+    console.log("REMOTE CALL REJECTED");
+
+    clearTimeout(ringTimeout);
+    stopTimer();
+
+    document.getElementById("callPopup").style.display="none";
+    document.getElementById("incomingCallPopup").style.display="none";
+
+    if(peerConnection){
+        try{
+            peerConnection.close();
+        }catch(e){}
+
+        peerConnection = null;
+    }
+
+    if(localStream){
+        localStream.getTracks().forEach(function(track){
+            try{
+                track.stop();
+            }catch(e){}
+        });
+
+        localStream = null;
+    }
+
+    let audio = document.getElementById("remoteAudio");
+
+    if(audio){
+        audio.srcObject = null;
+    }
+
+});
+
 function toggleCallHistory(){
 
     document.getElementById("callHistoryBox")

@@ -863,7 +863,8 @@ socket.on("call-ended", function(data){
     if(
         data &&
         data.from &&
-        data.from !== otherUser
+        data.from !== otherUser &&
+        data.to !== otherUser
     ){
         return;
     }
@@ -891,7 +892,8 @@ socket.on("call-rejected", function(data){
     if(
         data &&
         data.from &&
-        data.from !== otherUser
+        data.from !== otherUser &&
+        data.to !== otherUser
     ){
         return;
     }

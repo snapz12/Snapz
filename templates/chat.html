@@ -2066,8 +2066,8 @@ socket.on("call-rejected",function(data){
     if(
         data &&
         data.from &&
-        data.from !== currentCaller &&
-        data.from !== "{{ chat_with }}"
+        data.from !== "{{ chat_with }}" &&
+        data.to !== "{{ chat_with }}"
     ){
         return;
     }

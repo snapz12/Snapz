@@ -1996,6 +1996,85 @@ let mediaRecorder;
 let chunks = [];
 let recording = false;
 let allStories = {{ all_stories|tojson }};
+
+/* ============================================================
+   SNAPZ NOTIFICATION -> EXACT STORY DEEP LINK
+   ============================================================ */
+
+(function(){
+
+    function openNotificationStory(){
+
+        const params = new URLSearchParams(window.location.search);
+        const storyId = params.get("open");
+
+        if(!storyId){
+            return;
+        }
+
+        if(!Array.isArray(allStories)){
+            console.log("STORY DEEP LINK: allStories not ready");
+            return;
+        }
+
+        const story = allStories.find(function(item){
+
+            return String(item[0]) === String(storyId);
+
+        });
+
+        if(!story){
+
+            console.log(
+                "STORY DEEP LINK: story not found =",
+                storyId
+            );
+
+            return;
+        }
+
+        console.log(
+            "STORY DEEP LINK: opening exact story =",
+            story
+        );
+
+        if(typeof simpleOpenStory === "function"){
+
+            simpleOpenStory(
+                story[0],
+                story[2],
+                story[1],
+                story[3],
+                story[4],
+                story[5],
+                story[7]
+            );
+
+        }else{
+
+            console.log(
+                "STORY DEEP LINK: simpleOpenStory not ready"
+            );
+
+        }
+
+    }
+
+    if(document.readyState === "loading"){
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            openNotificationStory
+        );
+
+    }else{
+
+        openNotificationStory();
+
+    }
+
+})();
+
 let storyList = {{ all_stories|tojson }};
 console.log("ALL STORIES =", allStories);
 
@@ -5032,7 +5111,7 @@ function toggleSearchFollow(username){
 
 <body>
 {% for post in posts %}
-<div class="post">
+<div class="post" id="post-{{ post[4] }}">
     <div class="post-header">
         <div style="display: flex; align-items: center; gap: 10px;">
 {% set pic = post[3] or 'default.jpg' %}

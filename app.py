@@ -1651,6 +1651,44 @@ def upload():
                 )
             )
             reel_id = cur.lastrowid
+
+            # -----------------------------------------------------
+            # NOTIFY FOLLOWERS ABOUT NEW REEL
+            # -----------------------------------------------------
+            cur.execute(
+                """
+                SELECT follower_username
+                FROM followers
+                WHERE followed_username=?
+                """,
+                (username,)
+            )
+
+            reel_followers = cur.fetchall()
+
+            for follower_row in reel_followers:
+                follower_username = follower_row[0]
+
+                if not follower_username or follower_username == username:
+                    continue
+
+                cur.execute(
+                    """
+                    INSERT INTO notifications(
+                        user_to,
+                        user_from,
+                        action,
+                        post_id
+                    )
+                    VALUES(?,?,?,?)
+                    """,
+                    (
+                        follower_username,
+                        username,
+                        "uploaded a new reel",
+                        reel_id
+                    )
+                )
             
             # Save tagged users (Max 5 limit)
             tagged_users_str = request.form.get("tagged_users", "")
@@ -2125,6 +2163,44 @@ def upload():
         )
 
         post_id = cur.lastrowid
+
+        # -----------------------------------------------------
+        # NOTIFY FOLLOWERS ABOUT NEW POST
+        # -----------------------------------------------------
+        cur.execute(
+            """
+            SELECT follower_username
+            FROM followers
+            WHERE followed_username=?
+            """,
+            (username,)
+        )
+
+        post_followers = cur.fetchall()
+
+        for follower_row in post_followers:
+            follower_username = follower_row[0]
+
+            if not follower_username or follower_username == username:
+                continue
+
+            cur.execute(
+                """
+                INSERT INTO notifications(
+                    user_to,
+                    user_from,
+                    action,
+                    post_id
+                )
+                VALUES(?,?,?,?)
+                """,
+                (
+                    follower_username,
+                    username,
+                    "uploaded a new post",
+                    post_id
+                )
+            )
 
         # -----------------------------------------------------
         # SAVE TAGGED PEOPLE
@@ -2666,13 +2742,14 @@ def share_post():
         cur.execute(
             """
             INSERT INTO notifications
-            (user_to,user_from,action)
-            VALUES(?,?,?)
+            (user_to,user_from,action,post_id)
+            VALUES(?,?,?,?)
             """,
             (
                 receiver,
                 session["username"],
-                "shared a post with you 📤"
+                "shared a post with you 📤",
+                post_id
             )
         )
 
@@ -3179,29 +3256,53 @@ def notifications():
             if tag_row:
                 tag_accepted = bool(tag_row[0])
 
-        if action == "like":
+        if action in ("like", "liked your post ❤️", "liked your post"):
             text = " liked your post"
-            link = "/"
+            link = f"/#post-{row[3]}" if row[3] is not None else "/"
 
-        elif action == "comment":
-            text = " commented on your post"
-            link = "/"
+        elif action in ("comment", "reply"):
+            text = " replied to your post" if action == "reply" else " commented on your post"
+            link = f"/#post-{row[3]}" if row[3] is not None else "/"
 
         elif action == "follow":
             text = " started following you"
-            link = f"/user/{user_from}"
+            link = f"/profile/{user_from}"
 
-        elif action == "reel_like":
+        elif action in ("reel_like", "liked your reel ❤️", "liked your reel"):
             text = " liked your reel"
-            link = "/reels"
+            link = f"/reel/{row[3]}" if row[3] is not None else "/reels"
 
         elif action == "reel_comment":
             text = " commented on your reel"
-            link = "/reels"
+            link = f"/reel/{row[3]}" if row[3] is not None else "/reels"
 
         elif action == "mention":
             text = "@ mentioned you"
-            link = "/"
+            link = f"/#post-{row[3]}" if row[3] is not None else "/"
+
+        elif action == "tagged you in a post":
+            text = " tagged you in a post"
+            link = f"/#post-{row[3]}" if row[3] is not None else "/"
+
+        elif "shared a post" in action:
+            text = " shared a post with you"
+            link = f"/#post-{row[3]}" if row[3] is not None else "/"
+
+        elif "shared a reel" in action:
+            text = " shared a reel with you"
+            link = f"/reel/{row[3]}" if row[3] is not None else "/reels"
+
+        elif action == "uploaded a new post":
+            text = " uploaded a new post 📸"
+            link = f"/#post-{row[3]}" if row[3] is not None else "/"
+
+        elif action == "uploaded a new reel":
+            text = " uploaded a new reel 🎬"
+            link = f"/reel/{row[3]}" if row[3] is not None else "/reels"
+
+        elif action == "liked your story":
+            text = " liked your story"
+            link = f"/?open={row[3]}" if row[3] is not None else "/"
 
         elif action == "support_reply":
             text = " Snapz Support replied to your support request."
@@ -3806,13 +3907,14 @@ def like_post(post_id):
             cur.execute(
                 """
                 INSERT INTO notifications
-                (user_to, user_from, action)
-                VALUES(?,?,?)
+                (user_to, user_from, action, post_id)
+                VALUES(?,?,?,?)
                 """,
                 (
                     owner_username,
                     username,
-                    "liked your post ❤️"
+                    "liked your post ❤️",
+                    post_id
                 )
             )
 
@@ -4484,13 +4586,15 @@ def comment_post(post_id):
             INSERT INTO notifications(
                 user_to,
                 user_from,
-                action
+                action,
+                post_id
             )
-            VALUES(?,?,?)
+            VALUES(?,?,?,?)
         """, (
             owner[0],
             username,
-            notification_action
+            notification_action,
+            post_id
         ))
 
     conn.commit()
@@ -4595,12 +4699,13 @@ def like_reel(reel_id):
 
         cur.execute("""
             INSERT INTO notifications
-            (user_to, user_from, action)
-            VALUES(?,?,?)
+            (user_to, user_from, action, post_id)
+            VALUES(?,?,?,?)
         """, (
             owner,
             liker,
-            "liked your reel ❤️"
+            "liked your reel ❤️",
+            reel_id
         ))
 
     conn.commit()
@@ -4651,37 +4756,47 @@ def download_reel(reel_id):
 @app.route("/like_story/<int:story_id>", methods=["POST"])
 def like_story(story_id):
 
+    if "username" not in session:
+        return jsonify({
+            "status": "error",
+            "message": "Login required"
+        }), 401
+
     liker = session["username"]
 
     conn = sqlite3.connect("snapz.db")
     cur = conn.cursor()
 
-    # story owner nikalo
+    # Story owner nikalo
     cur.execute(
         "SELECT username FROM stories WHERE id=?",
         (story_id,)
     )
 
-    cur.execute("""
-        INSERT INTO notifications
-        (user_to, user_from, action)
-        VALUES (?, ?, ?)
-    """, (
-    owner,
-    liker,
-    "liked your story"
-    ))
-    owner = cur.fetchone()[0]
+    owner_row = cur.fetchone()
 
-    cur.execute("""
-        INSERT INTO notifications
-        (user_to, user_from, action)
-        VALUES (?, ?, ?)
-    """, (
-    owner,
-    liker,
-    "liked your story"
-    ))
+    if not owner_row:
+        conn.close()
+        return jsonify({
+            "status": "error",
+            "message": "Story not found"
+        }), 404
+
+    owner = owner_row[0]
+
+    # Notification
+    if owner != liker:
+
+        cur.execute("""
+            INSERT INTO notifications
+            (user_to, user_from, action, post_id)
+            VALUES (?, ?, ?, ?)
+        """, (
+            owner,
+            liker,
+            "liked your story",
+            story_id
+        ))
 
     conn.commit()
     conn.close()
@@ -4809,6 +4924,35 @@ def comment_reel(reel_id):
     ))
 
     comment_id = cur.lastrowid
+
+    # -----------------------------------------------------
+    # REEL COMMENT / REPLY NOTIFICATION
+    # -----------------------------------------------------
+    cur.execute("""
+        SELECT username
+        FROM reels
+        WHERE id=?
+        LIMIT 1
+    """, (reel_id,))
+
+    reel_owner_row = cur.fetchone()
+
+    if reel_owner_row and reel_owner_row[0] != username:
+
+        cur.execute("""
+            INSERT INTO notifications(
+                user_to,
+                user_from,
+                action,
+                post_id
+            )
+            VALUES(?,?,?,?)
+        """, (
+            reel_owner_row[0],
+            username,
+            "reel_comment",
+            reel_id
+        ))
 
     cur.execute("""
         SELECT profile_pic
@@ -4957,13 +5101,14 @@ def send_reel(reel_id, username):
         cur.execute(
             """
             INSERT INTO notifications
-            (user_to,user_from,action)
-            VALUES(?,?,?)
+            (user_to,user_from,action,post_id)
+            VALUES(?,?,?,?)
             """,
             (
                 username,
                 sender,
-                "shared a reel with you 🎬"
+                "shared a reel with you 🎬",
+                reel_id
             )
         )
 

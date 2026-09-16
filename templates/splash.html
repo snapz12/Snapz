@@ -1,116 +1,1436 @@
- <!DOCTYPE html>
-
-<html>
-
+<!DOCTYPE html>
+<html lang="en">
 <head>
+<meta charset="UTF-8">
 
-<title>SLOGAN</title>
+<meta name="viewport"
+      content="width=device-width,
+      initial-scale=1.0,
+      maximum-scale=1.0,
+      user-scalable=no">
 
+<title>Snapz Splash</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@500;600;700&display=swap"
+      rel="stylesheet">
+  
 <style>
 
+/* =========================================================
+   SNAPZ PREMIUM SPLASH
+   HTML + CSS + JS — SINGLE FILE
+========================================================= */
 
+*{
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+}
 
-#splash{
+html,
+body{
+    width:100%;
+    height:100%;
+    margin:0;
+    padding:0;
+    overflow:hidden;
+    background:#020003;
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+    user-select:none;
+}
+
+/* =========================================================
+   BACKGROUND
+========================================================= */
+
+#snapzSplash{
     position:fixed;
     inset:0;
-    background:#000;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
-    z-index:999999;
+    overflow:hidden;
+    background:
+        radial-gradient(
+            circle at 50% 42%,
+            rgba(255,0,135,.22),
+            transparent 25%
+        ),
+        radial-gradient(
+            circle at 50% 70%,
+            rgba(105,0,255,.15),
+            transparent 35%
+        ),
+        linear-gradient(
+            180deg,
+            #010102 0%,
+            #09000d 52%,
+            #020003 100%
+        );
 }
 
-#snapzLogo{
-    width:280px;
-    opacity:0;
-    transform:scale(.3);
-    animation:logoZoom 1.4s ease forwards;
-}
+/* Vignette */
 
-#snapzSlogan{
+#snapzSplash::after{
+    content:"";
     position:absolute;
-    bottom:10%;
-    width:100%;
-    text-align:center;
+    inset:0;
+    z-index:100;
+    pointer-events:none;
 
-    font-family:sans-serif;
-    font-size:30px;
-    font-weight:600;
-    letter-spacing:1px;
-
-    color:white;
-
-    opacity:1;
+    background:
+        radial-gradient(
+            circle,
+            transparent 42%,
+            rgba(0,0,0,.72) 100%
+        );
 }
 
-#snapzSlogan .pink{
-    color:#FF3D81;
+/* =========================================================
+   AMBIENT GLOW
+========================================================= */
+
+.snapzGlow{
+    position:absolute;
+    border-radius:50%;
+    pointer-events:none;
+    filter:blur(60px);
 }
 
-@keyframes logoZoom{
+.snapzGlowOne{
+    width:55vw;
+    height:55vw;
 
-0%{
-opacity:0;
-transform:scale(.3);
+    left:23vw;
+    top:25vh;
+
+    background:#ff007f;
+    opacity:.35;
+
+    animation:
+        snapzGlowPulse
+        4s
+        ease-in-out
+        infinite;
 }
 
-70%{
-opacity:1;
-transform:scale(1.08);
+.snapzGlowTwo{
+    width:38vw;
+    height:38vw;
+
+    left:42vw;
+    top:5vh;
+
+    background:#ff7800;
+    opacity:.15;
+
+    animation:
+        snapzGlowPulse
+        5s
+        ease-in-out
+        infinite
+        reverse;
 }
 
-100%{
-opacity:1;
-transform:scale(1);
+@keyframes snapzGlowPulse{
+
+    0%,
+    100%{
+        transform:scale(.92);
+        opacity:.25;
+    }
+
+    50%{
+        transform:scale(1.1);
+        opacity:.55;
+    }
 }
 
+/* =========================================================
+   MAIN STAGE
+========================================================= */
+
+.snapzStage{
+    position:absolute;
+    inset:0;
+
+    display:flex;
+    align-items:center;
+    flex-direction:column;
+
+    padding-top:29vh;
+
+    z-index:10;
 }
 
-@keyframes showText{
+/* =========================================================
+   MAIN CAMERA LOGO
+========================================================= */
 
-from{
-opacity:0;
+.snapzLogoWrap{
+
+    opacity:0;
+
+    transform:
+        translateY(55px)
+        scale(.30)
+        rotate(-18deg);
+
+    animation:
+        snapzLogoIn
+        1.2s
+        cubic-bezier(.17,.89,.26,1.22)
+        .20s
+        forwards;
 }
 
-to{
-opacity:1;
+.snapzBubble{
+
+    position:relative;
+
+    width:145px;
+    height:145px;
+
+    border-radius:
+        50%
+        50%
+        50%;
+
+    transform:rotate(-7deg);
+
+    background:
+        linear-gradient(
+            135deg,
+            #ff007d 4%,
+            #e90082 35%,
+            #ff285d 60%,
+            #ff8b18 100%
+        );
+
+    box-shadow:
+
+        0 0 20px rgba(255,0,128,.9),
+
+        0 0 55px
+        rgba(255,0,130,.55),
+
+        inset
+        8px
+        8px
+        25px
+        rgba(255,255,255,.12);
 }
 
+/* White dot */
+
+.snapzBubble::before{
+
+    content:"";
+
+    position:absolute;
+
+    right:18px;
+    top:18px;
+
+    width:14px;
+    height:14px;
+
+    border-radius:50%;
+
+    background:white;
+
+    box-shadow:
+        0 0 12px white;
 }
-@keyframes fadeIn{
+
+
+.snapzBubble::after {
+    content: "";
+    position: absolute;
+    
+    /* Tail ki positioning adjust ki hai */
+    left: 7px;
+    bottom: 15px;
+    
+    /* Size chota kiya gaya hai */
+    width: 36px;
+    height: 30px;
+    
+    /* Main bubble ke bottom corner se match hone wala exact gradient */
+    background: linear-gradient(
+        135deg, 
+        
+        #e90082 0%, 
+        #ff285d 50%, 
+        #ff6a18 995%
+    );
+    
+    /* Chote size ke hisab se gol rounded U-curve path */
+    clip-path: path("M 0 0 L 36 0 C 28 15, 24 30, 18 30 C 12 30, 8 15, 0 0 Z");
+    
+    /* Left side ki taraf smooth rotation */
+    transform: rotate(50deg);
+    transform-origin: top left;
+    
+    filter: drop-shadow(-2px 3px 6px rgba(233, 0, 130, 0.4));
+    z-index: -1;
+}
+
+
+/* =========================================================
+   CAMERA LENS
+========================================================= */
+
+.snapzLens{
+
+    position:absolute;
+
+    left:34px;
+    top:34px;
+
+    width:77px;
+    height:77px;
+
+    border-radius:50%;
+
+    border:12px solid white;
+
+    background:#09000f;
+
+    overflow:hidden;
+
+    box-shadow:
+
+        0 0 14px
+        rgba(255,255,255,.7),
+
+        inset
+        0 0 18px
+        #8200ff;
+}
+
+.snapzLensInner{
+
+    position:absolute;
+
+    inset:9px;
+
+    border-radius:50%;
+
+    border:5px solid #2c0060;
+
+    background:
+        radial-gradient(
+            circle at 35% 30%,
+            #42128c,
+            #07000d 65%
+        );
+
+    animation:
+        snapzLensSpin
+        4s
+        linear
+        infinite;
+}
+
+@keyframes snapzLensSpin{
 
     from{
-        opacity:0;
+        transform:rotate(0deg);
     }
 
     to{
+        transform:rotate(360deg);
+    }
+}
+
+/* Lens core */
+
+.snapzLensCore{
+
+    position:absolute;
+
+    width:24px;
+    height:24px;
+
+    left:15px;
+    top:18px;
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle,
+            #05000a 0 42%,
+            #270064 44% 70%,
+            #05000b 72%
+        );
+
+    box-shadow:
+        0 0 9px #7300ff;
+}
+
+/* =========================================================
+   SNAPZ LENS HIGHLIGHTS
+   ========================================================= */
+
+.snapzLensShineOne,
+.snapzLensShineTwo{
+    position:absolute;
+    border-radius:50%;
+    background:#fff;
+    box-shadow:0 0 8px rgba(255,255,255,.9);
+    pointer-events:none;
+}
+
+.snapzLensShineOne{
+    width:11px;
+    height:11px;
+    right:11px;
+    top:12px;
+    opacity:0;
+    animation:snapzLensShineIn .7s ease-out 1.05s forwards;
+}
+
+.snapzLensShineTwo{
+    width:6px;
+    height:6px;
+    right:25px;
+    top:25px;
+    opacity:0;
+    animation:snapzLensShineIn .55s ease-out 1.18s forwards;
+}
+
+
+/* =========================================================
+   SNAPZ LOGO ENTRANCE
+   ========================================================= */
+
+@keyframes snapzLogoIn{
+
+    0%{
+        opacity:0;
+        transform:
+            translateY(42px)
+            scale(.72);
+    }
+
+    55%{
         opacity:1;
+        transform:
+            translateY(-4px)
+            scale(1.025);
+    }
+
+    78%{
+        transform:
+            translateY(1px)
+            scale(.995);
+    }
+
+    100%{
+        opacity:1;
+        transform:
+            translateY(0)
+            scale(1);
+    }
+}
+
+/* =========================================================
+   LENS HIGHLIGHT ANIMATION
+   ========================================================= */
+
+@keyframes snapzLensShineIn{
+
+    0%{
+        opacity:0;
+        transform:scale(.25);
+    }
+
+    65%{
+        opacity:1;
+        transform:scale(1.15);
+    }
+
+    100%{
+        opacity:.9;
+        transform:scale(1);
+    }
+}
+  
+
+/* =========================================================
+   BRAND NAME
+========================================================= */
+
+.snapzBrand{
+
+    margin-top:27px;
+
+    text-align:center;
+
+    position:relative;
+
+    z-index:5;
+}
+
+/* =========================================================
+   SNAPZ BRAND TEXT — PHOTO STYLE
+========================================================= */
+
+.snapzName{
+
+    display:flex;
+
+    align-items:baseline;
+    justify-content:center;
+
+    font-family:'Comfortaa', sans-serif;
+
+    font-size:
+        clamp(
+            64px,
+            18vw,
+            92px
+        );
+
+    font-weight:700;
+
+    color:white;
+
+    letter-spacing:-3px;
+
+    line-height:.9;
+
+    -webkit-text-stroke:1.5px white;
+
+    text-shadow:
+        0 2px 10px
+        rgba(0,0,0,.15);
+}
+
+.snapzName span,
+.snapzName em{
+
+    font-family:'Comfortaa', sans-serif;
+
+    font-style:normal;
+
+    opacity:0;
+
+    transform:
+        translateY(35px)
+        scale(.72);
+
+    animation:
+        snapzLetterIn
+        .65s
+        cubic-bezier(.2,.8,.2,1)
+        forwards;
+}
+
+.snapzName span:nth-child(1){
+    animation-delay:1.00s;
+}
+
+.snapzName span:nth-child(2){
+    animation-delay:1.08s;
+}
+
+.snapzName span:nth-child(3){
+    animation-delay:1.16s;
+}
+
+.snapzName span:nth-child(4){
+    animation-delay:1.24s;
+}
+
+.snapzName em{
+
+    -webkit-text-stroke:1.2px #ff3d81;
+
+    background:
+        linear-gradient(
+            45deg,
+            #ff8a00,
+            #ff007a
+        );
+
+    -webkit-background-clip:text;
+    background-clip:text;
+
+    -webkit-text-fill-color:transparent;
+
+    color:transparent;
+
+    text-shadow:none;
+
+    animation-delay:1.32s;
+}
+
+@keyframes snapzLetterIn{
+
+    to{
+        opacity:1;
+
+        transform:
+            translateY(0)
+            scale(1);
+    }
+}
+
+/* =========================================================
+   TAGLINE
+========================================================= */
+
+.snapzTagline{
+
+    margin-top:20px;
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:10px;
+
+    font-size:12px;
+
+    letter-spacing:4px;
+
+    opacity:0;
+
+    transform:translateY(15px);
+
+    animation:
+        snapzTaglineIn
+        .7s
+        ease
+        1.7s
+        forwards;
+}
+
+.snapzTagline span:nth-child(1){
+    color:#ff3d81;
+}
+
+.snapzTagline span:nth-child(2){
+    color:white;
+}
+
+.snapzTagline span:nth-child(3){
+    color:#ff8a35;
+}
+
+@keyframes snapzTaglineIn{
+
+    to{
+        opacity:.95;
+        transform:translateY(0);
+    }
+}
+
+/* =========================================================
+   SNAPZ PREMIUM LOWER LIGHT TRAILS
+========================================================= */
+
+.snapzTrail{
+    position:absolute;
+
+    left:-8%;
+    right:-8%;
+    bottom:15%;
+
+    height:230px;
+
+    pointer-events:none;
+
+    overflow:hidden;
+
+    transform:rotate(-5deg);
+
+    z-index:1;
+
+    filter:
+        drop-shadow(0 0 10px rgba(255,0,120,.65))
+        drop-shadow(0 0 25px rgba(255,0,120,.25));
+}
+
+.snapzTrail i,
+.snapzTrail b,
+.snapzTrail em{
+
+    position:absolute;
+
+    display:block;
+
+    height:4px;
+
+    border-radius:100%;
+
+    transform-origin:center;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent 0%,
+            #ff007a 35%,
+            #ff1493 55%,
+            #ff5a8f 72%,
+            #ff8a00 92%,
+            transparent 100%
+        );
+
+    box-shadow:
+        0 0 5px #ff007a,
+        0 0 12px rgba(255,0,120,.9),
+        0 0 25px rgba(255,60,120,.55);
+}
+
+.snapzTrail i{
+
+    width:125%;
+
+    left:-5%;
+
+    bottom:35px;
+
+    transform:
+        rotate(-8deg)
+        skewX(-20deg);
+
+    animation:
+        snapzTrailMove 3.8s ease-in-out infinite;
+}
+
+.snapzTrail b{
+
+    width:120%;
+
+    left:8%;
+
+    bottom:72px;
+
+    height:5px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            #ff007a 30%,
+            #ff2b9a 48%,
+            #ff5a8f 67%,
+            #ff8a00 88%,
+            transparent
+        );
+
+    box-shadow:
+        0 0 6px #ff007a,
+        0 0 16px #ff007a,
+        0 0 30px rgba(255,0,120,.7);
+
+    transform:
+        rotate(-9deg)
+        skewX(-24deg);
+
+    animation:
+        snapzTrailMove 3.2s ease-in-out infinite reverse;
+}
+
+.snapzTrail em{
+
+    width:115%;
+
+    left:15%;
+
+    bottom:105px;
+
+    height:2px;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            #ff1493 35%,
+            #ff4d9d 60%,
+            #ff8a00 88%,
+            transparent
+        );
+
+    box-shadow:
+        0 0 5px #ff1493,
+        0 0 14px rgba(255,0,120,.8);
+
+    transform:
+        rotate(-10deg)
+        skewX(-26deg);
+
+    opacity:.85;
+}
+
+.snapzTrail::after{
+
+    content:"";
+
+    position:absolute;
+
+    width:75%;
+    height:80px;
+
+    left:15%;
+    bottom:0;
+
+    background:
+        radial-gradient(
+            ellipse,
+            rgba(255,0,120,.28),
+            rgba(255,0,120,.08) 40%,
+            transparent 72%
+        );
+
+    filter:blur(18px);
+
+    transform:
+        rotate(-8deg);
+
+    opacity:.8;
+}
+
+@keyframes snapzTrailMove{
+
+    0%{
+        transform:
+            translateX(-5%)
+            rotate(-8deg)
+            skewX(-20deg);
+    }
+
+    50%{
+        transform:
+            translateX(3%)
+            rotate(-8deg)
+            skewX(-20deg);
+    }
+
+    100%{
+        transform:
+            translateX(-5%)
+            rotate(-8deg)
+            skewX(-20deg);
     }
 
 }
-</style>
+  
+/* =========================================================
+   FLOATING SOCIAL ELEMENTS
+========================================================= */
 
+.snapzSocial{
+
+    position:absolute;
+
+    z-index:4;
+
+    opacity:0;
+
+    filter:
+        drop-shadow(
+            0 0 10px
+            rgba(255,0,130,.8)
+        );
+
+    animation:
+        snapzSocialIn
+        .8s
+        ease
+        forwards,
+
+        snapzSocialFloat
+        3.5s
+        ease-in-out
+        infinite;
+}
+
+.snapzHeart{
+
+    color:#ff3d81;
+
+    font-size:25px;
+
+    text-shadow:
+        0 0 12px
+        #ff3d81;
+}
+
+.snapzHeartOne{
+
+    left:8%;
+    top:57%;
+
+    animation-delay:
+        2.1s,
+        2.1s;
+}
+
+.snapzHeartTwo{
+
+    left:42%;
+    top:70%;
+
+    animation-delay:
+        2.5s,
+        2.5s;
+}
+
+.snapzCamera{
+
+    width:48px;
+    height:35px;
+
+    border-radius:10px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ff0087,
+            #ff8b2a
+        );
+}
+
+.snapzCamera::after{
+
+    content:"";
+
+    position:absolute;
+
+    width:12px;
+    height:12px;
+
+    border:3px solid white;
+
+    border-radius:50%;
+
+    left:15px;
+    top:7px;
+}
+
+.snapzCameraOne{
+
+    left:9%;
+    top:68%;
+
+    animation-delay:
+        2.3s,
+        2.3s;
+}
+
+.snapzCameraTwo{
+
+    right:7%;
+    top:31%;
+
+    animation-delay:
+        2.7s,
+        2.7s;
+}
+
+.snapzChat{
+
+    right:8%;
+    top:49%;
+
+    width:55px;
+    height:38px;
+
+    border-radius:13px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ff007d,
+            #ff8a30
+        );
+
+    /* Dots ko horizontal aur vertical center karne ke liye flexbox */
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:5px;
+
+    animation-delay:
+        2.5s,
+        2.5s;
+}
+
+/* Chat bubble ke andar 3 fixed dots */
+.snapzChat::before{
+    content:"";
+    width:5px;
+    height:5px;
+    border-radius:50%;
+    background:#ffffff;
+    
+    /* Box shadow ka use karke baki 2 dots generate kiye gaye hain */
+    box-shadow: 
+        -10px 0 0 #ffffff,
+         10px 0 0 #ffffff;
+}
+
+.snapzChat::after{
+
+    content:"";
+
+    position:absolute;
+
+    left:9px;
+    bottom:-9px;
+
+    border-style:solid;
+
+    border-width:
+        9px
+        12px
+        0
+        0;
+
+    border-color:
+        #ff007d
+        transparent
+        transparent
+        transparent;
+}
+
+
+@keyframes snapzSocialIn{
+
+    to{
+        opacity:.8;
+    }
+}
+
+@keyframes snapzSocialFloat{
+
+    0%,
+    100%{
+        transform:
+            translateY(0)
+            rotate(0deg);
+    }
+
+    50%{
+        transform:
+            translateY(-13px)
+            rotate(3deg);
+    }
+}
+
+/* =========================================================
+   PARTICLES
+========================================================= */
+
+.snapzParticle{
+
+    position:absolute;
+
+    border-radius:50%;
+
+    z-index:2;
+
+    pointer-events:none;
+
+    animation:
+        snapzParticleFloat
+        var(--duration)
+        ease-in-out
+        var(--delay)
+        infinite;
+}
+
+@keyframes snapzParticleFloat{
+
+    0%,
+    100%{
+        transform:
+            translate(0,0)
+            scale(.7);
+
+        opacity:.2;
+    }
+
+    50%{
+        transform:
+            translate(
+                var(--moveX),
+                var(--moveY)
+            )
+            scale(1.15);
+
+        opacity:1;
+    }
+}
+
+/* =========================================================
+   BOTTOM TEXT
+========================================================= */
+
+.snapzBottom{
+
+    position:absolute;
+
+    bottom:9%;
+
+    text-align:center;
+
+    color:#eee;
+
+    font-size:17px;
+
+    line-height:1.75;
+
+    opacity:0;
+
+    transform:translateY(15px);
+
+    animation:
+        snapzBottomIn
+        .9s
+        ease
+        2.1s
+        forwards;
+}
+
+.snapzBottom strong{
+
+    display:block;
+
+    color:#ff4d87;
+
+    font-weight:400;
+}
+
+.snapzSmallHeart{
+
+    color:#ff3d81;
+
+    font-size:24px;
+
+    line-height:1;
+
+    text-shadow:
+        0 0 14px
+        #ff3d81;
+
+    animation:
+        snapzHeartBeat
+        1.25s
+        ease-in-out
+        infinite;
+}
+
+@keyframes snapzHeartBeat{
+
+    0%,
+    100%{
+        transform:scale(1);
+    }
+
+    12%{
+        transform:scale(1.18);
+    }
+
+    24%{
+        transform:scale(.96);
+    }
+
+    36%{
+        transform:scale(1.1);
+    }
+}
+
+@keyframes snapzBottomIn{
+
+    to{
+        opacity:.92;
+        transform:translateY(0);
+    }
+}
+
+/* =========================================================
+   LOADING BAR
+========================================================= */
+
+.snapzLoader{
+
+    position:absolute;
+
+    bottom:4.3%;
+
+    width:205px;
+    height:6px;
+
+    border-radius:20px;
+
+    background:
+        rgba(255,61,129,.18);
+
+    overflow:hidden;
+}
+
+.snapzLoader span{
+
+    display:block;
+
+    width:0;
+
+    height:100%;
+
+    border-radius:20px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #ff0080,
+            #ff3d81,
+            #ff9c2d
+        );
+
+    box-shadow:
+        0 0 12px
+        #ff3d81;
+
+    animation:
+        snapzLoading
+        3.8s
+        cubic-bezier(.65,0,.35,1)
+        .1s
+        forwards;
+}
+
+@keyframes snapzLoading{
+
+    to{
+        width:100%;
+    }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width:430px){
+
+    .snapzStage{
+        padding-top:30vh;
+    }
+
+    .snapzBubble{
+        width:132px;
+        height:132px;
+    }
+
+    .snapzLens{
+        left:30px;
+        top:30px;
+    }
+
+    .snapzBrand{
+        margin-top:23px;
+    }
+
+    .snapzTagline{
+
+        font-size:10px;
+
+        letter-spacing:3px;
+
+        gap:8px;
+    }
+
+    .snapzBottom{
+
+        font-size:15px;
+
+        bottom:9%;
+    }
+}
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media(prefers-reduced-motion:reduce){
+
+    *{
+
+        animation-duration:.01ms !important;
+
+        animation-iteration-count:1 !important;
+    }
+}
+
+</style>
 </head>
 
-
 <body>
-<!-- Splash Screen -->
-<div id="splash">
 
-    <img src="/static/images/snapz_logo.png" id="snapzLogo">
+<div id="snapzSplash">
 
-<div id="snapzSlogan">
-    Snap <span class="pink">Your</span> World.
-</div>
-
-    <audio id="startupSound" autoplay>
+  <audio id="startupSound" autoplay>
         <source src="/static/sounds/startup.mp3" type="audio/mpeg">
-    </audio>
+  </audio>
+
+    <div class="snapzGlow snapzGlowOne"></div>
+    <div class="snapzGlow snapzGlowTwo"></div>
+
+    <div id="snapzParticles"></div>
+
+    <main class="snapzStage">
+
+        <!-- MAIN LOGO -->
+        <div class="snapzLogoWrap">
+
+            <div class="snapzBubble">
+
+                <div class="snapzLens">
+
+                    <div class="snapzLensInner"></div>
+
+                    <div class="snapzLensCore"></div>
+
+                    <i class="snapzLensShineOne"></i>
+
+                    <b class="snapzLensShineTwo"></b>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- BRAND -->
+        <div class="snapzBrand">
+
+            <div class="snapzName">
+
+                <span>S</span>
+                <span>n</span>
+                <span>a</span>
+                <span>p</span>
+                <em>z</em>
+
+            </div>
+
+            <div class="snapzTagline">
+
+                <span>SHARE.</span>
+                <span>CONNECT.</span>
+                <span>INSPIRE.</span>
+
+            </div>
+
+        </div>
+
+        <!-- FLOATING OBJECTS -->
+        <div class="snapzSocial snapzHeart snapzHeartOne">
+            ♥
+        </div>
+
+        <div class="snapzSocial snapzHeart snapzHeartTwo">
+            ♥
+        </div>
+
+        <div class="snapzSocial snapzCamera snapzCameraOne"></div>
+
+        <div class="snapzSocial snapzCamera snapzCameraTwo"></div>
+
+        <div class="snapzSocial snapzChat"></div>
+
+        <!-- BOTTOM TEXT -->
+        <div class="snapzBottom">
+
+            <div class="snapzSmallHeart">
+                ♥
+            </div>
+
+            <div>
+                Moments that matter.
+            </div>
+
+            <strong>
+                People who stay.
+            </strong>
+
+        </div>
+
+        <!-- LOADING -->
+        <div class="snapzLoader">
+
+            <span></span>
+
+     
+        </div>
+
+    </main>
 
 </div>
- 
+
 <script>
+
+
+
+  
+(function(){
+
+    const particleBox = document.getElementById("snapzParticles");
+
+    for(let i = 0; i < 90; i++){
+
+        const particle = document.createElement("span");
+
+        particle.className = "snapzParticle";
+
+        const size = 1 + Math.random() * 3;
+
+        particle.style.width = size + "px";
+
+        particle.style.height = size + "px";
+
+        particle.style.left = Math.random() * 100 + "%";
+
+        particle.style.top = Math.random() * 100 + "%";
+
+        particle.style.setProperty("--moveX", ((Math.random() - .5) * 38) + "px");
+
+        particle.style.setProperty("--moveY", ((Math.random() - .5) * 48) + "px");
+
+        particle.style.setProperty("--duration", (2 + Math.random() * 4) + "s");
+
+        particle.style.setProperty("--delay", Math.random() * 3 + "s");
+
+        if(i % 3 === 0){
+            particle.style.background = "#ff3d81";
+            particle.style.boxShadow = "0 0 8px #ff3d81";
+        }
+        else if(i % 3 === 1){
+            particle.style.background = "#ff8a2a";
+            particle.style.boxShadow = "0 0 8px #ff8a2a";
+        }
+        else{
+            particle.style.background = "#ffffff";
+            particle.style.boxShadow = "0 0 7px #ffffff";
+        }
+
+        particleBox.appendChild(particle);
+    }
+
+    window.snapzSplashDone = false;
+
+    setTimeout(function(){
+        window.snapzSplashDone = true;
+        window.dispatchEvent(new CustomEvent("snapzSplashFinished"));
+    },4100);
+
+})();
 
 window.onload=function(){
 
@@ -146,12 +1466,10 @@ setTimeout(function () {
 
     window.location.href="/";
 
-},2200);
-
+},4100);
 
 </script>
 
-
-  
 </body>
 </html>
+

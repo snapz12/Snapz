@@ -1,0 +1,19 @@
+{
+  "name": "Snapz",
+  "short_name": "Snapz",
+  "description": "Capture the vibe.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#000000",
+  "theme_color": "#FF3D81",
+  "icons": [
+    {
+      "src": "/static/images/snapz_logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

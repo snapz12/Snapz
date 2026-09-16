@@ -6,6 +6,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&display=swap" rel="stylesheet">
 <title>Snapz Clone</title>
 
+<link rel="manifest" href="/static/pwa/manifest.json">
+<meta name="theme-color" content="#FF3D81">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+
 <style>
 
 /* ============================================================
@@ -8606,6 +8613,21 @@ document.addEventListener("dblclick", function(e){
 
 
 {% include 'global_incoming_call.html' %}
+
+<script>
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+        navigator.serviceWorker.register("/static/pwa/sw.js")
+            .then(function (registration) {
+                console.log("SNAPZ PWA SERVICE WORKER REGISTERED");
+            })
+            .catch(function (error) {
+                console.error("SNAPZ PWA SERVICE WORKER ERROR =", error);
+            });
+    });
+}
+</script>
+
 </body>
 </html>
 

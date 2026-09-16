@@ -5,6 +5,40 @@
 <title>Notifications</title>
 
 <style>
+
+/* ============================================================
+   SNAPZ TAG ACCEPT / REJECT
+   ============================================================ */
+
+.tag-action-buttons{
+    display:flex;
+    gap:8px;
+    margin-top:9px;
+}
+
+.tag-action-form{
+    margin-top:0 !important;
+}
+
+.tag-action-form button{
+    border:none;
+    border-radius:7px;
+    padding:7px 14px;
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+}
+
+.tag-accept-btn{
+    background:#0095f6;
+    color:white;
+}
+
+.tag-reject-btn{
+    background:#333;
+    color:white;
+}
+
 body{
     background:black;
     color:white;
@@ -141,6 +175,8 @@ a{
 
             {% if n["action"] == "follow" %}
 
+
+
                 started following you
 
                 <svg class="notif-icon follow-icon" viewBox="0 0 24 24">
@@ -253,6 +289,63 @@ a{
             </div>
             </div>
 
+
+                          {% if n["tag_pending"] %}
+                              <div class="tag-action-buttons">
+
+                                  {% if n["tag_type"] == "post" %}
+
+                                      <form
+                                          action="/accept_tag/{{ n['post_id'] }}"
+                                          method="POST"
+                                          class="tag-action-form"
+                                          onsubmit="return snapzHandleTagAction(event, this)"
+                                      >
+                                          <button type="submit" class="tag-accept-btn">
+                                              Accept
+                                          </button>
+                                      </form>
+
+                                      <form
+                                          action="/reject_tag/{{ n['post_id'] }}"
+                                          method="POST"
+                                          class="tag-action-form"
+                                          onsubmit="return snapzHandleTagAction(event, this)"
+                                      >
+                                          <button type="submit" class="tag-reject-btn">
+                                              Reject
+                                          </button>
+                                      </form>
+
+                                  {% elif n["tag_type"] == "reel" %}
+
+                                      <form
+                                          action="/accept_reel_tag/{{ n['post_id'] }}"
+                                          method="POST"
+                                          class="tag-action-form"
+                                          onsubmit="return snapzHandleTagAction(event, this)"
+                                      >
+                                          <button type="submit" class="tag-accept-btn">
+                                              Accept
+                                          </button>
+                                      </form>
+
+                                      <form
+                                          action="/reject_reel_tag/{{ n['post_id'] }}"
+                                          method="POST"
+                                          class="tag-action-form"
+                                          onsubmit="return snapzHandleTagAction(event, this)"
+                                      >
+                                          <button type="submit" class="tag-reject-btn">
+                                              Reject
+                                          </button>
+                                      </form>
+
+                                  {% endif %}
+
+                              </div>
+                          {% endif %}
+
             <small>{{ n["time"] }}</small>
 
             {% if n["action"] == "follow" %}
@@ -292,8 +385,6 @@ a{
 
 {% include 'global_incoming_call.html' %}
 
-</body>
-</html>
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
@@ -325,3 +416,55 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 </script>
+
+<script>
+function snapzHandleTagAction(event, form) {
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    const buttons = form.parentElement.querySelectorAll("button");
+
+    buttons.forEach(function(button){
+        button.disabled = true;
+    });
+
+    fetch(form.action, {
+        method: "POST",
+        headers: {
+            "X-Requested-With": "XMLHttpRequest"
+        }
+    })
+    .then(function(response){
+        return response.json();
+    })
+    .then(function(data){
+
+        if(data.status === "ok"){
+            window.location.reload();
+            return;
+        }
+
+        alert(data.message || "Tag action failed");
+
+        buttons.forEach(function(button){
+            button.disabled = false;
+        });
+
+    })
+    .catch(function(error){
+
+        console.error("TAG ACTION ERROR =", error);
+
+        buttons.forEach(function(button){
+            button.disabled = false;
+        });
+
+    });
+
+    return false;
+}
+</script>
+
+</body>
+</html>

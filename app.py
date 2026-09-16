@@ -1704,6 +1704,26 @@ def upload():
                         "INSERT INTO reel_tags (reel_id, tagged_username, status) VALUES (?, ?, 'pending')",
                         (reel_id, t_user)
                     )
+
+                    # NOTIFY USER ABOUT REEL TAG
+                    if t_user and t_user != username:
+                        cur.execute(
+                            """
+                            INSERT INTO notifications(
+                                user_to,
+                                user_from,
+                                action,
+                                post_id
+                            )
+                            VALUES(?,?,?,?)
+                            """,
+                            (
+                                t_user,
+                                username,
+                                "tagged you in a reel",
+                                reel_id
+                            )
+                        )
             
             conn.commit()
 
@@ -2273,9 +2293,10 @@ def upload():
                 """
                 INSERT OR IGNORE INTO post_tags(
                     post_id,
-                    tagged_username
+                    tagged_username,
+                    accepted
                 )
-                VALUES(?, ?)
+                VALUES(?, ?, 0)
                 """,
                 (
                     post_id,
@@ -3246,10 +3267,14 @@ def notifications():
 
         action = row[1]
 
-        # Tagged post acceptance status
+        # Tagged post/reel status
         tag_accepted = False
+        tag_pending = False
+        tag_type = None
 
         if action == "tagged you in a post" and row[3] is not None:
+            tag_type = "post"
+
             cur.execute("""
                 SELECT accepted
                 FROM post_tags
@@ -3264,6 +3289,26 @@ def notifications():
 
             if tag_row:
                 tag_accepted = bool(tag_row[0])
+                tag_pending = not tag_accepted
+
+        elif action == "tagged you in a reel" and row[3] is not None:
+            tag_type = "reel"
+
+            cur.execute("""
+                SELECT status
+                FROM reel_tags
+                WHERE reel_id=?
+                  AND tagged_username=?
+            """, (
+                row[3],
+                current_user
+            ))
+
+            reel_tag_row = cur.fetchone()
+
+            if reel_tag_row:
+                tag_accepted = reel_tag_row[0] == "accepted"
+                tag_pending = reel_tag_row[0] == "pending"
 
         if action in ("like", "liked your post ❤️", "liked your post"):
             text = " liked your post"
@@ -3292,6 +3337,10 @@ def notifications():
         elif action == "tagged you in a post":
             text = " tagged you in a post"
             link = f"/#post-{row[3]}" if row[3] is not None else "/"
+
+        elif action == "tagged you in a reel":
+            text = " tagged you in a reel"
+            link = f"/reel/{row[3]}" if row[3] is not None else "/reels"
 
         elif "shared a post" in action:
             text = " shared a post with you"
@@ -3330,6 +3379,8 @@ def notifications():
             "time": row[2],
               "post_id": row[3],
               "tag_accepted": tag_accepted,
+            "tag_pending": tag_pending,
+            "tag_type": tag_type,
             "profile_pic": profile_pic,
             "following": is_following
 

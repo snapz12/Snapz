@@ -3217,8 +3217,17 @@ def notifications():
 
         pic = cur.fetchone()
 
-        if pic:
+        if pic and pic[0]:
             profile_pic = pic[0]
+
+            # Full URL ko direct use karo.
+            # Filename ho to Snapz static images path use karo.
+            if not (
+                profile_pic.startswith("http://")
+                or profile_pic.startswith("https://")
+                or profile_pic.startswith("/")
+            ):
+                profile_pic = "/static/images/" + profile_pic
         else:
             profile_pic = "/static/default.png"
 

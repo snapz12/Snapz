@@ -12,6 +12,32 @@ body{
     margin:0;
 }
 
+
+/* ============================================================
+   SNAPZ NOTIFICATION PROFILE PIC
+   ============================================================ */
+
+.notification-content{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.notification-profile-pic{
+    width:46px;
+    height:46px;
+    border-radius:50%;
+    object-fit:cover;
+    flex-shrink:0;
+    background:#222;
+    border:1px solid rgba(255,255,255,.12);
+}
+
+.notification-body{
+    flex:1;
+    min-width:0;
+}
+
 .notification{
     padding:15px;
     border-bottom:1px solid #333;
@@ -100,7 +126,18 @@ a{
 
         <div class="notification" data-link="{{ n['link'] }}">
 
-            <b>{{ n["username"] }}</b>
+            <div class="notification-content">
+
+                <img
+                    class="notification-profile-pic"
+                    src="{{ n['profile_pic'] or '/static/default.png' }}"
+                    alt=""
+                    onerror="this.onerror=null;this.src='/static/default.png';"
+                >
+
+                <div class="notification-body">
+
+                    <b>{{ n["username"] }}</b>
 
             {% if n["action"] == "follow" %}
 
@@ -212,6 +249,9 @@ a{
                 {{ n["text"] }}
 
             {% endif %}
+
+            </div>
+            </div>
 
             <small>{{ n["time"] }}</small>
 

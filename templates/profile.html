@@ -619,7 +619,13 @@ style="width:100%;margin-bottom:15px;">
             <textarea name="bio" style="width: 100%; padding: 10px; margin-bottom: 15px; background: #222; color: white; border: 1px solid #444; border-radius: 5px;">{{ session.get('bio') }}</textarea>
 
             <div style="display: flex; gap: 10px;">
-                <button type="button" onclick="closeEditModal()" style="flex: 1; padding: 10px; border: none; border-radius: 5px; background: #333; color: white;">Cancel</button>
+                <button
+    type="button"
+    id="snapzEditProfileCancelButton"
+    style="flex:1;padding:10px;border:none;border-radius:5px;background:#333;color:white;cursor:pointer;"
+    onclick="document.getElementById('edit-modal').style.display='none'; return false;">
+    Cancel
+</button>
                 <button type="submit" style="flex: 1; padding: 10px; border: none; border-radius: 5px; background: #0095f6; color: white;">Save</button>
             </div>
         </form>
@@ -964,6 +970,7 @@ function openEditModal() {
     function closeEditModal() {
         document.getElementById('edit-modal').style.display = 'none';
         // document.getElementById('overlay').style.display = 'none';
+    }
 
 function toggleProfileUserMenu(event) {
     if (event) {
@@ -1170,11 +1177,6 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    if (shareButton) {
-        shareButton.addEventListener("click", function(e) {
-            e.preventDefault();
-        });
-    }
 
 });
 

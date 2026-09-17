@@ -258,6 +258,125 @@ body{
 
 </style>
 
+
+<style>
+/* ============================================================
+   SNAPZ NEW SHARE PROFILE
+   ============================================================ */
+
+.snapz-new-share-profile-btn{
+    flex:1;
+    height:40px;
+    border:0;
+    border-radius:8px;
+    background:#262626;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:7px;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+}
+
+.snapz-new-share-profile-btn:active{
+    transform:scale(.97);
+}
+
+.snapz-share-icon{
+    font-size:19px;
+    line-height:1;
+}
+
+
+/* POPUP */
+
+#snapzNewSharePopup{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:999999999;
+    background:rgba(0,0,0,.68);
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+}
+
+#snapzNewSharePopupBox{
+    width:100%;
+    max-width:380px;
+    background:#181818;
+    border-radius:18px;
+    padding:22px;
+    box-sizing:border-box;
+    box-shadow:0 20px 60px rgba(0,0,0,.55);
+}
+
+.snapz-share-popup-title{
+    color:#fff;
+    font-size:19px;
+    font-weight:700;
+    text-align:center;
+    margin-bottom:18px;
+}
+
+#snapzNewShareProfileLink{
+    width:100%;
+    height:46px;
+    box-sizing:border-box;
+    background:#252525;
+    color:#fff;
+    border:1px solid #3a3a3a;
+    border-radius:10px;
+    padding:0 13px;
+    font-size:13px;
+    outline:none;
+    margin-bottom:12px;
+}
+
+.snapz-share-popup-copy{
+    width:100%;
+    height:44px;
+    border:0;
+    border-radius:10px;
+    background:linear-gradient(135deg,#ff3d81,#ff6b9d);
+    color:#fff;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+}
+
+.snapz-share-popup-close{
+    width:100%;
+    height:42px;
+    margin-top:9px;
+    border:0;
+    border-radius:10px;
+    background:#292929;
+    color:#fff;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+}
+
+#snapzNewShareCopyStatus{
+    color:#ff6b9d;
+    text-align:center;
+    font-size:13px;
+    margin-top:10px;
+    min-height:18px;
+}
+</style>
+
+
+<style>
+#snapzEditProfileButton {
+    font-weight: 700 !important;
+}
+</style>
+
 </head>
 
 <body>
@@ -328,7 +447,6 @@ body{
     <button onclick="window.location.href='/chat/{{ user[1] }}'">
         Message
     </button>
-
 <button
     id="profile-follow-btn"
     data-follow-username="{{ user[1]|trim }}"
@@ -336,7 +454,7 @@ body{
 
     {% if is_following %}
         Following
-    {% else %}
+{% else %}
         Follow
     {% endif %}
 
@@ -346,13 +464,19 @@ body{
 
     <!-- MY OWN PROFILE -->
 
-    <button onclick="openEditModal()">
+    <button type="button" id="snapzEditProfileButton"
+        onclick="document.getElementById('edit-modal').style.display='block'; return false;">
         Edit Profile
     </button>
 
-    <button onclick="shareProfileLink()">
-        Share Profile
-    </button>
+      <button type="button"
+          id="snapzNewShareProfileButton"
+          class="snapz-new-share-profile-btn"
+          onclick="snapzOpenShareProfile(); return false;">
+          <span>Share Profile</span>
+      </button>
+
+    
 
 {% endif %}
 
@@ -758,7 +882,7 @@ overscroll-behavior-y:contain;
 </div>
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
 
 <script>
 let cropper;
@@ -798,12 +922,14 @@ fileInput.addEventListener('change', function(e) {
 // Form submit hone se pehle cropped base64 image data nikalna
 document.getElementById('edit-profile-form').addEventListener('submit', function(e) {
     if (cropper) {
-        // Photo ko 200x200 standard circle size me canvas par crop karna
         const canvas = cropper.getCroppedCanvas({
             width: 200,
             height: 200
         });
-        hiddenInput.value = canvas.toDataURL('image/jpeg');
+
+        if (canvas) {
+            hiddenInput.value = canvas.toDataURL('image/jpeg');
+        }
     }
 });
 
@@ -861,34 +987,7 @@ function openEditModal() {
 
 
 
-// Jab form submit ho, tab image ka data hidden field mein daalo
-document.getElementById('edit-profile-form').addEventListener('submit', function() {
-    if (typeof cropper !== 'undefined' && cropper) {
-        const canvas = cropper.getCroppedCanvas();
-        if (canvas) {
-            const dataURL = canvas.toDataURL('image/jpeg');
-            document.getElementById('cropped-image-data').value = dataURL;
-        }
-    }
-});
-
-function previewImage(event) {
-    const reader = new FileReader();
-    reader.onload = function(){
-        const output = document.getElementById('image-to-crop');
-        output.src = reader.result;
-        // Yahan Cropper.js initialize karna padega
-    };
-    reader.readAsDataURL(event.target.files[0]);
-cropper = new Cropper(imageToCrop, {
-    aspectRatio: 1,
-    viewMode: 1,
-    background:false,
-    autoCropArea:1,
-    responsive:true
-});
-
-}
+// Cropper data is prepared by the single submit handler above.
 
 function toggleProfileUserMenu(event) {
     if (event) {
@@ -1031,29 +1130,77 @@ function toggleMenu() {
     }
 
 
-function shareProfileLink(){
 
-    const username = "{{ user[1] if user else session['username'] }}";
 
-    const link = window.location.origin + "/profile/" + username;
+function copySnapzProfileLink(link) {
 
-    if(navigator.share){
-
-        navigator.share({
-            title:"Snapz Profile",
-            text:"Check out this profile",
-            url:link
-        });
-
-    }else{
-
-        navigator.clipboard.writeText(link);
-
-        alert("Profile link copied");
-
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(link)
+            .then(function() {
+                alert("Profile link copied");
+            })
+            .catch(function() {
+                snapzFallbackCopy(link);
+            });
+        return;
     }
 
+    snapzFallbackCopy(link);
 }
+
+function snapzFallbackCopy(link) {
+
+    const input = document.createElement("textarea");
+
+    input.value = link;
+    input.setAttribute("readonly", "");
+    input.style.position = "fixed";
+    input.style.top = "0";
+    input.style.left = "-9999px";
+    input.style.opacity = "0";
+
+    document.body.appendChild(input);
+
+    input.focus();
+    input.select();
+    input.setSelectionRange(0, input.value.length);
+
+    let copied = false;
+
+    try {
+        copied = document.execCommand("copy");
+    } catch (e) {
+        copied = false;
+    }
+
+    document.body.removeChild(input);
+
+    if (copied) {
+        alert("Profile link copied");
+    } else {
+        prompt("Copy this profile link:", link);
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+
+    const editButton = document.getElementById("snapzEditProfileButton");
+    
+
+    if (editButton) {
+        editButton.addEventListener("click", function(e) {
+            e.preventDefault();
+            openEditModal();
+        });
+    }
+
+    if (shareButton) {
+        shareButton.addEventListener("click", function(e) {
+            e.preventDefault();
+        });
+    }
+
+});
 
 </script>
 
@@ -2839,5 +2986,278 @@ function confirmHideCurrent(){
 
 
 {% include 'global_incoming_call.html' %}
+
+<!-- ============================================================
+     SNAPZ NEW SHARE PROFILE POPUP
+     ============================================================ -->
+
+<div id="snapzNewSharePopup">
+
+    <div id="snapzNewSharePopupBox">
+
+        <div class="snapz-share-popup-title">
+            Share Profile
+        </div>
+
+        <input
+            type="text"
+            id="snapzNewShareProfileLink"
+            readonly>
+
+        <button
+            type="button"
+            class="snapz-share-popup-copy"
+            id="snapzNewShareCopyButton">
+            Copy Link
+        </button>
+
+        <div id="snapzNewShareCopyStatus"></div>
+
+        <button
+            type="button"
+            class="snapz-share-popup-close"
+            id="snapzNewShareCloseButton">
+            Close
+        </button>
+
+    </div>
+
+</div>
+
+
+<script>
+/* ============================================================
+   SNAPZ NEW SHARE PROFILE SYSTEM
+   ============================================================ */
+
+document.addEventListener("DOMContentLoaded", function(){
+
+    const shareButton =
+        document.getElementById("snapzNewShareProfileButton");
+
+    const popup =
+        document.getElementById("snapzNewSharePopup");
+
+    const linkInput =
+        document.getElementById("snapzNewShareProfileLink");
+
+    const copyButton =
+        document.getElementById("snapzNewShareCopyButton");
+
+    const closeButton =
+        document.getElementById("snapzNewShareCloseButton");
+
+    const status =
+        document.getElementById("snapzNewShareCopyStatus");
+
+
+    if(!shareButton){
+        return;
+    }
+
+
+    shareButton.addEventListener("click", function(e){
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        const username =
+            {{ session["username"]|tojson }};
+
+        const profileLink =
+            window.location.origin +
+            "/profile/" +
+            encodeURIComponent(username);
+
+        if(linkInput){
+            linkInput.value = profileLink;
+        }
+
+        if(status){
+            status.textContent = "";
+        }
+
+        if(popup){
+            popup.style.display = "flex";
+        }else{
+            alert(profileLink);
+        }
+
+    });
+
+
+    if(copyButton){
+
+        copyButton.addEventListener("click", function(e){
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            const link = linkInput ? linkInput.value : "";
+
+            if(!link){
+                return;
+            }
+
+            if(navigator.clipboard &&
+               navigator.clipboard.writeText){
+
+                navigator.clipboard.writeText(link)
+                .then(function(){
+
+                    if(status){
+                        status.textContent = "Link copied ✓";
+                    }
+
+                })
+                .catch(function(){
+
+                    fallbackCopy(link);
+                });
+
+            }else{
+
+                fallbackCopy(link);
+            }
+
+        });
+    }
+
+
+    function fallbackCopy(link){
+
+        const textarea =
+            document.createElement("textarea");
+
+        textarea.value = link;
+        textarea.style.position = "fixed";
+        textarea.style.left = "-9999px";
+
+        document.body.appendChild(textarea);
+
+        textarea.focus();
+        textarea.select();
+
+        try{
+
+            document.execCommand("copy");
+
+            if(status){
+                status.textContent = "Link copied ✓";
+            }
+
+        }catch(error){
+
+            alert(link);
+
+        }
+
+        document.body.removeChild(textarea);
+    }
+
+
+    if(closeButton){
+
+        closeButton.addEventListener("click", function(e){
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            if(popup){
+                popup.style.display = "none";
+            }
+
+        });
+
+    }
+
+
+    if(popup){
+
+        popup.addEventListener("click", function(e){
+
+            if(e.target === popup){
+                popup.style.display = "none";
+            }
+
+        });
+
+    }
+
+});
+</script>
+
+
+
+
+
+
+<script>
+function snapzOpenShareProfile() {
+    const username = {{ session["username"]|tojson }};
+    const profileLink = window.location.origin + "/profile/" + encodeURIComponent(username);
+
+    let popup = document.getElementById("snapzNewSharePopup");
+
+    if (!popup) {
+        popup = document.createElement("div");
+        popup.id = "snapzNewSharePopup";
+
+        popup.innerHTML = `
+            <div id="snapzNewSharePopupBox">
+                <div class="snapz-share-popup-title">Share Profile</div>
+
+                <input
+                    id="snapzNewShareProfileLink"
+                    type="text"
+                    readonly>
+
+                <button
+                    type="button"
+                    class="snapz-share-popup-copy"
+                    onclick="snapzCopyShareProfile()">
+                    Copy Link
+                </button>
+
+                <div id="snapzNewShareCopyStatus"></div>
+
+                <button
+                    type="button"
+                    class="snapz-share-popup-close"
+                    onclick="document.getElementById('snapzNewSharePopup').style.display='none'">
+                    Close
+                </button>
+            </div>
+        `;
+
+        document.body.appendChild(popup);
+    }
+
+    document.getElementById("snapzNewShareProfileLink").value = profileLink;
+    popup.style.display = "flex";
+}
+
+function snapzCopyShareProfile() {
+    const input = document.getElementById("snapzNewShareProfileLink");
+
+    input.focus();
+    input.select();
+
+    try {
+        document.execCommand("copy");
+
+        const status = document.getElementById("snapzNewShareCopyStatus");
+        status.textContent = "Link copied ✓";
+
+        setTimeout(function() {
+            status.textContent = "";
+        }, 2000);
+
+    } catch (e) {
+        alert(input.value);
+    }
+}
+</script>
+
 </body>
 </html>

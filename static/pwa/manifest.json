@@ -2,7 +2,7 @@
   "name": "Snapz",
   "short_name": "Snapz",
   "description": "Capture the vibe.",
-  "start_url": "/",
+  "start_url": "/splash",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",

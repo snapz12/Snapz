@@ -2838,7 +2838,10 @@ def update_profile():
 
     old_username = session["username"]
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("snapz.db", timeout=30)
+    conn.execute("PRAGMA busy_timeout=30000")
+    conn.execute("PRAGMA journal_mode=WAL")
+    conn.execute("BEGIN IMMEDIATE")
     cur = conn.cursor()
 
     # Username already exists check

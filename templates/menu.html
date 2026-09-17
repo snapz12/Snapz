@@ -49,6 +49,22 @@ body{
 ⚙ Settings
 </a>
 
+{% if session["username"] == "snapz_admin" %}
+<a href="/admin/support" class="item">
+<span style="display:flex;align-items:center;gap:10px;">
+<svg width="21" height="21" viewBox="0 0 24 24" fill="none"
+     stroke="currentColor" stroke-width="2"
+     stroke-linecap="round" stroke-linejoin="round"
+     aria-hidden="true">
+    <circle cx="12" cy="12" r="9"></circle>
+    <path d="M12 8v4"></path>
+    <path d="M12 16h.01"></path>
+</svg>
+<span>Support</span>
+</span>
+</a>
+{% endif %}
+
 <a href="/logout" class="item logout">
  Logout
 </a>

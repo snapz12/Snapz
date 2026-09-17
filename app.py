@@ -3366,6 +3366,10 @@ def notifications():
             text = " Snapz Support replied to your support request."
             link = "/my_support"
 
+        elif action == "support_request":
+            text = " sent a support request."
+            link = f"/admin/support/{row[3]}" if row[3] is not None else "/admin/support"
+
         else:
             text = action
             link = "#"
@@ -7297,17 +7301,32 @@ def help_center():
             message,
             filename
         ))
-
         support_id = cur.lastrowid
 
+        # NOTIFY SNAPZ ADMIN ABOUT NEW SUPPORT REQUEST
         cur.execute("""
-        INSERT INTO support_chat
-        (
-            support_id,
-            sender,
-            message
-        )
-        VALUES(?,?,?)
+            INSERT INTO notifications(
+                user_to,
+                user_from,
+                action,
+                post_id
+            )
+            VALUES(?,?,?,?)
+        """, (
+            "snapz_admin",
+            session["username"],
+            "support_request",
+            support_id
+        ))
+
+        cur.execute("""
+            INSERT INTO support_chat
+            (
+                support_id,
+                sender,
+                message
+            )
+            VALUES(?,?,?)
         """, (
             support_id,
             session["username"],

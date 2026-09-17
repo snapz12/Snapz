@@ -3039,13 +3039,33 @@ def update_profile():
 
     # ---------------- PROFILE PHOTO ----------------
 
-    file = request.files.get("profile_pic")
+    # ---------------- PROFILE PHOTO ----------------
 
-    if file and file.filename:
+    # ---------------- PROFILE PHOTO ----------------
+    file = request.files.get("profile_pic")
+    cropped_image = request.form.get("cropped_image", "").strip()
+
+    # ============================================================
+    # SNAPZ PROFILE PHOTO
+    # Cropped image has priority over original gallery file
+    # ============================================================
+
+    if cropped_image or (file and file.filename):
 
         try:
 
-            result = cloudinary.uploader.upload(file)
+            if cropped_image:
+                # Cropper.js generated image
+                result = cloudinary.uploader.upload(
+                    cropped_image,
+                    resource_type="image"
+                )
+            else:
+                # Existing normal upload fallback
+                result = cloudinary.uploader.upload(
+                    file,
+                    resource_type="image"
+                )
 
             photo_url = result["secure_url"]
 

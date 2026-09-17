@@ -6,9 +6,6 @@
 
 <title>Profile</title>
 
-<link  href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-
 <style>
 
 body{
@@ -187,23 +184,6 @@ body{
 .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1999; }
 
 /* Crop Box Styling */
-.crop-container {
-    max-width: 100%;
-    max-height: 250px;
-    margin-top: 10px;
-    display: none;
-    background: #000;
-}
-.cropper-view-box,
-.cropper-face{
-    border-radius:50%;
-}
-
-.crop-container img {
-    max-width: 100%;
-    display: block;
-}
-
 /* Modal ka style */
     .edit-modal {
         background: #121212;
@@ -226,18 +206,6 @@ body{
     }
 
 .profile-img { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 2px solid #dbdbdb; cursor: pointer; }
- #crop-box-wrapper { display: none; width: 300px; margin-top: 10px; }
-#image-to-crop { max-width: 100%; }
-
-#crop-box-wrapper{
-    display:none;
-    width:100%;
-    max-height:300px;
-    overflow:hidden;
-    margin-top:10px;
-}
-
-
 /* Grid Layout for Posts/Reels */
 .grid-container {
     display: grid;
@@ -374,6 +342,82 @@ body{
 <style>
 #snapzEditProfileButton {
     font-weight: 700 !important;
+}
+</style>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+
+<style>
+/* ============================================================
+   SNAPZ PROFILE ROUND CROP - FINAL
+   ============================================================ */
+
+/* Crop area */
+#crop-box-wrapper {
+    position: relative !important;
+    background: #000 !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+}
+
+/* Cropper canvas */
+#crop-box-wrapper .cropper-container {
+    background: #000 !important;
+}
+
+/* Outside the round crop = pure black */
+#crop-box-wrapper .cropper-modal {
+    background: #000 !important;
+    opacity: 1 !important;
+}
+
+/* Hide square crop border */
+#crop-box-wrapper .cropper-crop-box {
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Round preview */
+#crop-box-wrapper .cropper-view-box {
+    border-radius: 50% !important;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+}
+
+/* No blue/white tint inside circle */
+#crop-box-wrapper .cropper-face {
+    background: transparent !important;
+    background-color: transparent !important;
+    opacity: 0 !important;
+    border: none !important;
+    outline: none !important;
+}
+
+/* Remove blue crop lines */
+#crop-box-wrapper .cropper-line {
+    opacity: 0 !important;
+    background: transparent !important;
+}
+
+/* Remove blue corner/side handles visually */
+#crop-box-wrapper .cropper-point {
+    opacity: 0 !important;
+    background: transparent !important;
+}
+
+/* Remove cropper outlines */
+#crop-box-wrapper .cropper-dashed {
+    display: none !important;
+}
+
+/* Make the actual image inside the circle clean */
+#crop-box-wrapper .cropper-view-box img {
+    border-radius: 50% !important;
 }
 </style>
 
@@ -553,27 +597,19 @@ body{
 <form id="edit-profile-form" action="/update_profile" method="POST" enctype="multipart/form-data">
 <label>Change Profile Photo:</label>
 
-<input 
+<input
 type="file"
 id="profile-pic-input"
 name="profile_pic"
 accept="image/*"
 style="width:100%;margin-bottom:15px;">
 
-
-<div id="crop-box-wrapper">
-
-<img id="image-to-crop"
-style="max-width:100%;">
+<div id="crop-box-wrapper" style="display:none;width:100%;max-height:300px;overflow:hidden;margin-top:10px;background:#000;">
+    <img id="image-to-crop" style="max-width:100%;display:block;">
 </div>
 
-
-<input 
-type="hidden"
-name="cropped_image"
-id="cropped-image-data">
-
-            <label>Name:</label>
+<input type="hidden" name="cropped_image" id="cropped-image-data">
+<label>Name:</label>
             <input type="text" name="name" value="{{ session.get('name') }}" style="width: 100%; padding: 10px; margin-bottom: 15px; background: #222; color: white; border: 1px solid #444; border-radius: 5px;">
 
             <label>Username:</label>
@@ -885,54 +921,6 @@ overscroll-behavior-y:contain;
 
 
 <script>
-let cropper;
-const fileInput = document.getElementById('profile-pic-input');
-const imageToCrop = document.getElementById('image-to-crop');
-const cropWrapper = document.getElementById('crop-box-wrapper');
-const hiddenInput = document.getElementById('cropped-image-data');
-
-// Jab user photo select karega
-fileInput.addEventListener('change', function(e) {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-        const file = files[0];
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            imageToCrop.src = event.target.result;
-            cropWrapper.style.display = 'block';
-            
-            // Purana cropper instance reset karna
-            if (cropper) {
-                cropper.destroy();
-            }
-            
-            // Gol adjustment settings ke sath Cropper initiate karna
-            cropper = new Cropper(imageToCrop, {
-                aspectRatio: 1, // Gol selection ke liye 1:1 square box
-                viewMode: 1,
-                background: false,
-                autoCropArea: 1,
-                responsive: true
-            });
-        };
-        reader.readAsDataURL(file);
-    }
-});
-
-// Form submit hone se pehle cropped base64 image data nikalna
-document.getElementById('edit-profile-form').addEventListener('submit', function(e) {
-    if (cropper) {
-        const canvas = cropper.getCroppedCanvas({
-            width: 200,
-            height: 200
-        });
-
-        if (canvas) {
-            hiddenInput.value = canvas.toDataURL('image/jpeg');
-        }
-    }
-});
-
 function menuOpen(event){
     if(event) event.stopPropagation();
     togglePostMenu(event);
@@ -976,18 +964,6 @@ function openEditModal() {
     function closeEditModal() {
         document.getElementById('edit-modal').style.display = 'none';
         // document.getElementById('overlay').style.display = 'none';
-        
-        // Cropper saaf karne ke liye
-        if(typeof cropper !== 'undefined' && cropper) {
-            cropper.destroy();
-            cropper = null;
-        }
-    }
-
-
-
-
-// Cropper data is prepared by the single submit handler above.
 
 function toggleProfileUserMenu(event) {
     if (event) {
@@ -3259,5 +3235,7 @@ function snapzCopyShareProfile() {
 }
 </script>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+<script src="{{ url_for('static', filename='js/profile_crop.js') }}"></script>
 </body>
 </html>

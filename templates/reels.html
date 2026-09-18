@@ -665,7 +665,11 @@ filter:drop-shadow(0 0 3px black);
 
 <div class="actions">
 
-<button onclick="toggleLike(this, {{ r.id }})" class="action-btn">
+<button
+    onclick="toggleLike(this, {{ r.id }})"
+    class="action-btn"
+    data-reel-id="{{ r.id }}"
+    data-liked="{% if r.liked %}true{% else %}false{% endif %}">
 
 <svg class="reel-heart"
      width="32"
@@ -830,12 +834,16 @@ if(data.status=="liked"){
 
     count.innerText = data.likes;
 
+        btn.setAttribute("data-liked","true");
+
 }
 
 
 if(data.status=="unliked"){
 
     btn.classList.remove("active");
+
+    btn.setAttribute("data-liked","false");
 
     heart.setAttribute("fill","none");
     path.setAttribute("stroke","white");
@@ -2206,6 +2214,7 @@ function snapzShowThreeHeartBurst(clientX, clientY){
 
 /* ============================================================
    REEL VIDEO DOUBLE TAP
+   3 HEART + EXISTING LIKE BUTTON SYNC
 ============================================================ */
 
 document.addEventListener("dblclick", function(e){
@@ -2216,7 +2225,7 @@ document.addEventListener("dblclick", function(e){
 
     if (!video) return;
 
-    /* Buttons / action area par animation nahi */
+    /* Buttons / action area par double-tap like nahi */
     if (
         e.target.closest("button") ||
         e.target.closest("a") ||
@@ -2225,10 +2234,39 @@ document.addEventListener("dblclick", function(e){
         return;
     }
 
-    snapzShowThreeHeartBurst(e.clientX, e.clientY);
-});
+    const reel = video.closest(".reel");
 
-</script>
+    if (!reel) return;
+
+    const likeButton = reel.querySelector(
+        '.actions .action-btn[data-reel-id]'
+    );
+
+    if (!likeButton) return;
+
+    const reelId = likeButton.getAttribute("data-reel-id");
+
+    if (!reelId) return;
+
+    /* Existing 3-heart animation */
+    snapzShowThreeHeartBurst(
+        e.clientX,
+        e.clientY
+    );
+
+    /* Already liked = API call nahi hoga */
+    const alreadyLiked =
+        likeButton.getAttribute("data-liked") === "true" ||
+        likeButton.classList.contains("active");
+
+    if (alreadyLiked) {
+        return;
+    }
+
+    /* Existing Like system */
+    toggleLike(likeButton, reelId);
+
+});</script>
 
 {% include 'global_incoming_call.html' %}
 </body>

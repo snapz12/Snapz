@@ -5325,7 +5325,9 @@ function toggleSearchFollow(username){
 
 <button
     onclick="toggleLike(this, '{{ post[4] }}')"
-    class="action-btn">
+    class="action-btn"
+    data-post-id="{{ post[4] }}"
+    data-liked="{% if post[14] %}true{% else %}false{% endif %}">
 
     <span class="heart-icon">
         <svg
@@ -5685,10 +5687,12 @@ fetch("/like_post/" + postId,{
     if(data.status == "liked"){
 
         btn.classList.add("active");
+        btn.setAttribute("data-liked", "true");
 
     }else{
 
         btn.classList.remove("active");
+        btn.setAttribute("data-liked", "false");
 
     }
 
@@ -8587,8 +8591,8 @@ function snapzShowThreePostHeartBurst(clientX, clientY){
 
 /* ============================================================
    POST DOUBLE TAP
+   3 HEART + EXISTING LIKE BUTTON SYNC
 ============================================================ */
-
 document.addEventListener("dblclick", function(e){
 
     if (!e.target) return;
@@ -8597,7 +8601,7 @@ document.addEventListener("dblclick", function(e){
 
     if (!post) return;
 
-    /* Buttons / action area par animation nahi */
+    /* Buttons / action area par double-tap like nahi */
     if (
         e.target.closest("button") ||
         e.target.closest("a") ||
@@ -8606,7 +8610,33 @@ document.addEventListener("dblclick", function(e){
         return;
     }
 
-    snapzShowThreePostHeartBurst(e.clientX, e.clientY);
+    const likeButton = post.querySelector(
+        '.action-bar .action-btn[data-post-id]'
+    );
+
+    if (!likeButton) return;
+
+    const postId = likeButton.getAttribute("data-post-id");
+
+    if (!postId) return;
+
+    /* Existing 3-heart animation */
+    snapzShowThreePostHeartBurst(
+        e.clientX,
+        e.clientY
+    );
+
+    /* Already liked = API call nahi hoga */
+    const alreadyLiked =
+        likeButton.getAttribute("data-liked") === "true" ||
+        likeButton.classList.contains("active");
+
+    if (alreadyLiked) {
+        return;
+    }
+
+    /* Existing Like system */
+    toggleLike(likeButton, postId);
 });
 
 </script>

@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Snapz Support Chat</title>
+<title>Slovzan Support Chat</title>
 
 <style>
 
@@ -209,7 +209,7 @@ Support Conversation
 
 {% for msg in chat %}
 
-<div class="chat {% if msg['sender']=='Snapz Support' %}me{% else %}other{% endif %}">
+<div class="chat {% if msg['sender']=='Slovzan Support' %}me{% else %}other{% endif %}">
 
     <div class="bubble">
 
@@ -225,7 +225,7 @@ Support Conversation
 
 {{ msg["created_at"] }}
 
-{% if msg["sender"] == "Snapz Support" %}
+{% if msg["sender"] == "Slovzan Support" %}
     {% if msg["seen"] == 1 %}
         ✓✓ Seen
     {% else %}

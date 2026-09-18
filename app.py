@@ -36,7 +36,7 @@ import re
 REELS = []
 
 app = Flask(__name__, static_folder="static")
-app.secret_key = "snapz123"
+app.secret_key = "slovzan123"
 
 
 socketio = SocketIO(
@@ -57,29 +57,29 @@ app.config["MAIL_PORT"] = 587
 app.config["MAIL_USE_TLS"] = True
 app.config["MAIL_USE_SSL"] = False
 
-app.config["MAIL_USERNAME"] = "snapzofflicial0@gmail.com"
+app.config["MAIL_USERNAME"] = "slovzanofflicial0@gmail.com"
 app.config["MAIL_PASSWORD"] = "hmwczqojooyjrvte"
-app.config["MAIL_DEFAULT_SENDER"] = "snapzofflicial0@gmail.com"
+app.config["MAIL_DEFAULT_SENDER"] = "slovzanofflicial0@gmail.com"
 
 mail = Mail(app)
 
 def send_otp(receiver_email, otp):
 
     msg = Message(
-        subject="Snapz Password Reset OTP",
+        subject="Slovzan Password Reset OTP",
         sender=app.config["MAIL_USERNAME"],
         recipients=[receiver_email]
     )
 
     msg.body = f"""
-Your Snapz OTP is: {otp}
+Your Slovzan OTP is: {otp}
 
 This OTP is valid for 5 minutes.
 """
 
     mail.send(msg)
 
-conn = sqlite3.connect('snapz.db', check_same_thread=False)
+conn = sqlite3.connect('slovzan.db', check_same_thread=False)
 cur = conn.cursor()
 
 
@@ -151,7 +151,7 @@ def check_session():
     if "username" not in session:
         return None
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     cur.execute("""
@@ -178,7 +178,7 @@ def check_session():
 
 
 def init_db():
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
     cur.execute("PRAGMA table_info(posts)")
     print(cur.fetchall())
@@ -314,7 +314,7 @@ def check_user_session():
     if "username" not in session:
         return redirect("/login")
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     cur.execute("""
@@ -332,6 +332,10 @@ def check_user_session():
         return redirect("/login")
 
 
+@app.route("/download")
+def download_center():
+    return render_template("download.html")
+
 @app.route("/splash")
 def splash():
     return render_template("splash.html")
@@ -344,7 +348,7 @@ def home():
 
     current_user = session["username"]
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     cur.execute("""
@@ -768,7 +772,7 @@ def home():
     following_users = [row[0].strip() for row in cur.fetchall()]
 
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
     cur.execute("""
@@ -843,7 +847,7 @@ def send_otp():
     session["signup_email"] = email
 
     msg = Message(
-        "Snapz Verification OTP",
+        "Slovzan Verification OTP",
         sender=app.config["MAIL_USERNAME"],
         recipients=[email]
     )
@@ -875,7 +879,7 @@ def signup():
         if confirm_password and password != confirm_password:
             return "Passwords do not match"
 
-        conn = sqlite3.connect("snapz.db")
+        conn = sqlite3.connect("slovzan.db")
         cur = conn.cursor()
 
         # Username exists
@@ -945,7 +949,7 @@ def login():
         username = request.form.get("username", "").strip()
         password = request.form.get("password", "").strip()
 
-        conn = sqlite3.connect("snapz.db")
+        conn = sqlite3.connect("slovzan.db")
         conn.row_factory = sqlite3.Row
         cur = conn.cursor()
 
@@ -1001,7 +1005,7 @@ def users():
 
     my_username = session["username"]
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
@@ -1163,7 +1167,7 @@ def chat(username):
 
     my_username = session["username"]
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
 # =========================
@@ -1410,7 +1414,7 @@ def chat_messages(username):
 
     my_username = session["username"]
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
@@ -1490,7 +1494,7 @@ def send_message(username):
     if message == "":
         return jsonify({"status":"empty"})
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     my_username = session["username"]
@@ -1608,7 +1612,7 @@ def upload():
                 "message": str(e)
             })
 
-        conn = sqlite3.connect("snapz.db")
+        conn = sqlite3.connect("slovzan.db")
         cur = conn.cursor()
 
         try:
@@ -1880,7 +1884,7 @@ def upload():
         # SAVE STORY
         # -----------------------------------------------------
 
-        conn = sqlite3.connect("snapz.db")
+        conn = sqlite3.connect("slovzan.db")
         cur = conn.cursor()
 
         try:
@@ -1975,7 +1979,7 @@ def upload():
             "message": "Maximum 10 photos or videos allowed"
         }), 400
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     try:
@@ -2396,7 +2400,7 @@ def profile():
 
     username = session["username"]
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     # User Details
@@ -2577,7 +2581,7 @@ def reels():
 
     current_user = session["username"]
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     cur.execute("""
@@ -2706,7 +2710,7 @@ def share_post():
     receiver = data.get("receiver")
     post_id = data.get("post_id")
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     # Post data
@@ -2796,7 +2800,7 @@ def logout():
 
     if "username" in session:
 
-        conn = sqlite3.connect("snapz.db")
+        conn = sqlite3.connect("slovzan.db")
         cur = conn.cursor()
 
         cur.execute("""
@@ -2838,7 +2842,7 @@ def update_profile():
 
     old_username = session["username"]
 
-    conn = sqlite3.connect("snapz.db", timeout=30)
+    conn = sqlite3.connect("slovzan.db", timeout=30)
     conn.execute("PRAGMA busy_timeout=30000")
     conn.execute("PRAGMA journal_mode=WAL")
     conn.execute("BEGIN IMMEDIATE")
@@ -3046,7 +3050,7 @@ def update_profile():
     cropped_image = request.form.get("cropped_image", "").strip()
 
     # ============================================================
-    # SNAPZ PROFILE PHOTO
+    # SLOVZAN PROFILE PHOTO
     # Cropped image has priority over original gallery file
     # ============================================================
 
@@ -3108,7 +3112,7 @@ def search():
 
     query = request.args.get("q", "").strip()
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
@@ -3208,7 +3212,7 @@ def search():
 
 
 def create_tables():
-    conn = sqlite3.connect('snapz.db')
+    conn = sqlite3.connect('slovzan.db')
     cur = conn.cursor()
     # Puraane tables...
     cur.execute('''CREATE TABLE IF NOT EXISTS notifications (
@@ -3230,7 +3234,7 @@ def notifications():
 
     current_user = session["username"]
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     cur.execute("""
@@ -3265,7 +3269,7 @@ def notifications():
             profile_pic = pic[0]
 
             # Full URL ko direct use karo.
-            # Filename ho to Snapz static images path use karo.
+            # Filename ho to Slovzan static images path use karo.
             if not (
                 profile_pic.startswith("http://")
                 or profile_pic.startswith("https://")
@@ -3386,7 +3390,7 @@ def notifications():
             link = f"/?open={row[3]}" if row[3] is not None else "/"
 
         elif action == "support_reply":
-            text = " Snapz Support replied to your support request."
+            text = " Slovzan Support replied to your support request."
             link = "/my_support"
 
         elif action == "support_request":
@@ -3429,7 +3433,7 @@ def accept_reel_tag(reel_id):
     if "username" not in session:
         return jsonify({"status": "error", "message": "Login required"}), 401
     username = session["username"]
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
     cur.execute("UPDATE reel_tags SET status='accepted' WHERE reel_id=? AND tagged_username=?", (reel_id, username))
     conn.commit()
@@ -3441,7 +3445,7 @@ def reject_reel_tag(reel_id):
     if "username" not in session:
         return jsonify({"status": "error", "message": "Login required"}), 401
     username = session["username"]
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
     cur.execute("DELETE FROM reel_tags WHERE reel_id=? AND tagged_username=?", (reel_id, username))
     conn.commit()
@@ -3459,7 +3463,7 @@ def accept_tag(post_id):
 
     username = session["username"]
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     cur.execute("""
@@ -3497,7 +3501,7 @@ def reject_tag(post_id):
 
     username = session["username"]
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     cur.execute("""
@@ -3529,7 +3533,7 @@ def profile_view(username):
     if "username" not in session:
         return redirect("/login")
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     # User check
@@ -3677,7 +3681,7 @@ def edit_post():
 
     username = session["username"]
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     cur.execute("""
@@ -3715,7 +3719,7 @@ def hide_post(id):
 
     username = session["username"]
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     cur.execute("""
@@ -3752,7 +3756,7 @@ def hide_reel(id):
 
     username = session["username"]
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     cur.execute("""
@@ -3796,7 +3800,7 @@ def follow(username):
             "message":"You can't follow yourself"
         })
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     # User exists
@@ -3899,7 +3903,7 @@ def like_post(post_id):
 
     username = session["username"]
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     try:
@@ -4049,7 +4053,7 @@ def unfollow(username):
     if follower == username:
         return jsonify({"status": "error"}), 400
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     try:
@@ -4095,7 +4099,7 @@ def delete_post(id):
 
     username = session["username"]
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     # Check owner
@@ -4152,7 +4156,7 @@ def edit_reel():
 
     data = request.get_json()
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     cur.execute(
@@ -4176,7 +4180,7 @@ def delete_reel(id):
 
     username = session["username"]
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     # Check owner
@@ -4236,7 +4240,7 @@ def follow_back(username):
 
     follower = session["username"]
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     cur.execute("""
@@ -4264,7 +4268,7 @@ def unfollow_back(username):
 
     follower = session["username"]
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     cur.execute("""
@@ -4288,7 +4292,7 @@ def tag_people_users():
     username = session["username"]
     query = request.args.get("q", "").strip()
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
@@ -4385,7 +4389,7 @@ def tag_people_users():
 @app.route("/followers/<username>")
 def followers(username):
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     cur.execute("""
@@ -4440,7 +4444,7 @@ def followers(username):
 @app.route("/following/<username>")
 def following(username):
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     cur.execute("""
@@ -4483,7 +4487,7 @@ def following(username):
 @app.route("/comments/<int:post_id>")
 def get_comments(post_id):
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
@@ -4554,7 +4558,7 @@ def comment_post(post_id):
                 "message": "Invalid reply"
             })
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     # Post owner
@@ -4727,7 +4731,7 @@ def like_reel(reel_id):
 
     liker = session["username"]
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     # Reel owner
@@ -4816,7 +4820,7 @@ def like_reel(reel_id):
 @app.route("/download_reel/<int:reel_id>")
 def download_reel(reel_id):
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     cur.execute(
@@ -4833,9 +4837,9 @@ def download_reel(reel_id):
     video_url = row[0]
 
     if "?" in video_url:
-        video_url += "&fl_attachment=Snapz_Reel.mp4"
+        video_url += "&fl_attachment=Slovzan_Reel.mp4"
     else:
-        video_url += "?fl_attachment=Snapz_Reel.mp4"
+        video_url += "?fl_attachment=Slovzan_Reel.mp4"
 
     return redirect(video_url)
 
@@ -4851,7 +4855,7 @@ def like_story(story_id):
 
     liker = session["username"]
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     # Story owner nikalo
@@ -4896,7 +4900,7 @@ def get_reel_comments(reel_id):
     if "username" not in session:
         return {"status": "error", "message": "Login required"}, 401
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     cur.execute("""
@@ -4960,7 +4964,7 @@ def comment_reel(reel_id):
         except (TypeError, ValueError):
             reply_to = None
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     cur.execute(
@@ -5070,7 +5074,7 @@ def comment_reel(reel_id):
 @app.route("/reel/<int:reel_id>")
 def single_reel(reel_id):
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     cur.execute("""
@@ -5096,7 +5100,7 @@ def share_reel(reel_id):
 
     my_username = session["username"]
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     # Reel exists + get video filename
@@ -5142,7 +5146,7 @@ def send_reel(reel_id, username):
     sender = session["username"]
     receiver = username
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     # Check reel exists
@@ -5212,10 +5216,10 @@ def testmail():
     msg = Message(
         "Test Mail",
         sender=app.config["MAIL_USERNAME"],
-        recipients=["snapzofficial0@gmail.com"]
+        recipients=["slovzanofficial0@gmail.com"]
     )
 
-    msg.body = "Hello Snapz"
+    msg.body = "Hello Slovzan"
 
     mail.send(msg)
 
@@ -5229,7 +5233,7 @@ def view_story(story_id):
 
     viewer = session["username"]
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     # Blocked user story access protection
@@ -5284,7 +5288,7 @@ def story_views(story_id):
 
     current_user = session["username"]
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
@@ -5395,12 +5399,12 @@ def forgot_password():
 
 
         msg = Message(
-            subject="Snapz Password Reset OTP",
-            sender="snapzofflicial0@gmail.com",
+            subject="Slovzan Password Reset OTP",
+            sender="slovzanofflicial0@gmail.com",
             recipients=[email]
         )
 
-        msg.body = f"Your Snapz OTP is: {otp}\n\nThis OTP is valid for 5 minutes."
+        msg.body = f"Your Slovzan OTP is: {otp}\n\nThis OTP is valid for 5 minutes."
 
         print("msg.subject =", msg.subject)
         print("msg.sender =", msg.sender)
@@ -5481,11 +5485,11 @@ def resend_otp():
     session["reset_otp"] = otp
 
     msg = Message(
-        "Snapz Password Reset OTP",
+        "Slovzan Password Reset OTP",
         recipients=[email]
     )
 
-    msg.body = f"""Your new Snapz OTP is:
+    msg.body = f"""Your new Slovzan OTP is:
 
 {otp}
 
@@ -5510,7 +5514,7 @@ def send_images(username):
     if not files:
         return jsonify({"status":"no_file"})
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     os.makedirs("static/uploads", exist_ok=True)
@@ -5550,7 +5554,7 @@ def send_video(username):
     if not files:
         return jsonify({"status":"no_file"})
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     os.makedirs("static/uploads", exist_ok=True)
@@ -5621,7 +5625,7 @@ def send_voice(username):
 
 
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
 
@@ -5654,7 +5658,7 @@ def delete_message(id):
     if "username" not in session:
         return jsonify({"status":"error"})
 
-    conn=sqlite3.connect("snapz.db")
+    conn=sqlite3.connect("slovzan.db")
     cur=conn.cursor()
 
     cur.execute("""
@@ -5679,7 +5683,7 @@ def join(data):
 @socketio.on("answer-call")
 def answer_call(data):
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     cur.execute("""
@@ -5710,7 +5714,7 @@ def answer_call(data):
 
 def save_system_message(sender, receiver, text):
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     cur.execute("""
@@ -5738,7 +5742,7 @@ def end_call(data):
         return
 
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
 
@@ -5863,7 +5867,7 @@ def call_user(data):
 
     print("CALL USER:", data)
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     cur.execute("""
@@ -5892,7 +5896,7 @@ def call_user(data):
 @socketio.on("missed-call")
 def missed_call(data):
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     cur.execute("""
@@ -5980,7 +5984,7 @@ def reject_call(data):
         return
 
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
 
@@ -6087,7 +6091,7 @@ def change_email():
     if "username" not in session:
         return redirect("/login")
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     c = conn.cursor()
 
     c.execute(
@@ -6108,7 +6112,7 @@ def send_change_email_otp():
     if "username" not in session:
         return "Login First"
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     cur.execute(
@@ -6124,7 +6128,7 @@ def send_change_email_otp():
     session["change_email_otp"] = otp
 
     msg = Message(
-        "Snapz Email Change OTP",
+        "Slovzan Email Change OTP",
         sender=app.config["MAIL_USERNAME"],
         recipients=[email]
     )
@@ -6171,7 +6175,7 @@ def save_new_email():
     if new_email != confirm:
         return "Emails do not match"
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     cur.execute(
@@ -6201,7 +6205,7 @@ def change_mobile():
     if "username" not in session:
         return redirect("/login")
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     cur.execute(
@@ -6230,7 +6234,7 @@ def save_new_mobile():
     if new_mobile != confirm_mobile:
         return "Mobile numbers do not match"
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     cur.execute(
@@ -6258,7 +6262,7 @@ def privacy():
     if "username" not in session:
         return redirect("/login")
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     cur.execute("""
@@ -6289,7 +6293,7 @@ def update_privacy():
     setting = request.form.get("setting")
     value = request.form.get("value")
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     if setting == "private":
@@ -6325,7 +6329,7 @@ def message_privacy():
 
     username = session["username"]
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     # Request open karte hi Pending se remove karo.
@@ -6375,7 +6379,7 @@ def comment_privacy():
 
     username = session["username"]
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     if request.method == "POST":
@@ -6414,7 +6418,7 @@ def story_privacy():
 
     username = session["username"]
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     if request.method == "POST":
@@ -6454,7 +6458,7 @@ def close_friends():
 
     username = session["username"]
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     cur.execute("""
@@ -6490,7 +6494,7 @@ def toggle_close_friend(username):
 
     owner = session["username"]
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     cur.execute("""
@@ -6549,7 +6553,7 @@ def story_archive():
     if "username" not in session:
         return redirect("/login")
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
@@ -6582,7 +6586,7 @@ def view_archive_story(story_id):
     if "username" not in session:
         return redirect("/login")
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
@@ -6619,7 +6623,7 @@ def share_archive_story(story_id):
     if "username" not in session:
         return redirect("/login")
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     cur.execute("""
@@ -6665,7 +6669,7 @@ def delete_archive_story(story_id):
     if "username" not in session:
         return redirect("/login")
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     cur.execute("""
@@ -6692,7 +6696,7 @@ def account_info():
     if "username" not in session:
         return redirect("/login")
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     cur.execute("""
@@ -6718,7 +6722,7 @@ def download_account_data():
 
     username = session["username"]
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     # User
@@ -6786,7 +6790,7 @@ def blocked_accounts():
 
     me = session["username"]
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     conn.row_factory = sqlite3.Row
 
     cur = conn.cursor()
@@ -6825,7 +6829,7 @@ def block_user(username):
 
     me = session["username"]
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     cur.execute(
@@ -6856,7 +6860,7 @@ def report_user(username):
     if me == username:
         return "You cannot report yourself", 400
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     cur.execute(
@@ -6942,7 +6946,7 @@ def unblock_user(username):
 
     me = session["username"]
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     cur.execute(
@@ -6966,7 +6970,7 @@ def delete_account():
         password = request.form["password"]
         username = session["username"]
 
-        conn = sqlite3.connect("snapz.db")
+        conn = sqlite3.connect("slovzan.db")
         cur = conn.cursor()
 
         cur.execute(
@@ -7036,7 +7040,7 @@ def login_activity():
     if "username" not in session:
         return redirect("/login")
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
@@ -7070,7 +7074,7 @@ def logout_device(id):
     if "username" not in session:
         return redirect("/login")
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     cur.execute("""
@@ -7093,7 +7097,7 @@ def logout_other_devices():
     if "username" not in session:
         return redirect("/login")
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     cur.execute("""
@@ -7117,7 +7121,7 @@ def appearance():
     if "username" not in session:
         return redirect("/login")
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
@@ -7167,7 +7171,7 @@ def inject_appearance():
     if "username" not in session:
         return {}
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
@@ -7189,12 +7193,12 @@ def inject_appearance():
 
 @app.route("/about")
 def about_redirect():
-    return redirect(url_for("about_snapz"))
+    return redirect(url_for("about_slovzan"))
 
-@app.route("/about_snapz")
-def about_snapz():
+@app.route("/about_slovzan")
+def about_slovzan():
 
-    return render_template("about_snapz.html")
+    return render_template("about_slovzan.html")
 
 @app.route("/whats_new")
 def whats_new():
@@ -7231,13 +7235,13 @@ def check_update():
     )
 
 
-@app.route("/rate_snapz", methods=["GET","POST"])
-def rate_snapz():
+@app.route("/rate_slovzan", methods=["GET","POST"])
+def rate_slovzan():
 
     if "username" not in session:
         return redirect("/login")
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     cur = conn.cursor()
 
     if request.method == "POST":
@@ -7263,14 +7267,14 @@ def rate_snapz():
         conn.close()
 
         return render_template(
-            "rate_snapz.html",
+            "rate_slovzan.html",
             success=True
         )
 
     conn.close()
 
     return render_template(
-        "rate_snapz.html",
+        "rate_slovzan.html",
         success=False
     )
 
@@ -7316,7 +7320,7 @@ def help_center():
 
             file.save(os.path.join(folder, filename))
 
-        conn = sqlite3.connect("snapz.db")
+        conn = sqlite3.connect("slovzan.db")
         cur = conn.cursor()
 
         cur.execute("""
@@ -7336,7 +7340,7 @@ def help_center():
         ))
         support_id = cur.lastrowid
 
-        # NOTIFY SNAPZ ADMIN ABOUT NEW SUPPORT REQUEST
+        # NOTIFY SLOVZAN ADMIN ABOUT NEW SUPPORT REQUEST
         cur.execute("""
             INSERT INTO notifications(
                 user_to,
@@ -7346,7 +7350,7 @@ def help_center():
             )
             VALUES(?,?,?,?)
         """, (
-            "snapz_admin",
+            "slovzan_admin",
             session["username"],
             "support_request",
             support_id
@@ -7392,7 +7396,7 @@ def help_center():
         success=False
     )
 
-ADMIN_USERNAME = "snapz_admin"
+ADMIN_USERNAME = "slovzan_admin"
 
 @app.route("/admin/support")
 def admin_support():
@@ -7403,7 +7407,7 @@ def admin_support():
     if session["username"] != ADMIN_USERNAME:
         return "Access Denied"
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
@@ -7487,7 +7491,7 @@ def admin_support_view(support_id):
     if session["username"] != ADMIN_USERNAME:
         return "Access Denied"
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
@@ -7507,7 +7511,7 @@ def admin_support_view(support_id):
                 VALUES(?,?,?)
             """, (
                 support_id,
-                "Snapz Support",
+                "Slovzan Support",
                 reply
             ))
 
@@ -7515,7 +7519,7 @@ def admin_support_view(support_id):
                 "support_message",
                 {
                     "support_id": support_id,
-                    "sender": "Snapz Support",
+                    "sender": "Slovzan Support",
                     "message": reply
                 },
                 to="support_" + str(support_id)
@@ -7555,7 +7559,7 @@ def admin_support_view(support_id):
                 VALUES(?,?,?)
             """, (
                 user,
-                "Snapz Support",
+                "Slovzan Support",
                 "support_reply"
             ))
 
@@ -7581,7 +7585,7 @@ def admin_support_view(support_id):
         UPDATE support_chat
         SET seen=1
         WHERE support_id=?
-        AND sender!='Snapz Support'
+        AND sender!='Slovzan Support'
         AND seen=0
     """, (support_id,))
 
@@ -7620,7 +7624,7 @@ def my_support():
     if "username" not in session:
         return redirect("/login")
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
@@ -7650,7 +7654,7 @@ def support_chat(support_id):
     if "username" not in session:
         return redirect("/login")
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
@@ -7677,7 +7681,7 @@ def support_chat(support_id):
         UPDATE support_chat
         SET seen=1
         WHERE support_id=?
-        AND sender='Snapz Support'
+        AND sender='Slovzan Support'
         AND seen=0
     """, (support_id,))
 
@@ -7746,7 +7750,7 @@ def my_support_detail(support_id):
     if "username" not in session:
         return redirect("/login")
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
@@ -7799,7 +7803,7 @@ def my_support_detail(support_id):
         UPDATE support_chat
         SET seen=1
         WHERE support_id=?
-        AND sender='Snapz Support'
+        AND sender='Slovzan Support'
         AND seen=0
     """, (support_id,))
 
@@ -7850,7 +7854,7 @@ def story():
     music = request.files.get("music")
 
 
-    # New Snapz Music Library support
+    # New Slovzan Music Library support
     music_url = request.form.get(
         "music_url",
         ""
@@ -8073,7 +8077,7 @@ def story():
     # =====================
 
     conn = sqlite3.connect(
-        "snapz.db"
+        "slovzan.db"
     )
 
     cur = conn.cursor()
@@ -8146,7 +8150,7 @@ def music_library():
 
     search = request.args.get("search", "").strip()
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 
@@ -8207,7 +8211,7 @@ def support_chat_messages(support_id):
     if "username" not in session:
         return jsonify([])
 
-    conn = sqlite3.connect("snapz.db")
+    conn = sqlite3.connect("slovzan.db")
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
 

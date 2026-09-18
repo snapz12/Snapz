@@ -10,14 +10,14 @@
 <style>
 
 :root {
-    --snapz-theme-color: #0095f6;
-    --snapz-font-size: 16px;
-    --snapz-bg: #000;
-    --snapz-card: #111;
-    --snapz-border: #222;
-    --snapz-text: #fff;
-    --snapz-secondary: #888;
-    --snapz-select: #222;
+    --slovzan-theme-color: #0095f6;
+    --slovzan-font-size: 16px;
+    --slovzan-bg: #000;
+    --slovzan-card: #111;
+    --slovzan-border: #222;
+    --slovzan-text: #fff;
+    --slovzan-secondary: #888;
+    --slovzan-select: #222;
 }
 
 * {
@@ -35,9 +35,9 @@ body {
 }
 
 body {
-    background: var(--snapz-bg);
-    color: var(--snapz-text);
-    font-size: var(--snapz-font-size);
+    background: var(--slovzan-bg);
+    color: var(--slovzan-text);
+    font-size: var(--slovzan-font-size);
     transition:
         background-color .25s ease,
         color .25s ease;
@@ -57,19 +57,19 @@ body {
 }
 
 .back {
-    color: var(--snapz-text);
+    color: var(--slovzan-text);
     text-decoration: none;
     font-size: 28px;
     transition: color .25s ease;
 }
 
 .title {
-    font-size: calc(var(--snapz-font-size) + 8px);
+    font-size: calc(var(--slovzan-font-size) + 8px);
     font-weight: bold;
 }
 
 .card {
-    background: var(--snapz-card);
+    background: var(--slovzan-card);
     border-radius: 15px;
     overflow: hidden;
     transition:
@@ -82,7 +82,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 18px;
-    border-bottom: 1px solid var(--snapz-border);
+    border-bottom: 1px solid var(--slovzan-border);
     transition:
         background-color .25s ease,
         border-color .25s ease;
@@ -96,16 +96,16 @@ body {
     display: flex;
     align-items: center;
     gap: 14px;
-    font-size: var(--snapz-font-size);
+    font-size: var(--slovzan-font-size);
 }
 
 .right {
-    color: var(--snapz-secondary);
+    color: var(--slovzan-secondary);
 }
 
 select {
-    background: var(--snapz-select);
-    color: var(--snapz-text);
+    background: var(--slovzan-select);
+    color: var(--slovzan-text);
     border: none;
     padding: 6px 10px;
     border-radius: 8px;
@@ -117,7 +117,7 @@ select {
 }
 
 select:focus {
-    outline: 2px solid var(--snapz-theme-color);
+    outline: 2px solid var(--slovzan-theme-color);
 }
 
 .switch {
@@ -156,7 +156,7 @@ select:focus {
 }
 
 input:checked + .slider {
-    background: var(--snapz-theme-color);
+    background: var(--slovzan-theme-color);
 }
 
 input:checked + .slider:before {
@@ -175,37 +175,37 @@ input:checked + .slider:before {
 }
 
 body.font-small {
-    --snapz-font-size: 14px;
+    --slovzan-font-size: 14px;
 }
 
 body.font-medium {
-    --snapz-font-size: 16px;
+    --slovzan-font-size: 16px;
 }
 
 body.font-large {
-    --snapz-font-size: 18px;
+    --slovzan-font-size: 18px;
 }
 
 /* LIGHT MODE */
 
 body:not(.dark-mode) {
-    --snapz-bg: #f5f5f5;
-    --snapz-card: #ffffff;
-    --snapz-border: #dddddd;
-    --snapz-text: #111111;
-    --snapz-secondary: #666666;
-    --snapz-select: #eeeeee;
+    --slovzan-bg: #f5f5f5;
+    --slovzan-card: #ffffff;
+    --slovzan-border: #dddddd;
+    --slovzan-text: #111111;
+    --slovzan-secondary: #666666;
+    --slovzan-select: #eeeeee;
 }
 
 /* DARK MODE */
 
 body.dark-mode {
-    --snapz-bg: #000;
-    --snapz-card: #111;
-    --snapz-border: #222;
-    --snapz-text: #fff;
-    --snapz-secondary: #888;
-    --snapz-select: #222;
+    --slovzan-bg: #000;
+    --slovzan-card: #111;
+    --slovzan-border: #222;
+    --slovzan-text: #fff;
+    --slovzan-secondary: #888;
+    --slovzan-select: #222;
 }
 
 /* ANIMATIONS OFF */
@@ -353,16 +353,16 @@ body.animations-disabled * {
     const animationsToggle = document.getElementById("animationsToggle");
 
     const savedDarkMode =
-        localStorage.getItem("snapz_dark_mode");
+        localStorage.getItem("slovzan_dark_mode");
 
     const savedTheme =
-        localStorage.getItem("snapz_theme_color") || "Blue";
+        localStorage.getItem("slovzan_theme_color") || "Blue";
 
     const savedFontSize =
-        localStorage.getItem("snapz_font_size") || "Medium";
+        localStorage.getItem("slovzan_font_size") || "Medium";
 
     const savedAnimations =
-        localStorage.getItem("snapz_animations");
+        localStorage.getItem("slovzan_animations");
 
     function applyDarkMode(enabled) {
 
@@ -390,7 +390,7 @@ body.animations-disabled * {
         const color = colors[theme] || colors.Blue;
 
         document.documentElement.style.setProperty(
-            "--snapz-theme-color",
+            "--slovzan-theme-color",
             color
         );
 
@@ -436,7 +436,7 @@ body.animations-disabled * {
         };
 
         document.documentElement.style.setProperty(
-            "--snapz-font-size",
+            "--slovzan-font-size",
             sizes[size] || sizes.Medium
         );
 
@@ -513,7 +513,7 @@ body.animations-disabled * {
                     darkModeToggle.checked;
 
                 localStorage.setItem(
-                    "snapz_dark_mode",
+                    "slovzan_dark_mode",
                     enabled
                 );
 
@@ -535,7 +535,7 @@ body.animations-disabled * {
                     themeColorSelect.value;
 
                 localStorage.setItem(
-                    "snapz_theme_color",
+                    "slovzan_theme_color",
                     theme
                 );
 
@@ -557,7 +557,7 @@ body.animations-disabled * {
                     fontSizeSelect.value;
 
                 localStorage.setItem(
-                    "snapz_font_size",
+                    "slovzan_font_size",
                     size
                 );
 
@@ -579,7 +579,7 @@ body.animations-disabled * {
                     animationsToggle.checked;
 
                 localStorage.setItem(
-                    "snapz_animations",
+                    "slovzan_animations",
                     enabled
                 );
 

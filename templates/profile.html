@@ -229,10 +229,10 @@ body{
 
 <style>
 /* ============================================================
-   SNAPZ NEW SHARE PROFILE
+   SLOVZAN NEW SHARE PROFILE
    ============================================================ */
 
-.snapz-new-share-profile-btn{
+.slovzan-new-share-profile-btn{
     flex:1;
     height:40px;
     border:0;
@@ -249,11 +249,11 @@ body{
     -webkit-tap-highlight-color:transparent;
 }
 
-.snapz-new-share-profile-btn:active{
+.slovzan-new-share-profile-btn:active{
     transform:scale(.97);
 }
 
-.snapz-share-icon{
+.slovzan-share-icon{
     font-size:19px;
     line-height:1;
 }
@@ -261,7 +261,7 @@ body{
 
 /* POPUP */
 
-#snapzNewSharePopup{
+#slovzanNewSharePopup{
     display:none;
     position:fixed;
     inset:0;
@@ -272,7 +272,7 @@ body{
     padding:20px;
 }
 
-#snapzNewSharePopupBox{
+#slovzanNewSharePopupBox{
     width:100%;
     max-width:380px;
     background:#181818;
@@ -282,7 +282,7 @@ body{
     box-shadow:0 20px 60px rgba(0,0,0,.55);
 }
 
-.snapz-share-popup-title{
+.slovzan-share-popup-title{
     color:#fff;
     font-size:19px;
     font-weight:700;
@@ -290,7 +290,7 @@ body{
     margin-bottom:18px;
 }
 
-#snapzNewShareProfileLink{
+#slovzanNewShareProfileLink{
     width:100%;
     height:46px;
     box-sizing:border-box;
@@ -304,7 +304,7 @@ body{
     margin-bottom:12px;
 }
 
-.snapz-share-popup-copy{
+.slovzan-share-popup-copy{
     width:100%;
     height:44px;
     border:0;
@@ -316,7 +316,7 @@ body{
     cursor:pointer;
 }
 
-.snapz-share-popup-close{
+.slovzan-share-popup-close{
     width:100%;
     height:42px;
     margin-top:9px;
@@ -329,7 +329,7 @@ body{
     cursor:pointer;
 }
 
-#snapzNewShareCopyStatus{
+#slovzanNewShareCopyStatus{
     color:#ff6b9d;
     text-align:center;
     font-size:13px;
@@ -340,7 +340,7 @@ body{
 
 
 <style>
-#snapzEditProfileButton {
+#slovzanEditProfileButton {
     font-weight: 700 !important;
 }
 </style>
@@ -349,7 +349,7 @@ body{
 
 <style>
 /* ============================================================
-   SNAPZ PROFILE ROUND CROP - FINAL
+   SLOVZAN PROFILE ROUND CROP - FINAL
    ============================================================ */
 
 /* Crop area */
@@ -508,15 +508,15 @@ body{
 
     <!-- MY OWN PROFILE -->
 
-    <button type="button" id="snapzEditProfileButton"
+    <button type="button" id="slovzanEditProfileButton"
         onclick="document.getElementById('edit-modal').style.display='block'; return false;">
         Edit Profile
     </button>
 
       <button type="button"
-          id="snapzNewShareProfileButton"
-          class="snapz-new-share-profile-btn"
-          onclick="snapzOpenShareProfile(); return false;">
+          id="slovzanNewShareProfileButton"
+          class="slovzan-new-share-profile-btn"
+          onclick="slovzanOpenShareProfile(); return false;">
           <span>Share Profile</span>
       </button>
 
@@ -621,7 +621,7 @@ style="width:100%;margin-bottom:15px;">
             <div style="display: flex; gap: 10px;">
                 <button
     type="button"
-    id="snapzEditProfileCancelButton"
+    id="slovzanEditProfileCancelButton"
     style="flex:1;padding:10px;border:none;border-radius:5px;background:#333;color:white;cursor:pointer;"
     onclick="document.getElementById('edit-modal').style.display='none'; return false;">
     Cancel
@@ -993,17 +993,17 @@ function toggleProfileUserMenu(event) {
     return false;
 }
 
-const snapzProfileTargetUsername =
+const slovzanProfileTargetUsername =
     {{ user[1]|tojson if user else '""' }};
 
 function blockProfileUser() {
-    if (!snapzProfileTargetUsername) return;
+    if (!slovzanProfileTargetUsername) return;
 
-    const oldPopup = document.getElementById("snapzBlockConfirmPopup");
+    const oldPopup = document.getElementById("slovzanBlockConfirmPopup");
     if (oldPopup) oldPopup.remove();
 
     const popup = document.createElement("div");
-    popup.id = "snapzBlockConfirmPopup";
+    popup.id = "slovzanBlockConfirmPopup";
 
     popup.innerHTML = `
         <div style="
@@ -1042,7 +1042,7 @@ function blockProfileUser() {
                 ">
                     Are you sure you want to block
                     <strong style="color:#fff;">
-                        @${snapzProfileTargetUsername}
+                        @${slovzanProfileTargetUsername}
                     </strong>?
                 </div>
 
@@ -1052,7 +1052,7 @@ function blockProfileUser() {
                 ">
                     <button
                         type="button"
-                        id="snapzBlockCancelButton"
+                        id="slovzanBlockCancelButton"
                         style="
                             flex:1;
                             border:none;
@@ -1068,7 +1068,7 @@ function blockProfileUser() {
 
                     <button
                         type="button"
-                        id="snapzBlockConfirmButton"
+                        id="slovzanBlockConfirmButton"
                         style="
                             flex:1;
                             border:none;
@@ -1088,23 +1088,23 @@ function blockProfileUser() {
 
     document.body.appendChild(popup);
 
-    document.getElementById("snapzBlockCancelButton").onclick = function() {
+    document.getElementById("slovzanBlockCancelButton").onclick = function() {
         popup.remove();
     };
 
-    document.getElementById("snapzBlockConfirmButton").onclick = function() {
+    document.getElementById("slovzanBlockConfirmButton").onclick = function() {
         window.location.href =
-            "/block/" + encodeURIComponent(snapzProfileTargetUsername);
+            "/block/" + encodeURIComponent(slovzanProfileTargetUsername);
     };
 }
 
 
 function reportProfileUser() {
-    if (!snapzProfileTargetUsername) return;
+    if (!slovzanProfileTargetUsername) return;
 
     window.location.href =
         "/report_user/" +
-        encodeURIComponent(snapzProfileTargetUsername);
+        encodeURIComponent(slovzanProfileTargetUsername);
 }
 
 function toggleMenu() {
@@ -1115,7 +1115,7 @@ function toggleMenu() {
 
 
 
-function copySnapzProfileLink(link) {
+function copySlovzanProfileLink(link) {
 
     if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(link)
@@ -1123,15 +1123,15 @@ function copySnapzProfileLink(link) {
                 alert("Profile link copied");
             })
             .catch(function() {
-                snapzFallbackCopy(link);
+                slovzanFallbackCopy(link);
             });
         return;
     }
 
-    snapzFallbackCopy(link);
+    slovzanFallbackCopy(link);
 }
 
-function snapzFallbackCopy(link) {
+function slovzanFallbackCopy(link) {
 
     const input = document.createElement("textarea");
 
@@ -1167,7 +1167,7 @@ function snapzFallbackCopy(link) {
 
 document.addEventListener("DOMContentLoaded", function() {
 
-    const editButton = document.getElementById("snapzEditProfileButton");
+    const editButton = document.getElementById("slovzanEditProfileButton");
     
 
     if (editButton) {
@@ -1185,7 +1185,7 @@ document.addEventListener("DOMContentLoaded", function() {
 <script>
 function showTab(tab){
 
-    console.log("SNAPZ TAB CLICK:", tab);
+    console.log("SLOVZAN TAB CLICK:", tab);
 
     const tabs = ["posts", "reels", "tagged"];
 
@@ -1203,17 +1203,17 @@ function showTab(tab){
 
         selected.style.display = "grid";
 
-        console.log("SNAPZ ACTIVE TAB:", selected.id);
-        console.log("SNAPZ DISPLAY:", selected.style.display);
-        console.log("SNAPZ HTML LENGTH:", selected.innerHTML.length);
-        console.log("SNAPZ CHILDREN:", selected.children.length);
+        console.log("SLOVZAN ACTIVE TAB:", selected.id);
+        console.log("SLOVZAN DISPLAY:", selected.style.display);
+        console.log("SLOVZAN HTML LENGTH:", selected.innerHTML.length);
+        console.log("SLOVZAN CHILDREN:", selected.children.length);
 
         if(tab === "tagged"){
         }
 
     } else {
 
-        console.error("SNAPZ TAB NOT FOUND:", tab + "-tab");
+        console.error("SLOVZAN TAB NOT FOUND:", tab + "-tab");
 
         alert("ERROR: " + tab + "-tab NOT FOUND");
     }
@@ -1225,7 +1225,7 @@ let currentId = "";
 
 
 /* ============================================================
-   SNAPZ PROFILE FEED
+   SLOVZAN PROFILE FEED
    POST -> ONLY PROFILE POSTS
    REEL -> ONLY PROFILE REELS
 ============================================================ */
@@ -1300,7 +1300,7 @@ function renderProfilePost(index){
 
     document.getElementById("popup-content").innerHTML = `
 
-        <div class="snapz-profile-feed-item"
+        <div class="slovzan-profile-feed-item"
              data-feed-index="${index}"
              style="
                 width:100%;
@@ -1526,7 +1526,7 @@ function renderProfileReel(index){
 
     document.getElementById("popup-content").innerHTML = `
 
-        <div class="snapz-profile-feed-item"
+        <div class="slovzan-profile-feed-item"
              data-feed-index="${index}"
              style="
                 width:100%;
@@ -1591,7 +1591,7 @@ function openPost(id){
     const content = document.getElementById("popup-content");
 
     if(!popup || !content){
-        console.log("SNAPZ: popup not found");
+        console.log("SLOVZAN: popup not found");
         return false;
     }
 
@@ -1600,7 +1600,7 @@ function openPost(id){
     );
 
     if(!post){
-        console.log("SNAPZ: post not found:", id);
+        console.log("SLOVZAN: post not found:", id);
         return false;
     }
 
@@ -1965,7 +1965,7 @@ function openReel(id, file, caption){
 
         content.insertAdjacentHTML("beforeend", `
 
-            <div class="snapz-profile-feed-item"
+            <div class="slovzan-profile-feed-item"
                  data-feed-type="reel"
                  data-feed-index="${index}"
                  data-reel-id="${reel.id}"
@@ -2033,7 +2033,7 @@ function openReel(id, file, caption){
 
         const items =
             content.querySelectorAll(
-                '.snapz-profile-feed-item[data-feed-type="reel"]'
+                '.slovzan-profile-feed-item[data-feed-type="reel"]'
             );
 
         if(items[profileFeedIndex]){
@@ -2966,35 +2966,35 @@ function confirmHideCurrent(){
 {% include 'global_incoming_call.html' %}
 
 <!-- ============================================================
-     SNAPZ NEW SHARE PROFILE POPUP
+     SLOVZAN NEW SHARE PROFILE POPUP
      ============================================================ -->
 
-<div id="snapzNewSharePopup">
+<div id="slovzanNewSharePopup">
 
-    <div id="snapzNewSharePopupBox">
+    <div id="slovzanNewSharePopupBox">
 
-        <div class="snapz-share-popup-title">
+        <div class="slovzan-share-popup-title">
             Share Profile
         </div>
 
         <input
             type="text"
-            id="snapzNewShareProfileLink"
+            id="slovzanNewShareProfileLink"
             readonly>
 
         <button
             type="button"
-            class="snapz-share-popup-copy"
-            id="snapzNewShareCopyButton">
+            class="slovzan-share-popup-copy"
+            id="slovzanNewShareCopyButton">
             Copy Link
         </button>
 
-        <div id="snapzNewShareCopyStatus"></div>
+        <div id="slovzanNewShareCopyStatus"></div>
 
         <button
             type="button"
-            class="snapz-share-popup-close"
-            id="snapzNewShareCloseButton">
+            class="slovzan-share-popup-close"
+            id="slovzanNewShareCloseButton">
             Close
         </button>
 
@@ -3005,28 +3005,28 @@ function confirmHideCurrent(){
 
 <script>
 /* ============================================================
-   SNAPZ NEW SHARE PROFILE SYSTEM
+   SLOVZAN NEW SHARE PROFILE SYSTEM
    ============================================================ */
 
 document.addEventListener("DOMContentLoaded", function(){
 
     const shareButton =
-        document.getElementById("snapzNewShareProfileButton");
+        document.getElementById("slovzanNewShareProfileButton");
 
     const popup =
-        document.getElementById("snapzNewSharePopup");
+        document.getElementById("slovzanNewSharePopup");
 
     const linkInput =
-        document.getElementById("snapzNewShareProfileLink");
+        document.getElementById("slovzanNewShareProfileLink");
 
     const copyButton =
-        document.getElementById("snapzNewShareCopyButton");
+        document.getElementById("slovzanNewShareCopyButton");
 
     const closeButton =
-        document.getElementById("snapzNewShareCloseButton");
+        document.getElementById("slovzanNewShareCloseButton");
 
     const status =
-        document.getElementById("snapzNewShareCopyStatus");
+        document.getElementById("slovzanNewShareCopyStatus");
 
 
     if(!shareButton){
@@ -3171,38 +3171,38 @@ document.addEventListener("DOMContentLoaded", function(){
 
 
 <script>
-function snapzOpenShareProfile() {
+function slovzanOpenShareProfile() {
     const username = {{ session["username"]|tojson }};
     const profileLink = window.location.origin + "/profile/" + encodeURIComponent(username);
 
-    let popup = document.getElementById("snapzNewSharePopup");
+    let popup = document.getElementById("slovzanNewSharePopup");
 
     if (!popup) {
         popup = document.createElement("div");
-        popup.id = "snapzNewSharePopup";
+        popup.id = "slovzanNewSharePopup";
 
         popup.innerHTML = `
-            <div id="snapzNewSharePopupBox">
-                <div class="snapz-share-popup-title">Share Profile</div>
+            <div id="slovzanNewSharePopupBox">
+                <div class="slovzan-share-popup-title">Share Profile</div>
 
                 <input
-                    id="snapzNewShareProfileLink"
+                    id="slovzanNewShareProfileLink"
                     type="text"
                     readonly>
 
                 <button
                     type="button"
-                    class="snapz-share-popup-copy"
-                    onclick="snapzCopyShareProfile()">
+                    class="slovzan-share-popup-copy"
+                    onclick="slovzanCopyShareProfile()">
                     Copy Link
                 </button>
 
-                <div id="snapzNewShareCopyStatus"></div>
+                <div id="slovzanNewShareCopyStatus"></div>
 
                 <button
                     type="button"
-                    class="snapz-share-popup-close"
-                    onclick="document.getElementById('snapzNewSharePopup').style.display='none'">
+                    class="slovzan-share-popup-close"
+                    onclick="document.getElementById('slovzanNewSharePopup').style.display='none'">
                     Close
                 </button>
             </div>
@@ -3211,12 +3211,12 @@ function snapzOpenShareProfile() {
         document.body.appendChild(popup);
     }
 
-    document.getElementById("snapzNewShareProfileLink").value = profileLink;
+    document.getElementById("slovzanNewShareProfileLink").value = profileLink;
     popup.style.display = "flex";
 }
 
-function snapzCopyShareProfile() {
-    const input = document.getElementById("snapzNewShareProfileLink");
+function slovzanCopyShareProfile() {
+    const input = document.getElementById("slovzanNewShareProfileLink");
 
     input.focus();
     input.select();
@@ -3224,7 +3224,7 @@ function snapzCopyShareProfile() {
     try {
         document.execCommand("copy");
 
-        const status = document.getElementById("snapzNewShareCopyStatus");
+        const status = document.getElementById("slovzanNewShareCopyStatus");
         status.textContent = "Link copied ✓";
 
         setTimeout(function() {

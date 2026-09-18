@@ -7,7 +7,7 @@
 <style>
 
 /* ============================================================
-   SNAPZ TAG ACCEPT / REJECT
+   SLOVZAN TAG ACCEPT / REJECT
    ============================================================ */
 
 .tag-action-buttons{
@@ -48,7 +48,7 @@ body{
 
 
 /* ============================================================
-   SNAPZ NOTIFICATION PROFILE PIC
+   SLOVZAN NOTIFICATION PROFILE PIC
    ============================================================ */
 
 .notification-content{
@@ -299,7 +299,7 @@ a{
                                           action="/accept_tag/{{ n['post_id'] }}"
                                           method="POST"
                                           class="tag-action-form"
-                                          onsubmit="return snapzHandleTagAction(event, this)"
+                                          onsubmit="return slovzanHandleTagAction(event, this)"
                                       >
                                           <button type="submit" class="tag-accept-btn">
                                               Accept
@@ -310,7 +310,7 @@ a{
                                           action="/reject_tag/{{ n['post_id'] }}"
                                           method="POST"
                                           class="tag-action-form"
-                                          onsubmit="return snapzHandleTagAction(event, this)"
+                                          onsubmit="return slovzanHandleTagAction(event, this)"
                                       >
                                           <button type="submit" class="tag-reject-btn">
                                               Reject
@@ -323,7 +323,7 @@ a{
                                           action="/accept_reel_tag/{{ n['post_id'] }}"
                                           method="POST"
                                           class="tag-action-form"
-                                          onsubmit="return snapzHandleTagAction(event, this)"
+                                          onsubmit="return slovzanHandleTagAction(event, this)"
                                       >
                                           <button type="submit" class="tag-accept-btn">
                                               Accept
@@ -334,7 +334,7 @@ a{
                                           action="/reject_reel_tag/{{ n['post_id'] }}"
                                           method="POST"
                                           class="tag-action-form"
-                                          onsubmit="return snapzHandleTagAction(event, this)"
+                                          onsubmit="return slovzanHandleTagAction(event, this)"
                                       >
                                           <button type="submit" class="tag-reject-btn">
                                               Reject
@@ -418,7 +418,7 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 
 <script>
-function snapzHandleTagAction(event, form) {
+function slovzanHandleTagAction(event, form) {
 
     event.preventDefault();
     event.stopPropagation();

@@ -1,5 +1,5 @@
 <style>
-#snapzGlobalIncomingCall{
+#slovzanGlobalIncomingCall{
     position:fixed;
     inset:0;
     z-index:999999;
@@ -11,17 +11,17 @@
     -webkit-backdrop-filter:blur(8px);
 }
 
-#snapzGlobalIncomingCall .snapz-global-call-box{
+#slovzanGlobalIncomingCall .slovzan-global-call-box{
     width:min(88vw,360px);
     padding:28px 22px 22px;
     border-radius:26px;
     background:#fff;
     text-align:center;
     box-shadow:0 20px 70px rgba(0,0,0,.35);
-    animation:snapzGlobalCallIn .22s ease-out;
+    animation:slovzanGlobalCallIn .22s ease-out;
 }
 
-#snapzGlobalIncomingCall .snapz-global-call-icon{
+#slovzanGlobalIncomingCall .slovzan-global-call-icon{
     width:72px;
     height:72px;
     margin:0 auto 16px;
@@ -33,24 +33,24 @@
     background:linear-gradient(135deg,#ff3d81,#ff6b9d);
 }
 
-#snapzGlobalIncomingCall h2{
+#slovzanGlobalIncomingCall h2{
     margin:0 0 7px;
     font-size:22px;
     color:#222;
 }
 
-#snapzGlobalIncomingCall p{
+#slovzanGlobalIncomingCall p{
     margin:0 0 22px;
     font-size:15px;
     color:#777;
 }
 
-.snapz-global-call-buttons{
+.slovzan-global-call-buttons{
     display:flex;
     gap:12px;
 }
 
-.snapz-global-call-buttons button{
+.slovzan-global-call-buttons button{
     flex:1;
     border:0;
     padding:13px 10px;
@@ -60,22 +60,22 @@
     cursor:pointer;
 }
 
-#snapzGlobalAcceptCall{
+#slovzanGlobalAcceptCall{
     color:#fff;
     background:#20b965;
 }
 
-#snapzGlobalRejectCall,
-#snapzGlobalEndCall{
+#slovzanGlobalRejectCall,
+#slovzanGlobalEndCall{
     color:#fff;
     background:#e53935;
 }
 
-#snapzGlobalEndCall{
+#slovzanGlobalEndCall{
     display:none;
 }
 
-@keyframes snapzGlobalCallIn{
+@keyframes slovzanGlobalCallIn{
     from{
         opacity:0;
         transform:scale(.92) translateY(12px);
@@ -88,41 +88,41 @@
 </style>
 
 
-<div id="snapzGlobalIncomingCall">
+<div id="slovzanGlobalIncomingCall">
 
-    <div class="snapz-global-call-box">
+    <div class="slovzan-global-call-box">
 
         <div
-            id="snapzGlobalIncomingCallIcon"
-            class="snapz-global-call-icon"
+            id="slovzanGlobalIncomingCallIcon"
+            class="slovzan-global-call-icon"
         ></div>
 
-        <h2 id="snapzGlobalIncomingCallTitle">
+        <h2 id="slovzanGlobalIncomingCallTitle">
             Incoming Call
         </h2>
 
-        <p id="snapzGlobalIncomingCallType">
+        <p id="slovzanGlobalIncomingCallType">
             Voice Call
         </p>
 
-        <div class="snapz-global-call-buttons">
+        <div class="slovzan-global-call-buttons">
 
             <button
-                id="snapzGlobalAcceptCall"
+                id="slovzanGlobalAcceptCall"
                 type="button"
             >
                 Accept
             </button>
 
             <button
-                id="snapzGlobalRejectCall"
+                id="slovzanGlobalRejectCall"
                 type="button"
             >
                 Reject
             </button>
 
             <button
-                id="snapzGlobalEndCall"
+                id="slovzanGlobalEndCall"
                 type="button"
             >
                 End Call
@@ -140,11 +140,11 @@
 <script>
 (function(){
 
-    if(window.snapzGlobalIncomingCallLoaded){
+    if(window.slovzanGlobalIncomingCallLoaded){
         return;
     }
 
-    window.snapzGlobalIncomingCallLoaded = true;
+    window.slovzanGlobalIncomingCallLoaded = true;
 
 
     const globalCallSocket = io();
@@ -165,31 +165,31 @@
 
 
     const popup = document.getElementById(
-        "snapzGlobalIncomingCall"
+        "slovzanGlobalIncomingCall"
     );
 
     const titleText = document.getElementById(
-        "snapzGlobalIncomingCallTitle"
+        "slovzanGlobalIncomingCallTitle"
     );
 
     const typeText = document.getElementById(
-        "snapzGlobalIncomingCallType"
+        "slovzanGlobalIncomingCallType"
     );
 
     const icon = document.getElementById(
-        "snapzGlobalIncomingCallIcon"
+        "slovzanGlobalIncomingCallIcon"
     );
 
     const acceptButton = document.getElementById(
-        "snapzGlobalAcceptCall"
+        "slovzanGlobalAcceptCall"
     );
 
     const rejectButton = document.getElementById(
-        "snapzGlobalRejectCall"
+        "slovzanGlobalRejectCall"
     );
 
     const endButton = document.getElementById(
-        "snapzGlobalEndCall"
+        "slovzanGlobalEndCall"
     );
 
 
@@ -464,7 +464,7 @@
 
                 let audio =
                     document.getElementById(
-                        "snapzGlobalRemoteAudio"
+                        "slovzanGlobalRemoteAudio"
                     );
 
 
@@ -474,7 +474,7 @@
                         document.createElement("audio");
 
                     audio.id =
-                        "snapzGlobalRemoteAudio";
+                        "slovzanGlobalRemoteAudio";
 
                     audio.autoplay = true;
                     audio.playsInline = true;

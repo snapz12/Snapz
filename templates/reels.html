@@ -2,7 +2,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Snapz Reels</title><style>
+<title>Slovzan Reels</title><style>
 body{
     margin:0;
     background:#000;
@@ -18,10 +18,10 @@ body{
 
 
 /* ============================================================
-   SNAPZ REELS 3 HEART DOUBLE TAP BURST
+   SLOVZAN REELS 3 HEART DOUBLE TAP BURST
 ============================================================ */
 
-.snapz-heart-burst{
+.slovzan-heart-burst{
     position:fixed;
     left:0;
     top:0;
@@ -31,7 +31,7 @@ body{
     z-index:999999;
 }
 
-.snapz-burst-heart{
+.slovzan-burst-heart{
     position:absolute;
     width:42px;
     height:42px;
@@ -44,38 +44,38 @@ body{
     transform:translate(-50%,-50%) scale(.55) rotate(0deg);
     opacity:0;
 
-animation:snapzHeartFloat 1.15s cubic-bezier(.25,.46,.45,.94) forwards;
+animation:slovzanHeartFloat 1.15s cubic-bezier(.25,.46,.45,.94) forwards;
 
     filter:drop-shadow(0 3px 5px rgba(255,64,129,.28));
 
     will-change:transform,opacity;
 }
 
-.snapz-burst-heart svg{
+.slovzan-burst-heart svg{
     display:block;
     width:42px;
     height:42px;
     flex:none;
 }
 
-.snapz-burst-heart svg path{
+.slovzan-burst-heart svg path{
     fill:#FF4081;
     stroke:none;
 }
 
-.snapz-burst-heart:nth-child(1){
+.slovzan-burst-heart:nth-child(1){
     animation-delay:0ms;
 }
 
-.snapz-burst-heart:nth-child(2){
+.slovzan-burst-heart:nth-child(2){
     animation-delay:90ms;
 }
 
-.snapz-burst-heart:nth-child(3){
+.slovzan-burst-heart:nth-child(3){
     animation-delay:180ms;
 }
 
-@keyframes snapzHeartFloat{
+@keyframes slovzanHeartFloat{
 
     0%{
         opacity:0;
@@ -174,11 +174,11 @@ filter:drop-shadow(0 0 3px black);
 
 
 /* =========================================================
-   SNAPZ REEL COMMENTS - NEW SYSTEM
+   SLOVZAN REEL COMMENTS - NEW SYSTEM
    Modal is created directly inside BODY by JavaScript.
    ========================================================= */
 
-.snapz-reel-comment-overlay{
+.slovzan-reel-comment-overlay{
     position:fixed;
     inset:0;
     z-index:2147483000;
@@ -188,11 +188,11 @@ filter:drop-shadow(0 0 3px black);
     background:rgba(0,0,0,.58);
 }
 
-.snapz-reel-comment-overlay.show{
+.slovzan-reel-comment-overlay.show{
     display:flex;
 }
 
-.snapz-reel-comment-modal{
+.slovzan-reel-comment-modal{
     width:100%;
     max-width:560px;
     height:50vh;
@@ -205,7 +205,7 @@ filter:drop-shadow(0 0 3px black);
     box-shadow:0 -8px 35px rgba(0,0,0,.45);
 }
 
-.snapz-reel-comment-header{
+.slovzan-reel-comment-header{
     flex:0 0 58px;
     height:58px;
     display:flex;
@@ -218,7 +218,7 @@ filter:drop-shadow(0 0 3px black);
     font-weight:700;
 }
 
-.snapz-reel-comment-close{
+.slovzan-reel-comment-close{
     width:40px;
     height:40px;
     border:0;
@@ -230,7 +230,7 @@ filter:drop-shadow(0 0 3px black);
     cursor:pointer;
 }
 
-.snapz-reel-comment-list{
+.slovzan-reel-comment-list{
     flex:1 1 auto;
     min-height:0;
     overflow-y:auto;
@@ -239,7 +239,7 @@ filter:drop-shadow(0 0 3px black);
     -webkit-overflow-scrolling:touch;
 }
 
-.snapz-reel-comment-empty{
+.slovzan-reel-comment-empty{
     height:100%;
     display:flex;
     align-items:center;
@@ -248,7 +248,7 @@ filter:drop-shadow(0 0 3px black);
     font-size:15px;
 }
 
-.snapz-reel-comment-item{
+.slovzan-reel-comment-item{
     display:flex;
     flex-direction:column;
     gap:5px;
@@ -256,20 +256,20 @@ filter:drop-shadow(0 0 3px black);
     border-bottom:1px solid #222;
 }
 
-.snapz-reel-comment-user{
+.slovzan-reel-comment-user{
     color:#fff;
     font-size:14px;
     font-weight:700;
 }
 
-.snapz-reel-comment-text{
+.slovzan-reel-comment-text{
     color:#e9e9e9;
     font-size:15px;
     line-height:1.4;
     word-break:break-word;
 }
 
-.snapz-reel-comment-inputbar{
+.slovzan-reel-comment-inputbar{
     flex:0 0 auto;
     min-height:68px;
     width:100%;
@@ -282,7 +282,7 @@ filter:drop-shadow(0 0 3px black);
     border-top:1px solid #2b2b2b;
 }
 
-.snapz-reel-comment-input{
+.slovzan-reel-comment-input{
     flex:1;
     min-width:0;
     height:46px;
@@ -296,11 +296,11 @@ filter:drop-shadow(0 0 3px black);
     font-size:15px;
 }
 
-.snapz-reel-comment-input::placeholder{
+.slovzan-reel-comment-input::placeholder{
     color:#888;
 }
 
-.snapz-reel-comment-post{
+.slovzan-reel-comment-post{
     flex:0 0 76px;
     width:76px;
     height:46px;
@@ -313,19 +313,19 @@ filter:drop-shadow(0 0 3px black);
     cursor:pointer;
 }
 
-.snapz-reel-comment-post:disabled{
+.slovzan-reel-comment-post:disabled{
     opacity:.55;
 }
 
 
-.snapz-reel-comment-row{
+.slovzan-reel-comment-row{
     display:flex;
     align-items:flex-start;
     gap:10px;
     width:100%;
 }
 
-.snapz-reel-comment-profile{
+.slovzan-reel-comment-profile{
     width:38px;
     height:38px;
     min-width:38px;
@@ -334,12 +334,12 @@ filter:drop-shadow(0 0 3px black);
     background:#222;
 }
 
-.snapz-reel-comment-content{
+.slovzan-reel-comment-content{
     flex:1;
     min-width:0;
 }
 
-.snapz-reel-comment-top{
+.slovzan-reel-comment-top{
     display:flex;
     align-items:center;
     justify-content:space-between;
@@ -347,7 +347,7 @@ filter:drop-shadow(0 0 3px black);
     min-height:22px;
 }
 
-.snapz-reel-comment-user{
+.slovzan-reel-comment-user{
     color:#fff;
     font-size:14px;
     font-weight:700;
@@ -356,7 +356,7 @@ filter:drop-shadow(0 0 3px black);
     white-space:nowrap;
 }
 
-.snapz-reel-comment-reply-btn{
+.slovzan-reel-comment-reply-btn{
     flex:0 0 auto;
     border:0;
     background:none;
@@ -367,11 +367,11 @@ filter:drop-shadow(0 0 3px black);
     cursor:pointer;
 }
 
-.snapz-reel-comment-reply-btn:active{
+.slovzan-reel-comment-reply-btn:active{
     color:#fff;
 }
 
-.snapz-reel-comment-text{
+.slovzan-reel-comment-text{
     color:#e9e9e9;
     font-size:15px;
     line-height:1.4;
@@ -379,22 +379,22 @@ filter:drop-shadow(0 0 3px black);
     word-break:break-word;
 }
 
-.snapz-reel-replies{
+.slovzan-reel-replies{
     margin-left:48px;
     margin-top:10px;
     padding-left:10px;
     border-left:1px solid #333;
 }
 
-.snapz-reel-reply-row{
+.slovzan-reel-reply-row{
     margin-bottom:10px;
 }
 
-.snapz-reel-reply-row:last-child{
+.slovzan-reel-reply-row:last-child{
     margin-bottom:0;
 }
 
-.snapz-reel-reply-bar{
+.slovzan-reel-reply-bar{
     flex:0 0 auto;
     min-height:38px;
     display:flex;
@@ -409,7 +409,7 @@ filter:drop-shadow(0 0 3px black);
     font-size:13px;
 }
 
-.snapz-reel-reply-bar button{
+.slovzan-reel-reply-bar button{
     width:28px;
     height:28px;
     border:0;
@@ -419,7 +419,7 @@ filter:drop-shadow(0 0 3px black);
     cursor:pointer;
 }
 
-.snapz-reel-comment-count{
+.slovzan-reel-comment-count{
     text-align:center;
     font-size:12px;
     font-weight:bold;
@@ -574,7 +574,7 @@ filter:drop-shadow(0 0 3px black);
     font-size:18px;
 }
 </style></head><body><div class="header">
- Snapz Reels
+ Slovzan Reels
 
 </div>
 
@@ -584,7 +584,7 @@ filter:drop-shadow(0 0 3px black);
 
 {% if r.audio %}
 <audio
-    class="snapz-reel-music"
+    class="slovzan-reel-music"
     src="{{ r.audio }}"
     data-start="{{ r.music_start or 0 }}"
     data-end="{{ r.music_end or 0 }}"
@@ -722,7 +722,7 @@ stroke-linejoin="round"/>
 </button>
 
 {% if r.comments > 0 %}
-<div id="reel-comment-count-{{ r.id }}" class="snapz-reel-comment-count">
+<div id="reel-comment-count-{{ r.id }}" class="slovzan-reel-comment-count">
 {{ r.comments }}
 </div>
 {% endif %}
@@ -913,7 +913,7 @@ function toggleFollow(btn, username) {
          * Dusre pages/components ke liye event.
          */
         window.dispatchEvent(
-            new CustomEvent("snapzFollowChanged", {
+            new CustomEvent("slovzanFollowChanged", {
                 detail: {
                     username: username,
                     following: newFollowing
@@ -928,91 +928,91 @@ function toggleFollow(btn, username) {
 }
 
 
-let snapzActiveReelCommentId = null;
-let snapzCurrentReelReplyTo = null;
-let snapzCurrentReelReplyUsername = "";
+let slovzanActiveReelCommentId = null;
+let slovzanCurrentReelReplyTo = null;
+let slovzanCurrentReelReplyUsername = "";
 
-let snapzReelCommentOverlay = null;
-let snapzReelCommentList = null;
-let snapzReelCommentInput = null;
-let snapzReelCommentPost = null;
+let slovzanReelCommentOverlay = null;
+let slovzanReelCommentList = null;
+let slovzanReelCommentInput = null;
+let slovzanReelCommentPost = null;
 
 
-function snapzCreateReelCommentModal(){
+function slovzanCreateReelCommentModal(){
 
-    if(document.getElementById("snapzReelCommentOverlay")){
+    if(document.getElementById("slovzanReelCommentOverlay")){
 
-        snapzReelCommentOverlay =
-            document.getElementById("snapzReelCommentOverlay");
+        slovzanReelCommentOverlay =
+            document.getElementById("slovzanReelCommentOverlay");
 
-        snapzReelCommentList =
-            document.getElementById("snapzReelCommentList");
+        slovzanReelCommentList =
+            document.getElementById("slovzanReelCommentList");
 
-        snapzReelCommentInput =
-            document.getElementById("snapzReelCommentInput");
+        slovzanReelCommentInput =
+            document.getElementById("slovzanReelCommentInput");
 
-        snapzReelCommentPost =
-            document.getElementById("snapzReelCommentPost");
+        slovzanReelCommentPost =
+            document.getElementById("slovzanReelCommentPost");
 
         return;
     }
 
-    snapzReelCommentOverlay = document.createElement("div");
+    slovzanReelCommentOverlay = document.createElement("div");
 
-    snapzReelCommentOverlay.id =
-        "snapzReelCommentOverlay";
+    slovzanReelCommentOverlay.id =
+        "slovzanReelCommentOverlay";
 
-    snapzReelCommentOverlay.className =
-        "snapz-reel-comment-overlay";
+    slovzanReelCommentOverlay.className =
+        "slovzan-reel-comment-overlay";
 
 
-    snapzReelCommentOverlay.innerHTML = `
+    slovzanReelCommentOverlay.innerHTML = `
 
-        <div class="snapz-reel-comment-modal">
+        <div class="slovzan-reel-comment-modal">
 
-            <div class="snapz-reel-comment-header">
+            <div class="slovzan-reel-comment-header">
 
                 <span>Comments</span>
 
                 <button
                     type="button"
-                    class="snapz-reel-comment-close"
-                    id="snapzReelCommentClose"
+                    class="slovzan-reel-comment-close"
+                    id="slovzanReelCommentClose"
                 >×</button>
 
             </div>
 
 
             <div
-                id="snapzReelCommentList"
-                class="snapz-reel-comment-list"
+                id="slovzanReelCommentList"
+                class="slovzan-reel-comment-list"
             ></div>
 
 
             <div
-                id="snapzReelReplyBar"
-                class="snapz-reel-reply-bar"
+                id="slovzanReelReplyBar"
+                class="slovzan-reel-reply-bar"
                 style="display:none;"
             >
-                <span id="snapzReelReplyText">
+                <span id="slovzanReelReplyText">
                     Replying...
                 </span>
 
                 <button
                     type="button"
-                    id="snapzReelReplyCancel"
+                    id="slovzanReelReplyCancel"
                 >×</button>
             </div>
 
 
             <form
-                id="snapzReelCommentForm"
-                class="snapz-reel-comment-inputbar"
+                id="slovzanReelCommentForm"
+                class="slovzan-reel-comment-inputbar"
             >
 
                 <input
-                    id="snapzReelCommentInput"
-                    class="snapz-reel-comment-input"
+                    id="slovzanReelCommentInput"
+                    class="slovzan-reel-comment-input"
                     type="text"
                     placeholder="Add comment..."
                     autocomplete="off"
@@ -1020,8 +1020,8 @@ function snapzCreateReelCommentModal(){
                 >
 
                 <button
-                    id="snapzReelCommentPost"
-                    class="snapz-reel-comment-post"
+                    id="slovzanReelCommentPost"
+                    class="slovzan-reel-comment-post"
                     type="submit"
                 >Post</button>
 
@@ -1032,28 +1032,28 @@ function snapzCreateReelCommentModal(){
 
 
     document.body.appendChild(
-        snapzReelCommentOverlay
+        slovzanReelCommentOverlay
     );
 
 
-    snapzReelCommentList =
+    slovzanReelCommentList =
         document.getElementById(
-            "snapzReelCommentList"
+            "slovzanReelCommentList"
         );
 
-    snapzReelCommentInput =
+    slovzanReelCommentInput =
         document.getElementById(
-            "snapzReelCommentInput"
+            "slovzanReelCommentInput"
         );
 
-    snapzReelCommentPost =
+    slovzanReelCommentPost =
         document.getElementById(
-            "snapzReelCommentPost"
+            "slovzanReelCommentPost"
         );
 
 
     document
-        .getElementById("snapzReelCommentClose")
+        .getElementById("slovzanReelCommentClose")
         .addEventListener(
             "click",
             closeCommentModal
@@ -1061,18 +1061,18 @@ function snapzCreateReelCommentModal(){
 
 
     document
-        .getElementById("snapzReelReplyCancel")
+        .getElementById("slovzanReelReplyCancel")
         .addEventListener(
             "click",
-            snapzCancelReelReply
+            slovzanCancelReelReply
         );
 
 
-    snapzReelCommentOverlay.addEventListener(
+    slovzanReelCommentOverlay.addEventListener(
         "click",
         function(e){
 
-            if(e.target === snapzReelCommentOverlay){
+            if(e.target === slovzanReelCommentOverlay){
 
                 closeCommentModal();
 
@@ -1083,20 +1083,20 @@ function snapzCreateReelCommentModal(){
 
 
     document
-        .getElementById("snapzReelCommentForm")
+        .getElementById("slovzanReelCommentForm")
         .addEventListener(
             "submit",
             function(e){
 
                 e.preventDefault();
 
-                snapzSubmitReelComment();
+                slovzanSubmitReelComment();
 
             }
         );
 
 
-    snapzReelCommentInput.addEventListener(
+    slovzanReelCommentInput.addEventListener(
         "keydown",
         function(e){
 
@@ -1104,7 +1104,7 @@ function snapzCreateReelCommentModal(){
 
                 e.preventDefault();
 
-                snapzSubmitReelComment();
+                slovzanSubmitReelComment();
 
             }
 
@@ -1116,18 +1116,18 @@ function snapzCreateReelCommentModal(){
 
 function openCommentModal(reelId){
 
-    snapzActiveReelCommentId =
+    slovzanActiveReelCommentId =
         reelId;
 
-    snapzCurrentReelReplyTo =
+    slovzanCurrentReelReplyTo =
         null;
 
-    snapzCurrentReelReplyUsername =
+    slovzanCurrentReelReplyUsername =
         "";
 
-    snapzCreateReelCommentModal();
+    slovzanCreateReelCommentModal();
 
-    snapzReelCommentOverlay.classList.add(
+    slovzanReelCommentOverlay.classList.add(
         "show"
     );
 
@@ -1135,27 +1135,27 @@ function openCommentModal(reelId){
         "hidden";
 
 
-    snapzReelCommentList.innerHTML = `
-        <div class="snapz-reel-comment-empty">
+    slovzanReelCommentList.innerHTML = `
+        <div class="slovzan-reel-comment-empty">
             Loading comments...
         </div>
     `;
 
 
-    snapzReelCommentInput.value = "";
+    slovzanReelCommentInput.value = "";
 
-    snapzCancelReelReply();
+    slovzanCancelReelReply();
 
-    snapzLoadReelComments(
+    slovzanLoadReelComments(
         reelId
     );
 
 
     setTimeout(function(){
 
-        if(snapzReelCommentInput){
+        if(slovzanReelCommentInput){
 
-            snapzReelCommentInput.focus();
+            slovzanReelCommentInput.focus();
 
         }
 
@@ -1166,26 +1166,26 @@ function openCommentModal(reelId){
 
 function closeCommentModal(){
 
-    if(!snapzReelCommentOverlay){
+    if(!slovzanReelCommentOverlay){
 
         return;
 
     }
 
-    snapzCancelReelReply();
+    slovzanCancelReelReply();
 
-    snapzReelCommentOverlay.classList.remove(
+    slovzanReelCommentOverlay.classList.remove(
         "show"
     );
 
     document.body.style.overflow = "";
 
-    snapzActiveReelCommentId = null;
+    slovzanActiveReelCommentId = null;
 }
 
 
 
-function snapzLoadReelComments(reelId){
+function slovzanLoadReelComments(reelId){
 
     fetch(
         "/reel_comments/" + reelId,
@@ -1221,12 +1221,12 @@ function snapzLoadReelComments(reelId){
 
         }
 
-        snapzRenderReelComments(
+        slovzanRenderReelComments(
             data.comments || []
         );
 
 
-        snapzUpdateReelCommentCount(
+        slovzanUpdateReelCommentCount(
             reelId,
             data.count || 0
         );
@@ -1240,8 +1240,8 @@ function snapzLoadReelComments(reelId){
         );
 
 
-        snapzReelCommentList.innerHTML = `
-            <div class="snapz-reel-comment-empty">
+        slovzanReelCommentList.innerHTML = `
+            <div class="slovzan-reel-comment-empty">
                 Unable to load comments.
             </div>
         `;
@@ -1251,7 +1251,7 @@ function snapzLoadReelComments(reelId){
 
 
 
-function snapzReelProfilePic(url){
+function slovzanReelProfilePic(url){
 
     if(url && String(url).trim()){
 
@@ -1264,9 +1264,9 @@ function snapzReelProfilePic(url){
 
 
 
-function snapzRenderReelComments(comments){
+function slovzanRenderReelComments(comments){
 
-    snapzReelCommentList.innerHTML = "";
+    slovzanReelCommentList.innerHTML = "";
 
 
     const topComments =
@@ -1282,8 +1282,8 @@ function snapzRenderReelComments(comments){
 
     if(!topComments.length){
 
-        snapzReelCommentList.innerHTML = `
-            <div class="snapz-reel-comment-empty">
+        slovzanReelCommentList.innerHTML = `
+            <div class="slovzan-reel-comment-empty">
                 No comments yet
             </div>
         `;
@@ -1295,7 +1295,7 @@ function snapzRenderReelComments(comments){
 
     topComments.forEach(function(comment){
 
-        snapzAddReelComment(
+        slovzanAddReelComment(
             comment,
             comments
         );
@@ -1303,13 +1303,13 @@ function snapzRenderReelComments(comments){
     });
 
 
-    snapzReelCommentList.scrollTop =
-        snapzReelCommentList.scrollHeight;
+    slovzanReelCommentList.scrollTop =
+        slovzanReelCommentList.scrollHeight;
 }
 
 
 
-function snapzAddReelComment(
+function slovzanAddReelComment(
     comment,
     allComments
 ){
@@ -1318,24 +1318,24 @@ function snapzAddReelComment(
         document.createElement("div");
 
     item.className =
-        "snapz-reel-comment-item";
+        "slovzan-reel-comment-item";
 
 
     const row =
         document.createElement("div");
 
     row.className =
-        "snapz-reel-comment-row";
+        "slovzan-reel-comment-row";
 
 
     const pic =
         document.createElement("img");
 
     pic.className =
-        "snapz-reel-comment-profile";
+        "slovzan-reel-comment-profile";
 
     pic.src =
-        snapzReelProfilePic(
+        slovzanReelProfilePic(
             comment.profile_pic
         );
 
@@ -1354,21 +1354,21 @@ function snapzAddReelComment(
         document.createElement("div");
 
     content.className =
-        "snapz-reel-comment-content";
+        "slovzan-reel-comment-content";
 
 
     const top =
         document.createElement("div");
 
     top.className =
-        "snapz-reel-comment-top";
+        "slovzan-reel-comment-top";
 
 
     const username =
         document.createElement("span");
 
     username.className =
-        "snapz-reel-comment-user";
+        "slovzan-reel-comment-user";
 
     username.textContent =
         "@" + comment.username;
@@ -1381,7 +1381,7 @@ function snapzAddReelComment(
         "button";
 
     reply.className =
-        "snapz-reel-comment-reply-btn";
+        "slovzan-reel-comment-reply-btn";
 
     reply.textContent =
         "Reply";
@@ -1398,7 +1398,7 @@ function snapzAddReelComment(
         "click",
         function(){
 
-            snapzSetReelReplyMode(
+            slovzanSetReelReplyMode(
                 Number(comment.id),
                 comment.username
             );
@@ -1416,7 +1416,7 @@ function snapzAddReelComment(
         document.createElement("div");
 
     text.className =
-        "snapz-reel-comment-text";
+        "slovzan-reel-comment-text";
 
     text.textContent =
         comment.comment;
@@ -1449,12 +1449,12 @@ function snapzAddReelComment(
             document.createElement("div");
 
         replyList.className =
-            "snapz-reel-replies";
+            "slovzan-reel-replies";
 
 
         replies.forEach(function(replyComment){
 
-            snapzAddReelReply(
+            slovzanAddReelReply(
                 replyList,
                 replyComment,
                 allComments
@@ -1470,14 +1470,14 @@ function snapzAddReelComment(
     }
 
 
-    snapzReelCommentList.appendChild(
+    slovzanReelCommentList.appendChild(
         item
     );
 }
 
 
 
-function snapzAddReelReply(
+function slovzanAddReelReply(
     container,
     comment,
     allComments
@@ -1487,17 +1487,17 @@ function snapzAddReelReply(
         document.createElement("div");
 
     row.className =
-        "snapz-reel-comment-row snapz-reel-reply-row";
+        "slovzan-reel-comment-row slovzan-reel-reply-row";
 
 
     const pic =
         document.createElement("img");
 
     pic.className =
-        "snapz-reel-comment-profile";
+        "slovzan-reel-comment-profile";
 
     pic.src =
-        snapzReelProfilePic(
+        slovzanReelProfilePic(
             comment.profile_pic
         );
 
@@ -1516,21 +1516,21 @@ function snapzAddReelReply(
         document.createElement("div");
 
     content.className =
-        "snapz-reel-comment-content";
+        "slovzan-reel-comment-content";
 
 
     const top =
         document.createElement("div");
 
     top.className =
-        "snapz-reel-comment-top";
+        "slovzan-reel-comment-top";
 
 
     const username =
         document.createElement("span");
 
     username.className =
-        "snapz-reel-comment-user";
+        "slovzan-reel-comment-user";
 
     username.textContent =
         "@" + comment.username;
@@ -1543,7 +1543,7 @@ function snapzAddReelReply(
         "button";
 
     reply.className =
-        "snapz-reel-comment-reply-btn";
+        "slovzan-reel-comment-reply-btn";
 
     reply.textContent =
         "Reply";
@@ -1560,7 +1560,7 @@ function snapzAddReelReply(
         "click",
         function(){
 
-            snapzSetReelReplyMode(
+            slovzanSetReelReplyMode(
                 Number(comment.id),
                 comment.username
             );
@@ -1578,7 +1578,7 @@ function snapzAddReelReply(
         document.createElement("div");
 
     text.className =
-        "snapz-reel-comment-text";
+        "slovzan-reel-comment-text";
 
     text.textContent =
         comment.comment;
@@ -1601,26 +1601,26 @@ function snapzAddReelReply(
 
 
 
-function snapzSetReelReplyMode(
+function slovzanSetReelReplyMode(
     commentId,
     username
 ){
 
-    snapzCurrentReelReplyTo =
+    slovzanCurrentReelReplyTo =
         Number(commentId);
 
-    snapzCurrentReelReplyUsername =
+    slovzanCurrentReelReplyUsername =
         username || "";
 
 
     const bar =
         document.getElementById(
-            "snapzReelReplyBar"
+            "slovzanReelReplyBar"
         );
 
     const text =
         document.getElementById(
-            "snapzReelReplyText"
+            "slovzanReelReplyText"
         );
 
 
@@ -1636,17 +1636,17 @@ function snapzSetReelReplyMode(
 
         text.textContent =
             "Reply to @" +
-            snapzCurrentReelReplyUsername;
+            slovzanCurrentReelReplyUsername;
 
     }
 
 
-    if(snapzReelCommentInput){
+    if(slovzanReelCommentInput){
 
-        snapzReelCommentInput.placeholder =
+        slovzanReelCommentInput.placeholder =
             "Reply...";
 
-        snapzReelCommentInput.focus();
+        slovzanReelCommentInput.focus();
 
     }
 
@@ -1654,18 +1654,18 @@ function snapzSetReelReplyMode(
 
 
 
-function snapzCancelReelReply(){
+function slovzanCancelReelReply(){
 
-    snapzCurrentReelReplyTo =
+    slovzanCurrentReelReplyTo =
         null;
 
-    snapzCurrentReelReplyUsername =
+    slovzanCurrentReelReplyUsername =
         "";
 
 
     const bar =
         document.getElementById(
-            "snapzReelReplyBar"
+            "slovzanReelReplyBar"
         );
 
 
@@ -1677,9 +1677,9 @@ function snapzCancelReelReply(){
     }
 
 
-    if(snapzReelCommentInput){
+    if(slovzanReelCommentInput){
 
-        snapzReelCommentInput.placeholder =
+        slovzanReelCommentInput.placeholder =
             "Add comment...";
 
     }
@@ -1688,9 +1688,9 @@ function snapzCancelReelReply(){
 
 
 
-function snapzSubmitReelComment(){
+function slovzanSubmitReelComment(){
 
-    if(!snapzActiveReelCommentId){
+    if(!slovzanActiveReelCommentId){
 
         return;
 
@@ -1699,24 +1699,24 @@ function snapzSubmitReelComment(){
 
     const text =
         (
-            snapzReelCommentInput.value ||
+            slovzanReelCommentInput.value ||
             ""
         ).trim();
 
 
     if(!text){
 
-        snapzReelCommentInput.focus();
+        slovzanReelCommentInput.focus();
 
         return;
 
     }
 
 
-    snapzReelCommentPost.disabled =
+    slovzanReelCommentPost.disabled =
         true;
 
-    snapzReelCommentPost.textContent =
+    slovzanReelCommentPost.textContent =
         "Posting...";
 
 
@@ -1731,13 +1731,13 @@ function snapzSubmitReelComment(){
 
 
     if(
-        snapzCurrentReelReplyTo !==
+        slovzanCurrentReelReplyTo !==
         null
     ){
 
         formData.append(
             "reply_to",
-            snapzCurrentReelReplyTo
+            slovzanCurrentReelReplyTo
         );
 
     }
@@ -1745,7 +1745,7 @@ function snapzSubmitReelComment(){
 
     fetch(
         "/comment_reel/" +
-        snapzActiveReelCommentId,
+        slovzanActiveReelCommentId,
         {
             method:"POST",
 
@@ -1786,17 +1786,17 @@ function snapzSubmitReelComment(){
     .then(function(){
 
         const reelId =
-            snapzActiveReelCommentId;
+            slovzanActiveReelCommentId;
 
 
-        snapzReelCommentInput.value =
+        slovzanReelCommentInput.value =
             "";
 
 
-        snapzCancelReelReply();
+        slovzanCancelReelReply();
 
 
-        snapzLoadReelComments(
+        slovzanLoadReelComments(
             reelId
         );
 
@@ -1817,21 +1817,21 @@ function snapzSubmitReelComment(){
     })
     .finally(function(){
 
-        snapzReelCommentPost.disabled =
+        slovzanReelCommentPost.disabled =
             false;
 
-        snapzReelCommentPost.textContent =
+        slovzanReelCommentPost.textContent =
             "Post";
 
 
-        snapzReelCommentInput.focus();
+        slovzanReelCommentInput.focus();
 
     });
 }
 
 
 
-function snapzRefreshReelCommentCount(
+function slovzanRefreshReelCommentCount(
     reelId
 ){
 
@@ -1848,7 +1848,7 @@ function snapzRefreshReelCommentCount(
 
         if(data.status === "ok"){
 
-            snapzUpdateReelCommentCount(
+            slovzanUpdateReelCommentCount(
                 reelId,
                 data.count || 0
             );
@@ -1868,7 +1868,7 @@ function snapzRefreshReelCommentCount(
 
 
 
-function snapzUpdateReelCommentCount(
+function slovzanUpdateReelCommentCount(
     reelId,
     count
 ){
@@ -1938,7 +1938,7 @@ reelId;
 if(navigator.share){
 
 navigator.share({
-title:"Snapz Reel",
+title:"Slovzan Reel",
 url:url
 });
 
@@ -2000,7 +2000,7 @@ videos.forEach(video=>{
 
 <script>
 /* =====================================================
-   SNAPZ REEL MUSIC PLAYER
+   SLOVZAN REEL MUSIC PLAYER
    Syncs saved reel music with active reel.
 ===================================================== */
 (function(){
@@ -2019,7 +2019,7 @@ videos.forEach(video=>{
     function playReelMusic(reel){
 
         const music =
-            reel.querySelector(".snapz-reel-music");
+            reel.querySelector(".slovzan-reel-music");
 
         if(!music){
 
@@ -2090,7 +2090,7 @@ videos.forEach(video=>{
 
     }
 
-    window.snapzPlayReelMusic = playReelMusic;
+    window.slovzanPlayReelMusic = playReelMusic;
 
     const reels =
         document.querySelectorAll(".reel");
@@ -2117,7 +2117,7 @@ videos.forEach(video=>{
 
                 const music =
                     reel.querySelector(
-                        ".snapz-reel-music"
+                        ".slovzan-reel-music"
                     );
 
                 if(music){
@@ -2135,13 +2135,13 @@ videos.forEach(video=>{
 
 <script>
 /* ============================================================
-   SNAPZ REELS 3 HEART DOUBLE TAP BURST
+   SLOVZAN REELS 3 HEART DOUBLE TAP BURST
 ============================================================ */
 
-function snapzShowThreeHeartBurst(clientX, clientY){
+function slovzanShowThreeHeartBurst(clientX, clientY){
 
     const burst = document.createElement("div");
-    burst.className = "snapz-heart-burst";
+    burst.className = "slovzan-heart-burst";
 
     burst.style.left = clientX + "px";
     burst.style.top = clientY + "px";
@@ -2177,7 +2177,7 @@ function snapzShowThreeHeartBurst(clientX, clientY){
 
         const heart = document.createElement("span");
 
-        heart.className = "snapz-burst-heart";
+        heart.className = "slovzan-burst-heart";
 
         heart.innerHTML = `
             <svg
@@ -2249,7 +2249,7 @@ document.addEventListener("dblclick", function(e){
     if (!reelId) return;
 
     /* Existing 3-heart animation */
-    snapzShowThreeHeartBurst(
+    slovzanShowThreeHeartBurst(
         e.clientX,
         e.clientY
     );

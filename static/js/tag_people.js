@@ -1,5 +1,5 @@
 /* =========================================================
-   SNAPZ — TAG PEOPLE
+   SLOVZAN — TAG PEOPLE
    Clean standalone implementation
    Maximum 5 people
 ========================================================= */
@@ -19,17 +19,17 @@
 
     function injectStyles() {
 
-        if (document.getElementById("snapzTagPeopleStyle")) {
+        if (document.getElementById("slovzanTagPeopleStyle")) {
             return;
         }
 
         const style = document.createElement("style");
 
-        style.id = "snapzTagPeopleStyle";
+        style.id = "slovzanTagPeopleStyle";
 
         style.textContent = `
 
-        #snapzTagPeopleModal {
+        #slovzanTagPeopleModal {
             position: fixed !important;
             top: 0 !important;
             left: 0 !important;
@@ -55,7 +55,7 @@
         }
 
 
-        #snapzTagPeoplePanel {
+        #slovzanTagPeoplePanel {
 
             width: 100%;
             max-width: 520px;
@@ -76,7 +76,7 @@
         }
 
 
-        .snapzTagHeader {
+        .slovzanTagHeader {
 
             height: 64px;
 
@@ -91,7 +91,7 @@
         }
 
 
-        .snapzTagBack {
+        .slovzanTagBack {
 
             width: 42px;
 
@@ -103,7 +103,7 @@
         }
 
 
-        .snapzTagTitle {
+        .slovzanTagTitle {
 
             flex: 1;
 
@@ -115,7 +115,7 @@
         }
 
 
-        .snapzTagDone {
+        .slovzanTagDone {
 
             width: 42px;
 
@@ -129,13 +129,13 @@
         }
 
 
-        .snapzTagSearchArea {
+        .slovzanTagSearchArea {
 
             padding: 14px 16px 8px;
         }
 
 
-        .snapzTagSearchBox {
+        .slovzanTagSearchBox {
 
             display: flex;
 
@@ -155,7 +155,7 @@
         }
 
 
-        .snapzTagSearchBox span {
+        .slovzanTagSearchBox span {
 
             font-size: 22px;
 
@@ -163,7 +163,7 @@
         }
 
 
-        .snapzTagSearchBox input {
+        .slovzanTagSearchBox input {
 
             flex: 1;
 
@@ -180,7 +180,7 @@
         }
 
 
-        .snapzTagSearchButton {
+        .slovzanTagSearchButton {
 
             border: 0;
 
@@ -198,7 +198,7 @@
         }
 
 
-        .snapzTagCount {
+        .slovzanTagCount {
 
             padding: 5px 18px 10px;
 
@@ -208,7 +208,7 @@
         }
 
 
-        #snapzTagPeopleResults {
+        #slovzanTagPeopleResults {
 
             overflow-y: auto;
 
@@ -218,7 +218,7 @@
         }
 
 
-        .snapzTagUser {
+        .slovzanTagUser {
 
             display: flex;
 
@@ -232,7 +232,7 @@
         }
 
 
-        .snapzTagAvatar {
+        .slovzanTagAvatar {
 
             width: 48px;
             height: 48px;
@@ -247,7 +247,7 @@
         }
 
 
-        .snapzTagUsername {
+        .slovzanTagUsername {
 
             flex: 1;
 
@@ -263,7 +263,7 @@
         }
 
 
-        .snapzTagButton {
+        .slovzanTagButton {
 
             border: 0;
 
@@ -283,7 +283,7 @@
         }
 
 
-        .snapzTagButton.tagged {
+        .slovzanTagButton.tagged {
 
             background: #292d35;
 
@@ -291,7 +291,7 @@
         }
 
 
-        .snapzTagEmpty {
+        .slovzanTagEmpty {
 
             text-align: center;
 
@@ -337,7 +337,7 @@
 
         const count =
             document.getElementById(
-                "snapzTagCount"
+                "slovzanTagCount"
             );
 
         if (!count) {
@@ -360,7 +360,7 @@
 
         let modal =
             document.getElementById(
-                "snapzTagPeopleModal"
+                "slovzanTagPeopleModal"
             );
 
         if (modal) {
@@ -371,31 +371,31 @@
         modal = document.createElement("div");
 
         modal.id =
-            "snapzTagPeopleModal";
+            "slovzanTagPeopleModal";
 
 
         modal.innerHTML = `
 
-            <div id="snapzTagPeoplePanel">
+            <div id="slovzanTagPeoplePanel">
 
-                <div class="snapzTagHeader">
+                <div class="slovzanTagHeader">
 
                     <div
-                        class="snapzTagBack"
-                        id="snapzTagBack"
+                        class="slovzanTagBack"
+                        id="slovzanTagBack"
                     >
                         ‹
                     </div>
 
 
-                    <div class="snapzTagTitle">
+                    <div class="slovzanTagTitle">
                         Tag people
                     </div>
 
 
                     <div
-                        class="snapzTagDone"
-                        id="snapzTagDone"
+                        class="slovzanTagDone"
+                        id="slovzanTagDone"
                     >
                         Done
                     </div>
@@ -403,14 +403,14 @@
                 </div>
 
 
-                <div class="snapzTagSearchArea">
+                <div class="slovzanTagSearchArea">
 
-                    <div class="snapzTagSearchBox">
+                    <div class="slovzanTagSearchBox">
 
                         <span>⌕</span>
 
                         <input
-                            id="snapzTagSearchInput"
+                            id="slovzanTagSearchInput"
                             type="text"
                             placeholder="Search username..."
                             autocomplete="off"
@@ -418,8 +418,8 @@
 
                         <button
                             type="button"
-                            class="snapzTagSearchButton"
-                            id="snapzTagSearchButton"
+                            class="slovzanTagSearchButton"
+                            id="slovzanTagSearchButton"
                         >
                             Search
                         </button>
@@ -430,16 +430,16 @@
 
 
                 <div
-                    class="snapzTagCount"
-                    id="snapzTagCount"
+                    class="slovzanTagCount"
+                    id="slovzanTagCount"
                 >
                     0 / 5 tagged
                 </div>
 
 
-                <div id="snapzTagPeopleResults">
+                <div id="slovzanTagPeopleResults">
 
-                    <div class="snapzTagEmpty">
+                    <div class="slovzanTagEmpty">
                         Loading...
                     </div>
 
@@ -478,7 +478,7 @@
         ================================================= */
 
         document
-            .getElementById("snapzTagBack")
+            .getElementById("slovzanTagBack")
             .addEventListener(
                 "click",
                 closeTagPeople
@@ -490,7 +490,7 @@
         ================================================= */
 
         document
-            .getElementById("snapzTagDone")
+            .getElementById("slovzanTagDone")
             .addEventListener(
                 "click",
                 closeTagPeople
@@ -502,14 +502,14 @@
         ================================================= */
 
         document
-            .getElementById("snapzTagSearchButton")
+            .getElementById("slovzanTagSearchButton")
             .addEventListener(
                 "click",
                 function () {
 
                     const input =
                         document.getElementById(
-                            "snapzTagSearchInput"
+                            "slovzanTagSearchInput"
                         );
 
                     loadTagPeople(
@@ -526,7 +526,7 @@
         ================================================= */
 
         document
-            .getElementById("snapzTagSearchInput")
+            .getElementById("slovzanTagSearchInput")
             .addEventListener(
                 "keydown",
                 function (e) {
@@ -554,7 +554,7 @@
     function openTagPeople() {
 
         console.log(
-            "SNAPZ OPEN TAG PEOPLE"
+            "SLOVZAN OPEN TAG PEOPLE"
         );
 
 
@@ -568,7 +568,7 @@
         if (!modal) {
 
             console.error(
-                "SNAPZ: MODAL CREATE FAILED"
+                "SLOVZAN: MODAL CREATE FAILED"
             );
 
             return;
@@ -648,7 +648,7 @@
 
 
         console.log(
-            "SNAPZ TAG MODAL VISIBLE"
+            "SLOVZAN TAG MODAL VISIBLE"
         );
 
 
@@ -664,7 +664,7 @@
 
         const modal =
             document.getElementById(
-                "snapzTagPeopleModal"
+                "slovzanTagPeopleModal"
             );
 
         if (modal) {
@@ -690,7 +690,7 @@
 
         const results =
             document.getElementById(
-                "snapzTagPeopleResults"
+                "slovzanTagPeopleResults"
             );
 
         if (!results) {
@@ -699,7 +699,7 @@
 
 
         results.innerHTML = `
-            <div class="snapzTagEmpty">
+            <div class="slovzanTagEmpty">
                 Loading...
             </div>
         `;
@@ -734,7 +734,7 @@
 
 
             console.log(
-                "SNAPZ TAG USERS =",
+                "SLOVZAN TAG USERS =",
                 users
             );
 
@@ -744,13 +744,13 @@
         } catch (error) {
 
             console.error(
-                "SNAPZ TAG PEOPLE ERROR =",
+                "SLOVZAN TAG PEOPLE ERROR =",
                 error
             );
 
 
             results.innerHTML = `
-                <div class="snapzTagEmpty">
+                <div class="slovzanTagEmpty">
                     Unable to load people.
                 </div>
             `;
@@ -766,7 +766,7 @@
 
         const results =
             document.getElementById(
-                "snapzTagPeopleResults"
+                "slovzanTagPeopleResults"
             );
 
         if (!results) {
@@ -780,7 +780,7 @@
         ) {
 
             results.innerHTML = `
-                <div class="snapzTagEmpty">
+                <div class="slovzanTagEmpty">
                     No mutual followers found.
                 </div>
             `;
@@ -807,10 +807,10 @@
 
                 html += `
 
-                    <div class="snapzTagUser">
+                    <div class="slovzanTagUser">
 
                         <img
-                            class="snapzTagAvatar"
+                            class="slovzanTagAvatar"
                             src="${escapeHtml(
                                 user.profile_pic ||
                                 "/static/default.png"
@@ -821,7 +821,7 @@
                         >
 
 
-                        <div class="snapzTagUsername">
+                        <div class="slovzanTagUsername">
 
                             ${escapeHtml(
                                 username
@@ -832,7 +832,7 @@
 
                         <button
                             type="button"
-                            class="snapzTagButton ${
+                            class="slovzanTagButton ${
                                 isTagged
                                     ? "tagged"
                                     : ""
@@ -862,7 +862,7 @@
 
         results
             .querySelectorAll(
-                ".snapzTagButton"
+                ".slovzanTagButton"
             )
             .forEach(
                 function (button) {
@@ -928,7 +928,7 @@
 
         const input =
             document.getElementById(
-                "snapzTagSearchInput"
+                "slovzanTagSearchInput"
             );
 
 
@@ -944,14 +944,14 @@
        UPLOAD API
     ===================================================== */
 
-    window.snapzGetTaggedPeople =
+    window.slovzanGetTaggedPeople =
         function () {
 
             return selectedTags.slice();
         };
 
 
-    window.snapzResetTaggedPeople =
+    window.slovzanResetTaggedPeople =
         function () {
 
             selectedTags = [];
@@ -964,7 +964,7 @@
        GLOBAL OPEN API
     ===================================================== */
 
-    window.snapzOpenTagPeople =
+    window.slovzanOpenTagPeople =
         function () {
 
             openTagPeople();
@@ -980,14 +980,14 @@
 
         const button =
             document.getElementById(
-                "snapzTagPeopleButton"
+                "slovzanTagPeopleButton"
             );
 
 
         if (!button) {
 
             console.error(
-                "SNAPZ TAG PEOPLE BUTTON NOT FOUND"
+                "SLOVZAN TAG PEOPLE BUTTON NOT FOUND"
             );
 
             return;
@@ -995,7 +995,7 @@
 
 
         if (
-            button.dataset.snapzTagBound ===
+            button.dataset.slovzanTagBound ===
             "1"
         ) {
 
@@ -1003,7 +1003,7 @@
         }
 
 
-        button.dataset.snapzTagBound =
+        button.dataset.slovzanTagBound =
             "1";
 
 
@@ -1024,7 +1024,7 @@
                 e.stopPropagation();
 
                 console.log(
-                    "SNAPZ TAG PEOPLE BUTTON CLICK"
+                    "SLOVZAN TAG PEOPLE BUTTON CLICK"
                 );
 
 
@@ -1036,7 +1036,7 @@
 
 
         console.log(
-            "SNAPZ TAG PEOPLE BUTTON READY"
+            "SLOVZAN TAG PEOPLE BUTTON READY"
         );
     }
 
@@ -1060,23 +1060,23 @@
             return;
         }
 
-        if (button.dataset.snapzReelTagBound === "1") {
+        if (button.dataset.slovzanReelTagBound === "1") {
             return;
         }
 
-        button.dataset.snapzReelTagBound = "1";
+        button.dataset.slovzanReelTagBound = "1";
         button.removeAttribute("onclick");
 
         button.addEventListener("click", function (e) {
             e.preventDefault();
             e.stopPropagation();
 
-            console.log("SNAPZ REEL TAG PEOPLE BUTTON CLICK");
+            console.log("SLOVZAN REEL TAG PEOPLE BUTTON CLICK");
 
             openTagPeople();
         }, false);
 
-        console.log("SNAPZ REEL TAG PEOPLE BUTTON READY");
+        console.log("SLOVZAN REEL TAG PEOPLE BUTTON READY");
     }
 
 
@@ -1149,7 +1149,7 @@
 
 /* TEMP TAG MODAL DEBUG */
 setTimeout(function () {
-    const modal = document.getElementById("snapzTagPeopleModal");
+    const modal = document.getElementById("slovzanTagPeopleModal");
 
     console.log(
         "TAG MODAL DEBUG =",

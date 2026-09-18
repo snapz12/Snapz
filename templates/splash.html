@@ -19,7 +19,7 @@
 <style>
 
 /* =========================================================
-   SNAPZ PREMIUM SPLASH
+   SLOVZAN PREMIUM SPLASH
    HTML + CSS + JS — SINGLE FILE
 ========================================================= */
 
@@ -47,7 +47,7 @@ body{
    BACKGROUND
 ========================================================= */
 
-#snapzSplash{
+#slovzanSplash{
     position:fixed;
     inset:0;
     overflow:hidden;
@@ -72,7 +72,7 @@ body{
 
 /* Vignette */
 
-#snapzSplash::after{
+#slovzanSplash::after{
     content:"";
     position:absolute;
     inset:0;
@@ -91,14 +91,14 @@ body{
    AMBIENT GLOW
 ========================================================= */
 
-.snapzGlow{
+.slovzanGlow{
     position:absolute;
     border-radius:50%;
     pointer-events:none;
     filter:blur(60px);
 }
 
-.snapzGlowOne{
+.slovzanGlowOne{
     width:55vw;
     height:55vw;
 
@@ -109,13 +109,13 @@ body{
     opacity:.35;
 
     animation:
-        snapzGlowPulse
+        slovzanGlowPulse
         4s
         ease-in-out
         infinite;
 }
 
-.snapzGlowTwo{
+.slovzanGlowTwo{
     width:38vw;
     height:38vw;
 
@@ -126,14 +126,14 @@ body{
     opacity:.15;
 
     animation:
-        snapzGlowPulse
+        slovzanGlowPulse
         5s
         ease-in-out
         infinite
         reverse;
 }
 
-@keyframes snapzGlowPulse{
+@keyframes slovzanGlowPulse{
 
     0%,
     100%{
@@ -151,7 +151,7 @@ body{
    MAIN STAGE
 ========================================================= */
 
-.snapzStage{
+.slovzanStage{
     position:absolute;
     inset:0;
 
@@ -168,7 +168,7 @@ body{
    MAIN CAMERA LOGO
 ========================================================= */
 
-.snapzLogoWrap{
+.slovzanLogoWrap{
 
     opacity:0;
 
@@ -178,14 +178,14 @@ body{
         rotate(-18deg);
 
     animation:
-        snapzLogoIn
+        slovzanLogoIn
         1.2s
         cubic-bezier(.17,.89,.26,1.22)
         .20s
         forwards;
 }
 
-.snapzBubble{
+.slovzanBubble{
 
     position:relative;
 
@@ -224,7 +224,7 @@ body{
 
 /* White dot */
 
-.snapzBubble::before{
+.slovzanBubble::before{
 
     content:"";
 
@@ -245,7 +245,7 @@ body{
 }
 
 
-.snapzBubble::after {
+.slovzanBubble::after {
     content: "";
     position: absolute;
     
@@ -282,7 +282,7 @@ body{
    CAMERA LENS
 ========================================================= */
 
-.snapzLens{
+.slovzanLens{
 
     position:absolute;
 
@@ -310,7 +310,7 @@ body{
         #8200ff;
 }
 
-.snapzLensInner{
+.slovzanLensInner{
 
     position:absolute;
 
@@ -328,13 +328,13 @@ body{
         );
 
     animation:
-        snapzLensSpin
+        slovzanLensSpin
         4s
         linear
         infinite;
 }
 
-@keyframes snapzLensSpin{
+@keyframes slovzanLensSpin{
 
     from{
         transform:rotate(0deg);
@@ -347,7 +347,7 @@ body{
 
 /* Lens core */
 
-.snapzLensCore{
+.slovzanLensCore{
 
     position:absolute;
 
@@ -372,11 +372,11 @@ body{
 }
 
 /* =========================================================
-   SNAPZ LENS HIGHLIGHTS
+   SLOVZAN LENS HIGHLIGHTS
    ========================================================= */
 
-.snapzLensShineOne,
-.snapzLensShineTwo{
+.slovzanLensShineOne,
+.slovzanLensShineTwo{
     position:absolute;
     border-radius:50%;
     background:#fff;
@@ -384,30 +384,30 @@ body{
     pointer-events:none;
 }
 
-.snapzLensShineOne{
+.slovzanLensShineOne{
     width:11px;
     height:11px;
     right:11px;
     top:12px;
     opacity:0;
-    animation:snapzLensShineIn .7s ease-out 1.05s forwards;
+    animation:slovzanLensShineIn .7s ease-out 1.05s forwards;
 }
 
-.snapzLensShineTwo{
+.slovzanLensShineTwo{
     width:6px;
     height:6px;
     right:25px;
     top:25px;
     opacity:0;
-    animation:snapzLensShineIn .55s ease-out 1.18s forwards;
+    animation:slovzanLensShineIn .55s ease-out 1.18s forwards;
 }
 
 
 /* =========================================================
-   SNAPZ LOGO ENTRANCE
+   SLOVZAN LOGO ENTRANCE
    ========================================================= */
 
-@keyframes snapzLogoIn{
+@keyframes slovzanLogoIn{
 
     0%{
         opacity:0;
@@ -441,7 +441,7 @@ body{
    LENS HIGHLIGHT ANIMATION
    ========================================================= */
 
-@keyframes snapzLensShineIn{
+@keyframes slovzanLensShineIn{
 
     0%{
         opacity:0;
@@ -464,7 +464,7 @@ body{
    BRAND NAME
 ========================================================= */
 
-.snapzBrand{
+.slovzanBrand{
 
     margin-top:27px;
 
@@ -476,10 +476,10 @@ body{
 }
 
 /* =========================================================
-   SNAPZ BRAND TEXT — PHOTO STYLE
+   SLOVZAN BRAND TEXT — PHOTO STYLE
 ========================================================= */
 
-.snapzName{
+.slovzanName{
 
     display:flex;
 
@@ -510,8 +510,8 @@ body{
         rgba(0,0,0,.15);
 }
 
-.snapzName span,
-.snapzName em{
+.slovzanName span,
+.slovzanName em{
 
     font-family:'Comfortaa', sans-serif;
 
@@ -524,29 +524,29 @@ body{
         scale(.72);
 
     animation:
-        snapzLetterIn
+        slovzanLetterIn
         .65s
         cubic-bezier(.2,.8,.2,1)
         forwards;
 }
 
-.snapzName span:nth-child(1){
+.slovzanName span:nth-child(1){
     animation-delay:1.00s;
 }
 
-.snapzName span:nth-child(2){
+.slovzanName span:nth-child(2){
     animation-delay:1.08s;
 }
 
-.snapzName span:nth-child(3){
+.slovzanName span:nth-child(3){
     animation-delay:1.16s;
 }
 
-.snapzName span:nth-child(4){
+.slovzanName span:nth-child(4){
     animation-delay:1.24s;
 }
 
-.snapzName em{
+.slovzanName em{
 
     -webkit-text-stroke:1.2px #ff3d81;
 
@@ -569,7 +569,7 @@ body{
     animation-delay:1.32s;
 }
 
-@keyframes snapzLetterIn{
+@keyframes slovzanLetterIn{
 
     to{
         opacity:1;
@@ -584,7 +584,7 @@ body{
    TAGLINE
 ========================================================= */
 
-.snapzTagline{
+.slovzanTagline{
 
     margin-top:20px;
 
@@ -603,26 +603,26 @@ body{
     transform:translateY(15px);
 
     animation:
-        snapzTaglineIn
+        slovzanTaglineIn
         .7s
         ease
         1.7s
         forwards;
 }
 
-.snapzTagline span:nth-child(1){
+.slovzanTagline span:nth-child(1){
     color:#ff3d81;
 }
 
-.snapzTagline span:nth-child(2){
+.slovzanTagline span:nth-child(2){
     color:white;
 }
 
-.snapzTagline span:nth-child(3){
+.slovzanTagline span:nth-child(3){
     color:#ff8a35;
 }
 
-@keyframes snapzTaglineIn{
+@keyframes slovzanTaglineIn{
 
     to{
         opacity:.95;
@@ -631,10 +631,10 @@ body{
 }
 
 /* =========================================================
-   SNAPZ PREMIUM LOWER LIGHT TRAILS
+   SLOVZAN PREMIUM LOWER LIGHT TRAILS
 ========================================================= */
 
-.snapzTrail{
+.slovzanTrail{
     position:absolute;
 
     left:-8%;
@@ -656,9 +656,9 @@ body{
         drop-shadow(0 0 25px rgba(255,0,120,.25));
 }
 
-.snapzTrail i,
-.snapzTrail b,
-.snapzTrail em{
+.slovzanTrail i,
+.slovzanTrail b,
+.slovzanTrail em{
 
     position:absolute;
 
@@ -687,7 +687,7 @@ body{
         0 0 25px rgba(255,60,120,.55);
 }
 
-.snapzTrail i{
+.slovzanTrail i{
 
     width:125%;
 
@@ -700,10 +700,10 @@ body{
         skewX(-20deg);
 
     animation:
-        snapzTrailMove 3.8s ease-in-out infinite;
+        slovzanTrailMove 3.8s ease-in-out infinite;
 }
 
-.snapzTrail b{
+.slovzanTrail b{
 
     width:120%;
 
@@ -734,10 +734,10 @@ body{
         skewX(-24deg);
 
     animation:
-        snapzTrailMove 3.2s ease-in-out infinite reverse;
+        slovzanTrailMove 3.2s ease-in-out infinite reverse;
 }
 
-.snapzTrail em{
+.slovzanTrail em{
 
     width:115%;
 
@@ -768,7 +768,7 @@ body{
     opacity:.85;
 }
 
-.snapzTrail::after{
+.slovzanTrail::after{
 
     content:"";
 
@@ -796,7 +796,7 @@ body{
     opacity:.8;
 }
 
-@keyframes snapzTrailMove{
+@keyframes slovzanTrailMove{
 
     0%{
         transform:
@@ -825,7 +825,7 @@ body{
    FLOATING SOCIAL ELEMENTS
 ========================================================= */
 
-.snapzSocial{
+.slovzanSocial{
 
     position:absolute;
 
@@ -840,18 +840,18 @@ body{
         );
 
     animation:
-        snapzSocialIn
+        slovzanSocialIn
         .8s
         ease
         forwards,
 
-        snapzSocialFloat
+        slovzanSocialFloat
         3.5s
         ease-in-out
         infinite;
 }
 
-.snapzHeart{
+.slovzanHeart{
 
     color:#ff3d81;
 
@@ -862,7 +862,7 @@ body{
         #ff3d81;
 }
 
-.snapzHeartOne{
+.slovzanHeartOne{
 
     left:8%;
     top:57%;
@@ -872,7 +872,7 @@ body{
         2.1s;
 }
 
-.snapzHeartTwo{
+.slovzanHeartTwo{
 
     left:42%;
     top:70%;
@@ -882,7 +882,7 @@ body{
         2.5s;
 }
 
-.snapzCamera{
+.slovzanCamera{
 
     width:48px;
     height:35px;
@@ -897,7 +897,7 @@ body{
         );
 }
 
-.snapzCamera::after{
+.slovzanCamera::after{
 
     content:"";
 
@@ -914,7 +914,7 @@ body{
     top:7px;
 }
 
-.snapzCameraOne{
+.slovzanCameraOne{
 
     left:9%;
     top:68%;
@@ -924,7 +924,7 @@ body{
         2.3s;
 }
 
-.snapzCameraTwo{
+.slovzanCameraTwo{
 
     right:7%;
     top:31%;
@@ -934,7 +934,7 @@ body{
         2.7s;
 }
 
-.snapzChat{
+.slovzanChat{
 
     right:8%;
     top:49%;
@@ -963,7 +963,7 @@ body{
 }
 
 /* Chat bubble ke andar 3 fixed dots */
-.snapzChat::before{
+.slovzanChat::before{
     content:"";
     width:5px;
     height:5px;
@@ -976,7 +976,7 @@ body{
          10px 0 0 #ffffff;
 }
 
-.snapzChat::after{
+.slovzanChat::after{
 
     content:"";
 
@@ -1001,14 +1001,14 @@ body{
 }
 
 
-@keyframes snapzSocialIn{
+@keyframes slovzanSocialIn{
 
     to{
         opacity:.8;
     }
 }
 
-@keyframes snapzSocialFloat{
+@keyframes slovzanSocialFloat{
 
     0%,
     100%{
@@ -1028,7 +1028,7 @@ body{
    PARTICLES
 ========================================================= */
 
-.snapzParticle{
+.slovzanParticle{
 
     position:absolute;
 
@@ -1039,14 +1039,14 @@ body{
     pointer-events:none;
 
     animation:
-        snapzParticleFloat
+        slovzanParticleFloat
         var(--duration)
         ease-in-out
         var(--delay)
         infinite;
 }
 
-@keyframes snapzParticleFloat{
+@keyframes slovzanParticleFloat{
 
     0%,
     100%{
@@ -1073,7 +1073,7 @@ body{
    BOTTOM TEXT
 ========================================================= */
 
-.snapzBottom{
+.slovzanBottom{
 
     position:absolute;
 
@@ -1092,14 +1092,14 @@ body{
     transform:translateY(15px);
 
     animation:
-        snapzBottomIn
+        slovzanBottomIn
         .9s
         ease
         2.1s
         forwards;
 }
 
-.snapzBottom strong{
+.slovzanBottom strong{
 
     display:block;
 
@@ -1108,7 +1108,7 @@ body{
     font-weight:400;
 }
 
-.snapzSmallHeart{
+.slovzanSmallHeart{
 
     color:#ff3d81;
 
@@ -1121,13 +1121,13 @@ body{
         #ff3d81;
 
     animation:
-        snapzHeartBeat
+        slovzanHeartBeat
         1.25s
         ease-in-out
         infinite;
 }
 
-@keyframes snapzHeartBeat{
+@keyframes slovzanHeartBeat{
 
     0%,
     100%{
@@ -1147,7 +1147,7 @@ body{
     }
 }
 
-@keyframes snapzBottomIn{
+@keyframes slovzanBottomIn{
 
     to{
         opacity:.92;
@@ -1159,7 +1159,7 @@ body{
    LOADING BAR
 ========================================================= */
 
-.snapzLoader{
+.slovzanLoader{
 
     position:absolute;
 
@@ -1176,7 +1176,7 @@ body{
     overflow:hidden;
 }
 
-.snapzLoader span{
+.slovzanLoader span{
 
     display:block;
 
@@ -1199,14 +1199,14 @@ body{
         #ff3d81;
 
     animation:
-        snapzLoading
+        slovzanLoading
         3.8s
         cubic-bezier(.65,0,.35,1)
         .1s
         forwards;
 }
 
-@keyframes snapzLoading{
+@keyframes slovzanLoading{
 
     to{
         width:100%;
@@ -1219,25 +1219,25 @@ body{
 
 @media(max-width:430px){
 
-    .snapzStage{
+    .slovzanStage{
         padding-top:30vh;
     }
 
-    .snapzBubble{
+    .slovzanBubble{
         width:132px;
         height:132px;
     }
 
-    .snapzLens{
+    .slovzanLens{
         left:30px;
         top:30px;
     }
 
-    .snapzBrand{
+    .slovzanBrand{
         margin-top:23px;
     }
 
-    .snapzTagline{
+    .slovzanTagline{
 
         font-size:10px;
 
@@ -1246,7 +1246,7 @@ body{
         gap:8px;
     }
 
-    .snapzBottom{
+    .slovzanBottom{
 
         font-size:15px;
 
@@ -1273,33 +1273,33 @@ body{
 
 <body>
 
-<div id="snapzSplash">
+<div id="slovzanSplash">
 
   <audio id="startupSound" autoplay>
         <source src="/static/sounds/startup.mp3" type="audio/mpeg">
   </audio>
 
-    <div class="snapzGlow snapzGlowOne"></div>
-    <div class="snapzGlow snapzGlowTwo"></div>
+    <div class="slovzanGlow slovzanGlowOne"></div>
+    <div class="slovzanGlow slovzanGlowTwo"></div>
 
-    <div id="snapzParticles"></div>
+    <div id="slovzanParticles"></div>
 
-    <main class="snapzStage">
+    <main class="slovzanStage">
 
         <!-- MAIN LOGO -->
-        <div class="snapzLogoWrap">
+        <div class="slovzanLogoWrap">
 
-            <div class="snapzBubble">
+            <div class="slovzanBubble">
 
-                <div class="snapzLens">
+                <div class="slovzanLens">
 
-                    <div class="snapzLensInner"></div>
+                    <div class="slovzanLensInner"></div>
 
-                    <div class="snapzLensCore"></div>
+                    <div class="slovzanLensCore"></div>
 
-                    <i class="snapzLensShineOne"></i>
+                    <i class="slovzanLensShineOne"></i>
 
-                    <b class="snapzLensShineTwo"></b>
+                    <b class="slovzanLensShineTwo"></b>
 
                 </div>
 
@@ -1308,9 +1308,9 @@ body{
         </div>
 
         <!-- BRAND -->
-        <div class="snapzBrand">
+        <div class="slovzanBrand">
 
-            <div class="snapzName">
+            <div class="slovzanName">
 
                 <span>S</span>
                 <span>n</span>
@@ -1320,7 +1320,7 @@ body{
 
             </div>
 
-            <div class="snapzTagline">
+            <div class="slovzanTagline">
 
                 <span>SHARE.</span>
                 <span>CONNECT.</span>
@@ -1331,24 +1331,24 @@ body{
         </div>
 
         <!-- FLOATING OBJECTS -->
-        <div class="snapzSocial snapzHeart snapzHeartOne">
+        <div class="slovzanSocial slovzanHeart slovzanHeartOne">
             ♥
         </div>
 
-        <div class="snapzSocial snapzHeart snapzHeartTwo">
+        <div class="slovzanSocial slovzanHeart slovzanHeartTwo">
             ♥
         </div>
 
-        <div class="snapzSocial snapzCamera snapzCameraOne"></div>
+        <div class="slovzanSocial slovzanCamera slovzanCameraOne"></div>
 
-        <div class="snapzSocial snapzCamera snapzCameraTwo"></div>
+        <div class="slovzanSocial slovzanCamera slovzanCameraTwo"></div>
 
-        <div class="snapzSocial snapzChat"></div>
+        <div class="slovzanSocial slovzanChat"></div>
 
         <!-- BOTTOM TEXT -->
-        <div class="snapzBottom">
+        <div class="slovzanBottom">
 
-            <div class="snapzSmallHeart">
+            <div class="slovzanSmallHeart">
                 ♥
             </div>
 
@@ -1363,7 +1363,7 @@ body{
         </div>
 
         <!-- LOADING -->
-        <div class="snapzLoader">
+        <div class="slovzanLoader">
 
             <span></span>
 
@@ -1381,13 +1381,13 @@ body{
   
 (function(){
 
-    const particleBox = document.getElementById("snapzParticles");
+    const particleBox = document.getElementById("slovzanParticles");
 
     for(let i = 0; i < 90; i++){
 
         const particle = document.createElement("span");
 
-        particle.className = "snapzParticle";
+        particle.className = "slovzanParticle";
 
         const size = 1 + Math.random() * 3;
 
@@ -1423,11 +1423,11 @@ body{
         particleBox.appendChild(particle);
     }
 
-    window.snapzSplashDone = false;
+    window.slovzanSplashDone = false;
 
     setTimeout(function(){
-        window.snapzSplashDone = true;
-        window.dispatchEvent(new CustomEvent("snapzSplashFinished"));
+        window.slovzanSplashDone = true;
+        window.dispatchEvent(new CustomEvent("slovzanSplashFinished"));
     },3500);
 
 })();

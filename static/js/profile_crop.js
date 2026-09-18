@@ -1,5 +1,5 @@
 /* ============================================================
-   SNAPZ PROFILE PHOTO CROP
+   SLOVZAN PROFILE PHOTO CROP
    Separate Cropper.js module
    ============================================================ */
 
@@ -20,7 +20,7 @@
         }
 
         if (typeof Cropper === 'undefined') {
-            console.error('Snapz Profile Crop: Cropper.js is not loaded.');
+            console.error('Slovzan Profile Crop: Cropper.js is not loaded.');
             return;
         }
 
@@ -63,7 +63,7 @@
                         toggleDragModeOnDblclick: false
                     });
 
-                    // SNAPZ ROUND PROFILE CROP STYLE
+                    // SLOVZAN ROUND PROFILE CROP STYLE
                     const cropperContainer = document.querySelector('.cropper-container');
                     const cropBox = document.querySelector('.cropper-crop-box');
                     const viewBox = document.querySelector('.cropper-view-box');
@@ -126,7 +126,7 @@
         initProfileCrop();
     }
 
-    window.snapzProfileCropDestroy = function () {
+    window.slovzanProfileCropDestroy = function () {
         if (cropper) {
             cropper.destroy();
             cropper = null;

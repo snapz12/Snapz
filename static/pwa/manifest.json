@@ -1,6 +1,6 @@
 {
-  "name": "Snapz",
-  "short_name": "Snapz",
+  "name": "Slovzan",
+  "short_name": "Slovzan",
   "description": "Capture the vibe.",
   "start_url": "/splash",
   "scope": "/",
@@ -10,7 +10,7 @@
   "theme_color": "#FF3D81",
   "icons": [
     {
-      "src": "/static/images/snapz_logo.png",
+      "src": "/static/images/slovzan_logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"

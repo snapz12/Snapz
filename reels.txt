@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Snapz - Reels</title>
+    <title>Slovzan - Reels</title>
     <style>
         body {
             margin: 0;
@@ -90,7 +90,7 @@
 <body>
 
     <div class="reels-header">
-        Snapz Reels
+        Slovzan Reels
     </div>
 
     <div id="reelsSection" style="max-width: 500px; margin: 55px auto 0 auto; padding: 5px; padding-bottom: 90px; box-sizing: border-box;">

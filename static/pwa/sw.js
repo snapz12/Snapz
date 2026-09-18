@@ -1,4 +1,4 @@
-const CACHE_NAME = "snapz-pwa-v1";
+const CACHE_NAME = "slovzan-pwa-v1";
 
 self.addEventListener("install", function(event) {
     self.skipWaiting();

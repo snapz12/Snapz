@@ -1,5 +1,5 @@
 /* =========================================================
-   SNAPZ POST + REEL MUSIC SYSTEM
+   SLOVZAN POST + REEL MUSIC SYSTEM
    ========================================================= */
 
 (function () {
@@ -25,14 +25,14 @@
        OPEN MUSIC LIBRARY
     ===================================================== */
 
-    window.openSnapzPostReelMusic = function (target) {
+    window.openSlovzanPostReelMusic = function (target) {
 
         if (
             target !== "post" &&
             target !== "reel" &&
             target !== "story"
         ) {
-            console.error("SNAPZ MUSIC: invalid target", target);
+            console.error("SLOVZAN MUSIC: invalid target", target);
             return;
         }
 
@@ -41,13 +41,13 @@
 
         createLibraryPanel();
 
-        const panel = document.getElementById("snapzPostReelMusicPanel");
+        const panel = document.getElementById("slovzanPostReelMusicPanel");
         if (!panel) return;
 
         panel.style.display = "block";
         document.body.style.overflow = "hidden";
 
-        const title = document.getElementById("snapzPostReelMusicTitle");
+        const title = document.getElementById("slovzanPostReelMusicTitle");
         if (title) title.textContent = "Add audio";
 
         loadMusic();
@@ -59,10 +59,10 @@
 
     function createLibraryPanel() {
 
-        if (document.getElementById("snapzPostReelMusicPanel")) return;
+        if (document.getElementById("slovzanPostReelMusicPanel")) return;
 
         const panel = document.createElement("div");
-        panel.id = "snapzPostReelMusicPanel";
+        panel.id = "slovzanPostReelMusicPanel";
 
         panel.style.cssText = `
             display:none;
@@ -77,44 +77,44 @@
 
         panel.innerHTML = `
             <div style="position:sticky;top:0;z-index:10;height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:#050505;border-bottom:1px solid #242424;">
-                <button type="button" id="snapzPostReelMusicBack" style="background:none;border:0;color:#fff;font-size:32px;cursor:pointer;">‹</button>
-                <b id="snapzPostReelMusicTitle" style="font-size:19px;">Add audio</b>
+                <button type="button" id="slovzanPostReelMusicBack" style="background:none;border:0;color:#fff;font-size:32px;cursor:pointer;">‹</button>
+                <b id="slovzanPostReelMusicTitle" style="font-size:19px;">Add audio</b>
                 <div style="width:32px;"></div>
             </div>
 
             <div style="padding:14px 18px;">
-                <input id="snapzPostReelMusicSearch" type="search" placeholder="Search music..." autocomplete="off" style="width:100%;box-sizing:border-box;border:0;outline:none;border-radius:12px;background:#1d1d1d;color:#fff;padding:13px 15px;font-size:16px;">
+                <input id="slovzanPostReelMusicSearch" type="search" placeholder="Search music..." autocomplete="off" style="width:100%;box-sizing:border-box;border:0;outline:none;border-radius:12px;background:#1d1d1d;color:#fff;padding:13px 15px;font-size:16px;">
             </div>
 
-            <div id="snapzPostReelMusicList" style="padding:0 18px 80px;">
+            <div id="slovzanPostReelMusicList" style="padding:0 18px 80px;">
                 <div style="text-align:center;color:#777;padding:40px;">Loading music...</div>
             </div>
 
-            <input id="snapzMusicFile" type="file" accept="audio/*" style="display:none;">
+            <input id="slovzanMusicFile" type="file" accept="audio/*" style="display:none;">
 
             <div style="position:fixed;bottom:0;left:0;right:0;background:#050505;padding:12px 18px;border-top:1px solid #242424;z-index:20;">
-                <button type="button" id="snapzUploadMusicButton" onclick="document.getElementById('snapzMusicFile').click()" style="width:100%;border:0;border-radius:12px;background:#fff;color:#000;font-size:15px;font-weight:bold;padding:14px;cursor:pointer;">＋ Upload Music</button>
-                <div id="snapzMusicUploadStatus" style="display:none;margin-top:8px;text-align:center;color:#fff;font-size:12px;"></div>
+                <button type="button" id="slovzanUploadMusicButton" onclick="document.getElementById('slovzanMusicFile').click()" style="width:100%;border:0;border-radius:12px;background:#fff;color:#000;font-size:15px;font-weight:bold;padding:14px;cursor:pointer;">＋ Upload Music</button>
+                <div id="slovzanMusicUploadStatus" style="display:none;margin-top:8px;text-align:center;color:#fff;font-size:12px;"></div>
             </div>
         `;
 
         document.body.appendChild(panel);
 
-        document.getElementById("snapzPostReelMusicBack").addEventListener("click", closeLibrary);
-        document.getElementById("snapzPostReelMusicSearch").addEventListener("input", function () {
+        document.getElementById("slovzanPostReelMusicBack").addEventListener("click", closeLibrary);
+        document.getElementById("slovzanPostReelMusicSearch").addEventListener("input", function () {
             loadMusic(this.value.trim());
         });
     }
 
     function closeLibrary() {
         stopAudio();
-        const panel = document.getElementById("snapzPostReelMusicPanel");
+        const panel = document.getElementById("slovzanPostReelMusicPanel");
         if (panel) panel.style.display = "none";
         document.body.style.overflow = "";
     }
 
     function loadMusic(search = "") {
-        const list = document.getElementById("snapzPostReelMusicList");
+        const list = document.getElementById("slovzanPostReelMusicList");
         if (!list) return;
 
         list.innerHTML = `<div style="text-align:center;color:#777;padding:40px;">Loading music...</div>`;
@@ -140,7 +140,7 @@
     }
 
     function renderMusic() {
-        const list = document.getElementById("snapzPostReelMusicList");
+        const list = document.getElementById("slovzanPostReelMusicList");
         if (!list || !musicList.length) {
             if (list) list.innerHTML = `<div style="text-align:center;color:#777;padding:40px;">No music found</div>`;
             return;
@@ -217,7 +217,7 @@
     function openTrimScreen() {
         createTrimPanel();
 
-        const trimPanel = document.getElementById("snapzTrimScreenPanel");
+        const trimPanel = document.getElementById("slovzanTrimScreenPanel");
         if (trimPanel) {
             trimPanel.style.display = "flex";
             document.body.style.overflow = "hidden";
@@ -228,10 +228,10 @@
     }
 
     function createTrimPanel() {
-        if (document.getElementById("snapzTrimScreenPanel")) return;
+        if (document.getElementById("slovzanTrimScreenPanel")) return;
 
         const panel = document.createElement("div");
-        panel.id = "snapzTrimScreenPanel";
+        panel.id = "slovzanTrimScreenPanel";
         panel.style.cssText = `
             display:none;
             position:fixed;
@@ -249,26 +249,26 @@
         panel.innerHTML = `
             <!-- Top Controls -->
             <div style="position:absolute;top:15px;left:0;right:0;z-index:20;display:flex;justify-content:space-between;align-items:center;padding:0 20px;">
-                <button type="button" id="snapzTrimCancel" style="background:none;border:none;color:#fff;font-size:17px;font-weight:600;cursor:pointer;">Cancel</button>
+                <button type="button" id="slovzanTrimCancel" style="background:none;border:none;color:#fff;font-size:17px;font-weight:600;cursor:pointer;">Cancel</button>
                 <div style="display:flex;gap:12px;">
                     <div style="width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;">✨</div>
                     <div style="width:30px;height:30px;border-radius:50%;background:linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);"></div>
                 </div>
-                <button type="button" id="snapzTrimDone" style="background:none;border:none;color:#fff;font-size:17px;font-weight:700;cursor:pointer;">Done</button>
+                <button type="button" id="slovzanTrimDone" style="background:none;border:none;color:#fff;font-size:17px;font-weight:700;cursor:pointer;">Done</button>
             </div>
 
             <!-- Media Preview Area -->
-            <div id="snapzTrimPreviewContainer" style="flex:1;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#000;">
-                <div id="snapzMediaHolder" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;position:relative;"></div>
+            <div id="slovzanTrimPreviewContainer" style="flex:1;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#000;">
+                <div id="slovzanMediaHolder" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;position:relative;"></div>
 
                 <!-- Music Floating Sticker Badge -->
                 <div style="position:absolute;top:45%;left:50%;transform:translate(-50%, -50%);background:rgba(255,255,255,0.95);color:#000;padding:8px 16px;border-radius:8px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 25px rgba(0,0,0,0.4);max-width:80%;z-index:10;">
                     <div style="width:24px;height:24px;border-radius:4px;background:#222;display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;overflow:hidden;flex-shrink:0;">
-                        <span id="snapzStickerIcon">🎵</span>
+                        <span id="slovzanStickerIcon">🎵</span>
                     </div>
                     <div style="overflow:hidden;white-space:nowrap;">
-                        <div id="snapzStickerTitle" style="font-weight:700;font-size:13px;text-overflow:ellipsis;overflow:hidden;">Song Title</div>
-                        <div id="snapzStickerArtist" style="font-size:11px;color:#666;text-overflow:ellipsis;overflow:hidden;">Artist</div>
+                        <div id="slovzanStickerTitle" style="font-weight:700;font-size:13px;text-overflow:ellipsis;overflow:hidden;">Song Title</div>
+                        <div id="slovzanStickerArtist" style="font-size:11px;color:#666;text-overflow:ellipsis;overflow:hidden;">Artist</div>
                     </div>
                 </div>
             </div>
@@ -277,9 +277,9 @@
             <div style="padding:20px 16px calc(25px + env(safe-area-inset-bottom));background:linear-gradient(to top, rgba(0,0,0,0.95), transparent);">
                 <!-- Duration Badge & Play/Pause Row -->
                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding:0 10px;">
-                    <div id="snapzDurationBadge" style="width:36px;height:36px;border-radius:50%;border:2px solid rgba(255,255,255,0.6);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:rgba(0,0,0,0.4);">30</div>
+                    <div id="slovzanDurationBadge" style="width:36px;height:36px;border-radius:50%;border:2px solid rgba(255,255,255,0.6);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:rgba(0,0,0,0.4);">30</div>
                     
-                    <button type="button" id="snapzPlayPauseBtn" style="width:54px;height:54px;border-radius:50%;background:#fff;border:none;color:#000;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,0.3);">
+                    <button type="button" id="slovzanPlayPauseBtn" style="width:54px;height:54px;border-radius:50%;background:#fff;border:none;color:#000;display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,0.3);">
                         ▶
                     </button>
                     
@@ -287,8 +287,8 @@
                 </div>
 
                 <!-- Waveform Slider Track -->
-                <div id="snapzWaveformTrack" style="position:relative;height:50px;width:100%;overflow:hidden;display:flex;align-items:center;cursor:grab;">
-                    <div id="snapzWaveformBars" style="display:flex;gap:3px;align-items:center;position:absolute;left:0;white-space:nowrap;transition:transform 0.1s ease-out;"></div>
+                <div id="slovzanWaveformTrack" style="position:relative;height:50px;width:100%;overflow:hidden;display:flex;align-items:center;cursor:grab;">
+                    <div id="slovzanWaveformBars" style="display:flex;gap:3px;align-items:center;position:absolute;left:0;white-space:nowrap;transition:transform 0.1s ease-out;"></div>
                     
                     <!-- Fixed Selection Box (Instagram Center Frame) -->
                     <div style="position:absolute;left:50%;top:0;bottom:0;width:140px;transform:translateX(-50%);border:2.5px solid #fff;border-image:linear-gradient(to bottom, #ff007f, #7f00ff) 1;border-radius:8px;pointer-events:none;box-shadow:0 0 15px rgba(255,0,127,0.4);"></div>
@@ -298,9 +298,9 @@
 
         document.body.appendChild(panel);
 
-        document.getElementById("snapzTrimCancel").addEventListener("click", closeTrimScreen);
-        document.getElementById("snapzTrimDone").addEventListener("click", applyTrimSelection);
-        document.getElementById("snapzPlayPauseBtn").addEventListener("click", togglePlayback);
+        document.getElementById("slovzanTrimCancel").addEventListener("click", closeTrimScreen);
+        document.getElementById("slovzanTrimDone").addEventListener("click", applyTrimSelection);
+        document.getElementById("slovzanPlayPauseBtn").addEventListener("click", togglePlayback);
 
         setupScroller();
     }
@@ -310,7 +310,7 @@
     ===================================================== */
 
     function setupMediaPreview() {
-        const holder = document.getElementById("snapzMediaHolder");
+        const holder = document.getElementById("slovzanMediaHolder");
         if (!holder) return;
         holder.innerHTML = "";
 
@@ -346,14 +346,14 @@
                           currentFile.type.startsWith("video");
 
                 console.log(
-                    "SNAPZ TRIM SELECTED PHOTO =",
+                    "SLOVZAN TRIM SELECTED PHOTO =",
                     currentIndex,
                     currentFile.name
                 );
             }
         } catch (e) {
             console.log(
-                "SNAPZ TRIM SELECTED PHOTO LOOKUP ERROR =",
+                "SLOVZAN TRIM SELECTED PHOTO LOOKUP ERROR =",
                 e
             );
         }
@@ -382,13 +382,13 @@
                         );
 
                     console.log(
-                        "SNAPZ STORY TRIM MEDIA =",
+                        "SLOVZAN STORY TRIM MEDIA =",
                         storyFile.name
                     );
                 }
             } catch (e) {
                 console.log(
-                    "SNAPZ STORY TRIM MEDIA ERROR =",
+                    "SLOVZAN STORY TRIM MEDIA ERROR =",
                     e
                 );
             }
@@ -397,7 +397,7 @@
         // 3. Fallback: Check active Video
         if (!mediaSrc) {
             allVideos.forEach(v => {
-                if (v.src && !v.closest("#snapzTrimScreenPanel")) {
+                if (v.src && !v.closest("#slovzanTrimScreenPanel")) {
                     mediaSrc = v.src;
                     isVideo = true;
                 } else {
@@ -405,7 +405,7 @@
                     if (
                         source &&
                         source.src &&
-                        !v.closest("#snapzTrimScreenPanel")
+                        !v.closest("#slovzanTrimScreenPanel")
                     ) {
                         mediaSrc = source.src;
                         isVideo = true;
@@ -419,8 +419,8 @@
             allImages.forEach(img => {
                 if (
                     img.src &&
-                    !img.closest("#snapzTrimScreenPanel") &&
-                    !img.closest("#snapzPostReelMusicPanel") &&
+                    !img.closest("#slovzanTrimScreenPanel") &&
+                    !img.closest("#slovzanPostReelMusicPanel") &&
                     img.offsetWidth > 100
                 ) {
                     mediaSrc = img.src;
@@ -469,14 +469,14 @@
             updateDurationBadge();
         }
 
-        const titleEl = document.getElementById("snapzStickerTitle");
-        const artistEl = document.getElementById("snapzStickerArtist");
+        const titleEl = document.getElementById("slovzanStickerTitle");
+        const artistEl = document.getElementById("slovzanStickerArtist");
         if (titleEl) titleEl.textContent = selectedMusic.title;
         if (artistEl) artistEl.textContent = selectedMusic.artist;
     }
 
     function updateDurationBadge() {
-        const badge = document.getElementById("snapzDurationBadge");
+        const badge = document.getElementById("slovzanDurationBadge");
         if (badge) badge.textContent = selectedDuration;
     }
 
@@ -513,7 +513,7 @@
     }
 
     function generateWaveform() {
-        const container = document.getElementById("snapzWaveformBars");
+        const container = document.getElementById("slovzanWaveformBars");
         if (!container) return;
 
         container.innerHTML = "";
@@ -550,7 +550,7 @@
         }
 
         isPlaying = true;
-        const btn = document.getElementById("snapzPlayPauseBtn");
+        const btn = document.getElementById("slovzanPlayPauseBtn");
         if (btn) btn.textContent = "⏸";
     }
 
@@ -559,7 +559,7 @@
         if (previewMediaElement && previewMediaElement.tagName === "VIDEO") previewMediaElement.pause();
 
         isPlaying = false;
-        const btn = document.getElementById("snapzPlayPauseBtn");
+        const btn = document.getElementById("slovzanPlayPauseBtn");
         if (btn) btn.textContent = "▶";
     }
 
@@ -576,8 +576,8 @@
     ===================================================== */
 
     function setupScroller() {
-        const track = document.getElementById("snapzWaveformTrack");
-        const bars = document.getElementById("snapzWaveformBars");
+        const track = document.getElementById("slovzanWaveformTrack");
+        const bars = document.getElementById("slovzanWaveformBars");
         if (!track || !bars) return;
 
         let isDragging = false;
@@ -633,7 +633,7 @@
             duration: selectedDuration
         };
 
-        window.snapzSelectedAudio = selectedAudioData;
+        window.slovzanSelectedAudio = selectedAudioData;
 
         // Dynamic Text Update for 'Add audio' button
         updateMainAddAudioBtnText(selectedMusic.title);
@@ -652,7 +652,7 @@
 
     function closeTrimScreen() {
         stopAudio();
-        const panel = document.getElementById("snapzTrimScreenPanel");
+        const panel = document.getElementById("slovzanTrimScreenPanel");
         if (panel) panel.style.display = "none";
         document.body.style.overflow = "";
     }
@@ -660,11 +660,11 @@
 })();
 
 /* =====================================================
-   SNAPZ MUSIC UPLOAD WITH PROGRESS TRACKING
+   SLOVZAN MUSIC UPLOAD WITH PROGRESS TRACKING
 ===================================================== */
 
 document.addEventListener('change', function(event) {
-    if (event.target && event.target.id === 'snapzMusicFile') {
+    if (event.target && event.target.id === 'slovzanMusicFile') {
         const file = event.target.files[0];
         if (file) {
             uploadMusicWithProgress(file);
@@ -678,8 +678,8 @@ function uploadMusicWithProgress(file) {
         return;
     }
 
-    const button = document.getElementById('snapzUploadMusicButton');
-    const status = document.getElementById('snapzMusicUploadStatus');
+    const button = document.getElementById('slovzanUploadMusicButton');
+    const status = document.getElementById('slovzanMusicUploadStatus');
 
     if (button) {
         button.disabled = true;
@@ -739,7 +739,7 @@ function uploadMusicWithProgress(file) {
                     }
                 }
 
-                const fileInput = document.getElementById('snapzMusicFile');
+                const fileInput = document.getElementById('slovzanMusicFile');
                 if (fileInput) fileInput.value = '';
 
                 setTimeout(function() {

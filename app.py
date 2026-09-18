@@ -6328,6 +6328,16 @@ def message_privacy():
     conn = sqlite3.connect("snapz.db")
     cur = conn.cursor()
 
+    # Request open karte hi Pending se remove karo.
+    # Reply hone par neeche status='replied' ho jayega.
+    if request.method == "GET":
+        cur.execute("""
+            UPDATE support_messages
+            SET status='viewed'
+            WHERE id=? AND status='open'
+        """, (support_id,))
+        conn.commit()
+
     if request.method == "POST":
 
         value = request.form["privacy"]

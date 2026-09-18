@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Download Slovzan</title>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+html,body{
+    margin:0;
+    min-height:100%;
+    background:#050005;
+    color:white;
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+    display:flex;
+    justify-content:center;
+}
+
+.download-page{
+    width:100%;
+    max-width:700px;
+    min-height:100vh;
+    padding:28px 18px 40px;
+    background:
+        radial-gradient(circle at 50% 15%,rgba(255,61,129,.20),transparent 30%),
+        linear-gradient(180deg,#080008 0%,#020002 100%);
+}
+
+.logo{
+    width:82px;
+    height:82px;
+    display:block;
+    margin:20px auto 18px;
+    border-radius:22px;
+    object-fit:cover;
+}
+
+h1{
+    text-align:center;
+    margin:0;
+    font-size:30px;
+}
+
+.subtitle{
+    text-align:center;
+    color:#aaa;
+    margin:10px 0 30px;
+}
+
+.download-card{
+    background:#151015;
+    border:1px solid #292129;
+    border-radius:18px;
+    padding:18px;
+    margin-bottom:14px;
+}
+
+.download-card h2{
+    margin:0 0 7px;
+    font-size:19px;
+}
+
+.download-card p{
+    margin:0 0 15px;
+    color:#aaa;
+    font-size:14px;
+}
+
+.download-btn{
+    display:block;
+    width:100%;
+    padding:13px;
+    border:0;
+    border-radius:12px;
+    background:#FF4081;
+    color:white;
+    text-align:center;
+    text-decoration:none;
+    font-weight:700;
+}
+
+.download-btn.disabled{
+    background:#302830;
+    color:#888;
+    pointer-events:none;
+}
+
+.web-link{
+    text-align:center;
+    margin-top:25px;
+}
+
+.web-link a{
+    color:#FF4081;
+    text-decoration:none;
+    font-weight:700;
+}
+</style>
+</head>
+
+<body>
+
+<div class="download-page">
+
+<img
+    class="logo"
+    src="{{ url_for('static', filename='images/snapz_logo.png') }}"
+    alt="Slovzan">
+
+<h1>Download Slovzan</h1>
+
+<div class="subtitle">
+Capture the vibe. • Version 1.0.0
+</div>
+
+<div class="download-card">
+    <h2>🤖 Android</h2>
+    <p>Install Slovzan on Android devices.</p>
+    <a class="download-btn disabled" href="#">
+        APK Coming Soon
+    </a>
+</div>
+
+<div class="download-card">
+    <h2>🍎 iPhone & iPad</h2>
+    <p>Install Slovzan from the Apple App Store.</p>
+    <a class="download-btn disabled" href="#">
+        App Store Coming Soon
+    </a>
+</div>
+
+<div class="download-card">
+    <h2>🪟 Windows</h2>
+    <p>Install Slovzan on Windows computers.</p>
+    <a class="download-btn disabled" href="#">
+        Windows App Coming Soon
+    </a>
+</div>
+
+<div class="download-card">
+    <h2>🍎 macOS</h2>
+    <p>Install Slovzan on Mac computers.</p>
+    <a class="download-btn disabled" href="#">
+        macOS App Coming Soon
+    </a>
+</div>
+
+<div class="download-card">
+    <h2>🐧 Linux</h2>
+    <p>Use Slovzan on Linux devices.</p>
+    <a class="download-btn disabled" href="#">
+        Linux App Coming Soon
+    </a>
+</div>
+
+<div class="web-link">
+    <a href="/">Open Slovzan Web →</a>
+</div>
+
+</div>
+
+</body>
+</html>

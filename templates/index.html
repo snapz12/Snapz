@@ -8658,6 +8658,129 @@ if ("serviceWorker" in navigator) {
 }
 </script>
 
+
+<!-- =========================================================
+     SLOVZAN LOGO SPLASH
+     Home-integrated • 3.5 seconds
+========================================================= -->
+
+<style>
+#slovzanLogoSplash{
+    position:fixed;
+    inset:0;
+    z-index:999999999;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    background:
+        radial-gradient(
+            circle at 50% 42%,
+            rgba(255,0,130,.16) 0%,
+            rgba(70,0,80,.10) 30%,
+            #000 72%
+        );
+
+    opacity:1;
+    visibility:visible;
+
+    transition:
+        opacity .55s ease,
+        visibility .55s ease;
+}
+
+#slovzanLogoSplash.slovzanSplashHide{
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+}
+
+.slovzanSplashLogo{
+    width:min(72vw,330px);
+    height:auto;
+
+    display:block;
+
+    object-fit:contain;
+
+    filter:
+        drop-shadow(0 0 18px rgba(255,0,128,.35))
+        drop-shadow(0 0 42px rgba(255,0,128,.18));
+
+    opacity:0;
+    transform:scale(.82);
+
+    animation:
+        slovzanLogoSplashIn
+        .8s
+        cubic-bezier(.2,.8,.2,1)
+        forwards;
+}
+
+@keyframes slovzanLogoSplashIn{
+    0%{
+        opacity:0;
+        transform:scale(.82);
+    }
+
+    65%{
+        opacity:1;
+        transform:scale(1.045);
+    }
+
+    100%{
+        opacity:1;
+        transform:scale(1);
+    }
+}
+
+@media (prefers-reduced-motion:reduce){
+    .slovzanSplashLogo{
+        animation:none;
+        opacity:1;
+        transform:none;
+    }
+
+    #slovzanLogoSplash{
+        transition:none;
+    }
+}
+</style>
+
+<div id="slovzanLogoSplash" aria-hidden="true">
+    <img
+        class="slovzanSplashLogo"
+        src="{{ url_for('static', filename='images/slovzan_logo.png') }}"
+        alt="Slovzan"
+    >
+</div>
+
+<script>
+(function(){
+
+    const splash = document.getElementById("slovzanLogoSplash");
+
+    if(!splash) return;
+
+    /*
+       Logo splash visible for 3.5 seconds,
+       then smoothly fades into Home.
+    */
+    setTimeout(function(){
+
+        splash.classList.add("slovzanSplashHide");
+
+        setTimeout(function(){
+            splash.remove();
+        }, 600);
+
+    }, 3500);
+
+})();
+</script>
+
+
 </body>
 </html>
 

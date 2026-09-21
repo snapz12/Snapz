@@ -336,10 +336,6 @@ def check_user_session():
 def download_center():
     return render_template("download.html")
 
-@app.route("/splash")
-def splash():
-    return render_template("splash.html")
-
 @app.route("/")
 def home():
 
@@ -988,7 +984,7 @@ def login():
             conn.commit()
             conn.close()
 
-            return redirect("/splash")
+            return redirect("/")
         else:
             conn.close()
             return render_template(

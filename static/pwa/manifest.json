@@ -2,7 +2,7 @@
   "name": "Slovzan",
   "short_name": "Slovzan",
   "description": "Capture the vibe.",
-  "start_url": "/splash",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",

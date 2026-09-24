@@ -1,6 +1,6 @@
 {
-  "name": "Slovzan",
-  "short_name": "Slovzan",
+  "name": "SLOVZAN",
+  "short_name": "SLOVZAN",
   "description": "Capture the vibe.",
   "start_url": "/",
   "scope": "/",
@@ -10,10 +10,22 @@
   "theme_color": "#FF3D81",
   "icons": [
     {
-      "src": "/static/images/slovzan_logo.png",
+      "src": "/static/pwa/icons/slovzan-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/pwa/icons/slovzan-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "/static/pwa/icons/slovzan-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
